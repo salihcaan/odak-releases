@@ -382,13 +382,9 @@ h1.hero-h .mute{color:var(--dim);font-weight:600}
     0 6px 18px -6px var(--prod-blue-glow),
     inset 0 1px 0 rgba(255,255,255,.18);
 }
-.palette li.on .title-row,
-.palette li.on .path,
-.palette li.on .title-row .branch{color:#fff !important;border-color:rgba(255,255,255,.3) !important}
+.palette li.on .title-row{color:#fff !important}
 .palette li.on .path{color:rgba(255,255,255,.75) !important}
 .palette li.on .chip{color:rgba(255,255,255,.9) !important;border-color:rgba(255,255,255,.28) !important;background:rgba(255,255,255,.1) !important}
-.palette li.on .chip.diff{color:#fff !important;background:rgba(255,255,255,.18) !important;border-color:rgba(255,255,255,.35) !important}
-.palette li.on .git-dot{background:rgba(255,255,255,.95) !important;box-shadow:0 0 0 2px rgba(255,255,255,.18) !important}
 .palette li.on .ide-stack{background:rgba(255,255,255,.14) !important;border-color:rgba(255,255,255,.18) !important}
 .palette li .lang{
   width:28px;height:28px;border-radius:7px;
@@ -405,19 +401,23 @@ h1.hero-h .mute{color:var(--dim);font-weight:600}
   display:flex;align-items:center;gap:8px;
   font-size:14px;font-weight:500;color:var(--fg);letter-spacing:-.005em;
 }
-.palette li .title-row .git-dot{
-  width:6px;height:6px;border-radius:50%;background:var(--accent);
-  box-shadow:0 0 6px var(--accent-glow);
-  flex-shrink:0;
-}
-.palette li .title-row .branch{
-  font-family:var(--mono);font-size:10.5px;color:var(--mute);letter-spacing:.02em;
-  padding:1px 6px;border:1px solid var(--border);border-radius:4px;
-}
 .palette li .path{
   font-family:var(--mono);font-size:11px;color:var(--mute);
   margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  display:flex;align-items:center;gap:6px;
 }
+.palette li .path .sep{color:var(--faint)}
+.palette li .path .branch{color:var(--dim)}
+.palette li .path .dirty{display:inline-flex;align-items:center;gap:4px;color:var(--dim)}
+.palette li .path .dirty .dot{
+  width:5px;height:5px;border-radius:50%;
+  background:oklch(62% 0.13 75);                        /* real app gitDirty ochre */
+  box-shadow:0 0 4px oklch(62% 0.13 75 / .5);
+}
+.palette li.on .path .sep{color:rgba(255,255,255,.4) !important}
+.palette li.on .path .branch{color:rgba(255,255,255,.75) !important}
+.palette li.on .path .dirty{color:rgba(255,255,255,.9) !important}
+.palette li.on .path .dirty .dot{background:rgba(255,255,255,.95);box-shadow:0 0 4px rgba(255,255,255,.3)}
 .palette li .meta{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .palette li .ide-stack{
   display:flex;align-items:center;gap:4px;padding:3px;
@@ -985,29 +985,32 @@ footer.site-foot{
             <li data-keys="platform-landing platf pl" class="on">
               <div class="lang ts">TS</div>
               <div class="body">
-                <div class="title-row">
-                  <span class="git-dot"></span>
-                  platform-landing
+                <div class="title-row">platform-landing</div>
+                <div class="path">
+                  <span>~/code/work/platform-landing</span>
+                  <span class="sep">·</span>
                   <span class="branch">feat/pricing</span>
+                  <span class="sep">·</span>
+                  <span class="dirty"><span class="dot"></span>7</span>
                 </div>
-                <div class="path">~/code/work/platform-landing</div>
               </div>
               <div class="meta">
                 <div class="ide-stack" title="Open windows">
+                  <div class="ide" title="VS Code"><img src="assets/ide/vscode.png" alt="VS Code"></div>
                   <div class="ide" title="Cursor"><img src="assets/ide/cursor.png" alt="Cursor"></div>
-                  <div class="ide" title="iTerm"><svg><use href="#ide-iterm"/></svg></div>
+                  <div class="ide" title="IntelliJ IDEA"><img src="assets/ide/intellij.png" alt="IntelliJ IDEA"></div>
                 </div>
-                <span class="chip diff">+32 −7</span>
               </div>
             </li>
             <li data-keys="platform-ios platf pl">
               <div class="lang sw">SW</div>
               <div class="body">
-                <div class="title-row">
-                  platform-ios
+                <div class="title-row">platform-ios</div>
+                <div class="path">
+                  <span>~/code/work/platform-ios</span>
+                  <span class="sep">·</span>
                   <span class="branch">main</span>
                 </div>
-                <div class="path">~/code/work/platform-ios</div>
               </div>
               <div class="meta">
                 <div class="ide-stack"><div class="ide"><img src="assets/ide/xcode.png" alt="Xcode"></div></div>
@@ -1016,11 +1019,12 @@ footer.site-foot{
             <li data-keys="platform-api platf pl">
               <div class="lang go">GO</div>
               <div class="body">
-                <div class="title-row">
-                  platform-api
+                <div class="title-row">platform-api</div>
+                <div class="path">
+                  <span>~/code/work/platform-api</span>
+                  <span class="sep">·</span>
                   <span class="branch">main</span>
                 </div>
-                <div class="path">~/code/work/platform-api</div>
               </div>
               <div class="meta">
                 <div class="ide-stack"><div class="ide"><img src="assets/ide/intellij.png" alt="IntelliJ IDEA"></div></div>
@@ -1029,27 +1033,28 @@ footer.site-foot{
             <li data-keys="platform-etl platf pl">
               <div class="lang py">PY</div>
               <div class="body">
-                <div class="title-row">
-                  <span class="git-dot"></span>
-                  platform-etl
+                <div class="title-row">platform-etl</div>
+                <div class="path">
+                  <span>~/code/work/platform-etl</span>
+                  <span class="sep">·</span>
+                  <span class="branch">main</span>
+                  <span class="sep">·</span>
+                  <span class="dirty"><span class="dot"></span>2</span>
                 </div>
-                <div class="path">~/code/work/platform-etl</div>
               </div>
-              <div class="meta">
-                <span class="chip">py3.12</span>
-              </div>
+              <div class="meta"></div>
             </li>
             <li data-keys="platform-legacy platf pl">
               <div class="lang rb">RB</div>
               <div class="body">
-                <div class="title-row">
-                  platform-legacy
+                <div class="title-row">platform-legacy</div>
+                <div class="path">
+                  <span>~/code/archive/platform-legacy</span>
+                  <span class="sep">·</span>
+                  <span class="branch">main</span>
                 </div>
-                <div class="path">~/code/archive/platform-legacy</div>
               </div>
-              <div class="meta">
-                <span class="chip">archived</span>
-              </div>
+              <div class="meta"></div>
             </li>
           </ul>
           <div class="footer">
@@ -1067,10 +1072,10 @@ footer.site-foot{
           <div><div class="lbl">fuzzy match</div>"platf" → platform-*</div>
         </div>
         <div class="float-tag b">
-          <div><div class="lbl">inline git</div>feat/pricing · dirty · +32 −7</div>
+          <div><div class="lbl">inline git</div>feat/pricing · 7 modified</div>
         </div>
         <div class="float-tag c">
-          <div><div class="lbl">already open</div>Cursor · iTerm</div>
+          <div><div class="lbl">already open</div>VS Code · Cursor · IntelliJ</div>
         </div>
       </div>
     </div>
@@ -1115,22 +1120,26 @@ footer.site-foot{
           <li class="on">
             <div class="lang sw">SW</div>
             <div class="body">
-              <div class="title-row">
-                <span class="git-dot"></span>
-                <span><span style="color:var(--accent)">od</span>a<span style="color:var(--accent)">k</span>-mac</span>
+              <div class="title-row"><span><span style="color:var(--accent)">od</span>a<span style="color:var(--accent)">k</span>-mac</span></div>
+              <div class="path">
+                <span>~/code/odak-mac</span>
+                <span class="sep">·</span>
                 <span class="branch">feat/liquid-glass</span>
+                <span class="sep">·</span>
+                <span class="dirty"><span class="dot"></span>4</span>
               </div>
-              <div class="path">~/code/odak-mac</div>
             </div>
             <div class="meta"><div class="ide-stack"><div class="ide"><img src="assets/ide/xcode.png" alt="Xcode"></div></div></div>
           </li>
           <li>
             <div class="lang ts">TS</div>
             <div class="body">
-              <div class="title-row">
-                <span><span style="color:var(--accent)">od</span>a<span style="color:var(--accent)">k</span>-site</span>
+              <div class="title-row"><span><span style="color:var(--accent)">od</span>a<span style="color:var(--accent)">k</span>-site</span></div>
+              <div class="path">
+                <span>~/code/odak-site</span>
+                <span class="sep">·</span>
+                <span class="branch">main</span>
               </div>
-              <div class="path">~/code/odak-site</div>
             </div>
             <div class="meta"><div class="ide-stack"><div class="ide"><img src="assets/ide/cursor.png" alt="Cursor"></div></div></div>
           </li>
@@ -1138,15 +1147,23 @@ footer.site-foot{
             <div class="lang py">PY</div>
             <div class="body">
               <div class="title-row"><span><span style="color:var(--accent)">od</span>a<span style="color:var(--accent)">k</span>-scripts</span></div>
-              <div class="path">~/code/odak-scripts</div>
+              <div class="path">
+                <span>~/code/odak-scripts</span>
+                <span class="sep">·</span>
+                <span class="branch">main</span>
+              </div>
             </div>
-            <div class="meta"><span class="chip">py</span></div>
+            <div class="meta"></div>
           </li>
           <li>
             <div class="lang sw">SW</div>
             <div class="body">
               <div class="title-row">audi<span style="color:var(--accent)">o</span>-<span style="color:var(--accent)">d</span>oc<span style="color:var(--accent)">k</span></div>
-              <div class="path">~/code/side/audio-dock</div>
+              <div class="path">
+                <span>~/code/side/audio-dock</span>
+                <span class="sep">·</span>
+                <span class="branch">main</span>
+              </div>
             </div>
             <div class="meta"></div>
           </li>
