@@ -323,12 +323,12 @@ h1.hero-h .mute{color:var(--dim);font-weight:600}
   position:relative;z-index:1;
   transform-style:preserve-3d;
   will-change:transform;
-  /* Stable outer frame: palette pinned to the top edge via flex so the
-     search bar's Y doesn't move when rows collapse underneath.
-     align-items defaults to stretch (palette fills cross-axis, capped
-     by its own max-width + centered by its own margin:auto). Float-tags
-     remain absolutely positioned relative to this frame. */
-  min-height:380px;
+  /* Must exceed the palette's natural full-5-row height (~396px). If the
+     palette is ever taller than stage-inner, the hero-grid centering math
+     shifts stage-inner the moment the palette shrinks through this floor,
+     which would tug the (absolutely-positioned) search bar down on the
+     very first keystroke. 440 leaves headroom for metrics variance. */
+  min-height:440px;
   display:flex;
   flex-direction:column;
   justify-content:flex-start;
