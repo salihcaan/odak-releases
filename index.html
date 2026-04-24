@@ -199,6 +199,11 @@ button{font-family:inherit}
 
 @media (max-width:760px){
   .nav-links{display:none}
+  .hero-grid{grid-template-columns:1fr;gap:32px;padding-top:40px}
+  .hero{padding:48px var(--gutter) 32px}
+  .palette li .title-row{font-size:13px}
+  .palette li .path{font-size:10px}
+  .palette li .ide-stack .ide{width:22px;height:22px;padding:2px}
 }
 
 /* ==========================================================
@@ -495,6 +500,8 @@ h1.hero-h .mute{color:var(--dim);font-weight:600}
 .palette li .title-row{
   display:flex;align-items:center;gap:8px;
   font-size:14px;font-weight:500;color:var(--fg);letter-spacing:-.005em;
+  overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+  max-width:100%;
 }
 .palette li .path{
   font-family:var(--mono);font-size:11px;color:var(--mute);
