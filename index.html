@@ -1035,8 +1035,8 @@ footer.site-foot{
 }
 
 @media (max-width:960px){
-  .hero-grid{grid-template-columns:1fr;gap:40px}
-  .f-split,.f-split.rev{grid-template-columns:1fr;gap:40px}
+  .hero-grid{grid-template-columns:minmax(0, 1fr);gap:40px}
+  .f-split,.f-split.rev{grid-template-columns:minmax(0, 1fr);gap:40px}
   .f-split.rev .f-copy,.f-split.rev .f-stage{order:initial}
   .f-copy{position:static}
   .pos-diagram{grid-template-columns:1fr}
@@ -1047,10 +1047,16 @@ footer.site-foot{
 
 @media (max-width:760px){
   .nav-links{display:none}
-  .hero-grid{grid-template-columns:1fr;gap:32px;padding-top:40px}
+  /* minmax(0, 1fr) prevents intrinsic content (e.g. nowrap hero-bar) from
+     pushing the column wider than the viewport. min-width:0 on the children
+     is the same fix at the flex/grid-item level. */
+  .hero-grid{grid-template-columns:minmax(0, 1fr);gap:32px;padding-top:40px}
+  .hero-text,.hero-stage{min-width:0}
   .hero{padding:48px var(--gutter) 32px}
   .hero-stage{width:100%;max-width:100%;overflow:hidden}
   .hero-stage .stage-inner{padding:0;box-sizing:border-box;min-height:380px}
+  /* Let hero-bar wrap on mobile — keeps it from forcing column width */
+  a.hero-bar{white-space:normal;flex-wrap:wrap}
   .palette{width:100%;max-width:100%;margin:70px auto 0}
   .palette .search-bar{left:0;right:0}
   .palette li .title-row{font-size:13px}
