@@ -1049,191 +1049,33 @@ footer.site-foot{
 
 .macbook{
   position:relative;width:100%;
-  transform-style:preserve-3d;
-  transform:rotateX(6deg);
-  transform-origin:center bottom;
 }
-
-/* Lid: Space Black aluminum bezel + display.
-   Mirrors M4/M5 14" MBP — slim ~3.5mm bezels, very dark uniform body,
-   subtle squared corners. Real device hasn't changed since 2021. */
-.macbook .lid{
-  position:relative;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.03), transparent 30%),
-    linear-gradient(180deg,#1c1c1e 0%, #141415 100%);
-  border:1px solid #2a2a2c;
-  border-radius:18px 18px 3px 3px;
-  padding:9px 8px 8px;                      /* tight 3.5mm-style bezels */
-  box-shadow:
-    0 80px 140px -40px rgba(0,0,0,.72),
-    0 40px 80px -20px rgba(0,0,0,.45),
-    inset 0 1px 0 rgba(255,255,255,.05),
-    inset 0 0 0 1px rgba(255,255,255,.02);
+/* Photoreal MacBook Air 13" Midnight frame (Apache 2.0, mockuphone.com).
+   Image aspect 2160x1408 ≈ 1.534. Screen rectangle within the PNG:
+   left 10.25%, right 10.28%, top 10.38%, bottom 10.43%. */
+.macbook .frame{
+  display:block;width:100%;height:auto;
+  user-select:none;-webkit-user-drag:none;
+  filter:drop-shadow(0 60px 70px rgba(0,0,0,.45));
 }
-[data-theme="light"] .macbook .lid{
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.4), transparent 30%),
-    linear-gradient(180deg,#d4cfc6 0%, #b2ada3 100%);
-  border-color:#9a9488;
-  box-shadow:
-    0 80px 140px -40px rgba(26,20,16,.32),
-    0 40px 80px -20px rgba(26,20,16,.18),
-    inset 0 1px 0 rgba(255,255,255,.55);
+[data-theme="light"] .macbook .frame{
+  filter:drop-shadow(0 60px 70px rgba(26,20,16,.28));
 }
-/* Subtle screen-edge bezel ring — gives the display a recessed feel */
-.macbook .lid::before{
-  content:'';position:absolute;inset:7px 6px 6px;
-  border-radius:9px;
-  box-shadow:inset 0 0 0 .5px rgba(0,0,0,.6);
-  pointer-events:none;z-index:1;
-}
-
+/* Screen interior — the palette/menubar sit absolutely within these bounds */
 .macbook .screen{
-  aspect-ratio:16 / 10;
-  border-radius:7px;overflow:hidden;position:relative;
+  position:absolute;
+  top:10.38%;left:10.25%;right:10.28%;bottom:10.43%;
+  overflow:hidden;
   background:
     radial-gradient(ellipse 70% 50% at 25% 18%, oklch(72% 0.18 60 / .5), transparent 60%),
     radial-gradient(ellipse 60% 40% at 80% 85%, oklch(45% 0.22 30 / .42), transparent 70%),
     linear-gradient(155deg,#1d1410 0%, #2a1c14 50%, #14100a 100%);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);
 }
-/* Faint screen reflection — diagonal highlight, like glass under room light */
+/* Faint screen reflection — diagonal highlight */
 .macbook .screen::before{
   content:'';position:absolute;inset:0;z-index:7;pointer-events:none;
-  background:linear-gradient(115deg, transparent 0%, transparent 35%, rgba(255,255,255,.04) 50%, transparent 65%);
+  background:linear-gradient(115deg, transparent 0%, transparent 35%, rgba(255,255,255,.05) 50%, transparent 65%);
   mix-blend-mode:screen;
-}
-.macbook .notch{
-  position:absolute;top:0;left:50%;transform:translateX(-50%);
-  width:22%;max-width:170px;height:22px;
-  background:#000;border-radius:0 0 11px 11px;z-index:8;
-}
-/* Tiny camera dot inside the notch */
-.macbook .notch::after{
-  content:'';position:absolute;left:50%;top:50%;
-  transform:translate(-50%,-50%);
-  width:5px;height:5px;border-radius:50%;
-  background:radial-gradient(circle at 30% 30%, #444 0%, #0a0a0a 70%);
-  box-shadow:inset 0 0 1px rgba(255,255,255,.15);
-}
-
-/* Hinge: thin recessed band spanning nearly the full lid width.
-   Real MBP hinge is dark, narrow, and almost flush with the lid edges. */
-.macbook .hinge{
-  height:7px;
-  margin:0 1.5%;
-  background:linear-gradient(180deg, #050506 0%, #1a1a1c 50%, #050506 100%);
-  box-shadow:
-    inset 0 1px 2px rgba(0,0,0,.7),
-    inset 0 -1px 1px rgba(255,255,255,.04);
-  position:relative;
-}
-[data-theme="light"] .macbook .hinge{
-  background:linear-gradient(180deg,#7a7468 0%, #a8a299 50%, #6e685c 100%);
-  box-shadow:
-    inset 0 1px 2px rgba(0,0,0,.25),
-    inset 0 -1px 1px rgba(255,255,255,.3);
-}
-
-/* Deck: aluminum unibody — keyboard + trackpad sit here.
-   Slightly wider than the lid to suggest the bottom-half housing. */
-.macbook .deck{
-  position:relative;
-  margin:0 -0.5%;
-  padding:3.2% 11% 1.6%;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.04), transparent 18%),
-    linear-gradient(180deg,#1c1c1e 0%, #141415 60%, #0e0e10 100%);
-  border:1px solid #2a2a2c;
-  border-top:0;
-  border-radius:3px 3px 22px 22px;
-  box-shadow:
-    0 60px 110px -30px rgba(0,0,0,.6),
-    inset 0 1px 0 rgba(255,255,255,.05);
-}
-[data-theme="light"] .macbook .deck{
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.5), transparent 20%),
-    linear-gradient(180deg,#cfc9bf 0%, #b2ada3 60%, #969084 100%);
-  border-color:#9a9488;
-  box-shadow:
-    0 60px 110px -30px rgba(26,20,16,.28),
-    inset 0 1px 0 rgba(255,255,255,.55);
-}
-/* Curved scoop on the front edge — the classic MBP fingertip cutout */
-.macbook .deck::after{
-  content:'';position:absolute;
-  left:38%;right:38%;bottom:-1px;height:9px;
-  background:radial-gradient(ellipse 100% 100% at 50% 0%, rgba(0,0,0,.55), transparent 70%);
-  border-radius:0 0 50% 50%;
-  pointer-events:none;
-}
-
-/* Keyboard: 4 rows of keys, generated by JS into .keyboard. */
-.macbook .keyboard{
-  display:grid;
-  grid-template-rows:repeat(4, 1fr);
-  gap:.45%;
-  width:100%;
-  aspect-ratio:14 / 2.4;
-  background:#08080a;
-  border-radius:3px;
-  padding:.7%;
-  box-shadow:
-    inset 0 1px 2px rgba(0,0,0,.85),
-    inset 0 -1px 0 rgba(255,255,255,.03);
-}
-.macbook .kb-row{
-  display:grid;
-  grid-template-columns:repeat(14, 1fr);
-  gap:.5%;
-}
-.macbook .kb-row.space{
-  grid-template-columns:1fr 1fr 1fr 6fr 1fr 1fr 1fr 1fr;
-}
-.macbook .kb-key{
-  background:linear-gradient(180deg, #2c2c2e 0%, #1a1a1c 100%);
-  border-radius:1.5px;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.05),
-    inset 0 -1px 0 rgba(0,0,0,.6),
-    0 .5px 0 rgba(0,0,0,.4);
-}
-[data-theme="light"] .macbook .keyboard{
-  background:#3a352d;
-  box-shadow:inset 0 1px 2px rgba(0,0,0,.5);
-}
-[data-theme="light"] .macbook .kb-key{
-  background:linear-gradient(180deg, #1f1c18 0%, #0e0c0a 100%);
-}
-
-/* Trackpad — centered glassy rectangle below the keyboard */
-.macbook .trackpad{
-  margin:1.6% auto 0;
-  width:32%;
-  aspect-ratio:9 / 2.6;
-  background:linear-gradient(180deg, #16161a 0%, #0c0c10 100%);
-  border:1px solid #2a2a2c;
-  border-radius:5px;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.04),
-    inset 0 0 14px rgba(0,0,0,.55);
-}
-[data-theme="light"] .macbook .trackpad{
-  background:linear-gradient(180deg, #b8b3a8 0%, #9a9488 100%);
-  border-color:#807a6e;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.4),
-    inset 0 0 12px rgba(0,0,0,.12);
-}
-
-/* Desk shadow — pushed lower since the deck adds height */
-.macbook::after{
-  content:'';position:absolute;
-  bottom:-50px;left:8%;right:8%;height:90px;
-  background:radial-gradient(ellipse at 50% 0%, rgba(0,0,0,.55), transparent 70%);
-  filter:blur(28px);z-index:-1;
 }
 
 /* Desktop chrome inside the screen */
@@ -1385,16 +1227,6 @@ footer.site-foot{
 @media (max-width:760px){
   .mb-section{padding-top:48px}
   .mb-section .section-head{margin-bottom:36px}
-  .mb-stage{perspective:1600px}
-  .macbook{transform:rotateX(4deg)}
-  .macbook .lid{padding:6px 5px 5px;border-radius:12px 12px 2px 2px}
-  .macbook .lid::before{inset:5px 4px 4px;border-radius:7px}
-  .macbook .notch{width:24%;height:14px;border-radius:0 0 8px 8px}
-  .macbook .notch::after{width:3px;height:3px}
-  .macbook .hinge{height:5px;margin:0 1.5%}
-  .macbook .deck{padding:3% 9% 1.4%;border-radius:2px 2px 14px 14px}
-  .macbook .keyboard{aspect-ratio:14 / 2.6;padding:.6%;border-radius:2px}
-  .macbook .trackpad{width:36%;border-radius:3px;margin-top:1.3%}
   .mb-menubar{font-size:9px;padding:0 10px 0 46px;height:18px;gap:8px}
   .mb-keys{gap:8px}
   .mb-keys .fk{font-size:13px;padding:8px 12px;min-width:36px;border-radius:9px}
@@ -1666,9 +1498,8 @@ footer.site-foot{
   <div class="mb-stage reveal">
     <div class="glow"></div>
     <div class="macbook">
-      <div class="lid">
-        <div class="screen">
-          <div class="notch"></div>
+      <img class="frame" src="assets/devices/macbook-air-13-midnight.png" alt="" aria-hidden="true" width="2160" height="1408">
+      <div class="screen">
           <div class="mb-desk">
             <div class="mb-menubar">
               <span class="app">Cursor</span>
@@ -1765,12 +1596,6 @@ footer.site-foot{
             </div>
           </div>
         </div>
-      </div>
-      <div class="hinge"></div>
-      <div class="deck">
-        <div class="keyboard" id="mb-keyboard" aria-hidden="true"></div>
-        <div class="trackpad" aria-hidden="true"></div>
-      </div>
     </div>
   </div>
 </section>
@@ -2467,28 +2292,6 @@ footer.site-foot{
   }, { threshold: 0.15 });
   io.observe(palette);
   start();
-})();
-
-// ===== MacBook keyboard: build rows of keys =====
-(function(){
-  const kb = document.getElementById('mb-keyboard');
-  if(!kb) return;
-  const rows = [
-    {cols:14},
-    {cols:14},
-    {cols:14},
-    {cols:8, cls:'space'},
-  ];
-  rows.forEach(r => {
-    const row = document.createElement('div');
-    row.className = 'kb-row' + (r.cls ? ' ' + r.cls : '');
-    for(let i = 0; i < r.cols; i++){
-      const k = document.createElement('span');
-      k.className = 'kb-key';
-      row.appendChild(k);
-    }
-    kb.appendChild(row);
-  });
 })();
 
 // ===== MacBook stage: keys → palette → search loop =====
