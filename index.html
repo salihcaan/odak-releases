@@ -197,23 +197,7 @@ button{font-family:inherit}
 }
 .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 24px -4px color-mix(in oklch, var(--fg) 40%, transparent)}
 
-@media (max-width:760px){
-  .nav-links{display:none}
-  .hero-grid{grid-template-columns:1fr;gap:32px;padding-top:40px}
-  .hero{padding:48px var(--gutter) 32px;overflow:clip}
-  .hero-stage{width:100%;max-width:100%}
-  .hero-stage .stage-inner{padding:0;box-sizing:border-box;min-height:380px}
-  .palette{width:100%;max-width:100%;margin:70px auto 0}
-  .palette .search-bar{left:0;right:0}
-  .palette li .title-row{font-size:13px}
-  .palette li .path{font-size:10px}
-  .palette li .ide-stack .ide{width:20px;height:20px;padding:2px}
-  .palette li .ide-stack{gap:3px}
-  .palette li .meta{flex-shrink:1;min-width:0;overflow:hidden}
-  .palette li{gap:6px;padding:10px 10px}
-  #hero-list li:nth-child(n+4){display:none}
-  .chosen-window{width:100% !important}
-}
+
 
 /* ==========================================================
    HERO
@@ -1059,6 +1043,24 @@ footer.site-foot{
   .pricing{grid-template-columns:1fr}
   .foot-grid{grid-template-columns:1fr 1fr;gap:28px}
   .odak-demo{grid-template-columns:1fr}
+}
+
+@media (max-width:760px){
+  .nav-links{display:none}
+  .hero-grid{grid-template-columns:1fr;gap:32px;padding-top:40px}
+  .hero{padding:48px var(--gutter) 32px;overflow:clip}
+  .hero-stage{width:100%;max-width:100%}
+  .hero-stage .stage-inner{padding:0;box-sizing:border-box;min-height:380px}
+  .palette{width:100%;max-width:100%;margin:70px auto 0}
+  .palette .search-bar{left:0;right:0}
+  .palette li .title-row{font-size:13px}
+  .palette li .path{font-size:10px}
+  .palette li .ide-stack .ide{width:20px;height:20px;padding:2px}
+  .palette li .ide-stack{gap:3px}
+  .palette li .meta{flex-shrink:1;min-width:0;overflow:hidden}
+  .palette li{gap:6px;padding:10px 10px}
+  #hero-list li:nth-child(n+4){display:none}
+  .chosen-window{width:100% !important}
 }
 </style>
 </head>
