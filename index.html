@@ -1446,8 +1446,8 @@ footer.site-foot{
   font-family:-apple-system, system-ui, var(--sans);
   font-weight:500;
   /* Reserve room so the title text doesn't run under the corner badge.
-     Badge is 32×32 with -9px overhang → ~23px intrudes into the window. */
-  padding-right:26px;
+     Badge is 48×48 with -14px overhang → ~34px intrudes into the window. */
+  padding-right:38px;
 }
 .mb-window .traffic{display:flex;gap:3px;flex-shrink:0;align-items:center}
 .mb-window .traffic span{width:5px;height:5px;border-radius:50%}
@@ -1458,35 +1458,50 @@ footer.site-foot{
    identifier for which app a window is. */
 .mb-window .ico{display:none}
 /* Top-right IDE sticker — the only IDE identifier on the window.
-   Overhangs the corner; sized large so the logo reads at chaos
-   scale, then rides the window's transform: scale() into focus
-   so we don't double the icon at hand-off. PNG sources are 512px,
-   so they stay crisp even after the 3.4× grow into focus. */
+   Overhangs the corner; the icon art is shown bare (no container
+   bezel) since each PNG/SVG already carries its own app-icon shape.
+   Rides the window's transform: scale() into focus so we don't
+   double the icon at hand-off. PNG sources are 512px, so they
+   stay crisp even after the 3.4× grow into focus. */
 .mb-window .app-badge{
   position:absolute;
-  top:-9px;right:-9px;
-  width:32px;height:32px;
-  border-radius:8px;
-  overflow:hidden;
-  display:grid;place-items:center;
-  background:rgba(0,0,0,.45);
-  box-shadow:
-    0 6px 14px rgba(0,0,0,.6),
-    inset 0 0 0 1px rgba(255,255,255,.22);
+  top:-14px;right:-14px;
+  width:48px;height:48px;
+  display:block;
   z-index:2;
-  transition:box-shadow .3s var(--ease-out);
+  pointer-events:none;
+  /* Solid black mat behind the icon so the bounding-box corners read
+     as macOS-dark instead of the brown desktop bleeding through (which
+     looks "white"-ish next to the dark window). Radius matches the
+     iOS app-icon ratio (~22%) so it aligns with the icon's own rounded
+     shape — no visible frame, just clean dark blending. No border, no
+     shadow: this is a flat mat, not a glassy bezel. */
+  background:#000;
+  border-radius:11px;
+  overflow:hidden;
 }
 .mb-window .app-badge img,
 .mb-window .app-badge svg{
-  width:84%;height:84%;object-fit:contain;display:block;
+  width:100%;height:100%;object-fit:contain;display:block;
 }
-/* The badge rides the focused window's scale() into focus — the
-   focused window already carries an accent ring and glow, so the
-   badge just brightens its own inset edge for a touch more presence. */
+/* Focused state shows the icon hero-sized — kill the chaos-state mat so
+   it doesn't read as a black frame around the icon. The icon's own
+   squircle edge sits cleanly on the focused window's accent ring. */
 .mb-window.focused .app-badge{
-  box-shadow:
-    0 8px 20px rgba(0,0,0,.6),
-    inset 0 0 0 1.25px rgba(255,255,255,.32);
+  background:transparent;
+  border-radius:0;
+  overflow:visible;
+}
+/* The focused window has an outer accent-glow that bleeds through the
+   icon's transparent bounding-box corners (the area outside the squircle
+   shape) and reads as a glassy sheen around the icon. A tight, hard
+   drop-shadow on the icon's alpha shape blocks that glow at the icon's
+   immediate edge. Blur is intentionally small (~1px) so when scaled 3.4×
+   into focus it stays a sharp dark seam, not a soft halo that would
+   itself look glassy. */
+.mb-window.focused .app-badge img,
+.mb-window.focused .app-badge svg{
+  filter:drop-shadow(0 0 1px #000) drop-shadow(0 0 1px #000);
 }
 .mb-window .title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .mb-window .body{
@@ -1759,13 +1774,12 @@ footer.site-foot{
   /* Hide menu items past Edit on phones — no room. Keep app name + 1-2 menus. */
   .mb-menubar .left .item:nth-of-type(n+3){display:none}
   /* Chaos windows on phones are ~50px wide — pull the corner badge in
-     proportionally so it stays a sticker, not a beach ball. The badge
-     still rides the window's grow transform into focus, so this size
-     scales 3.4× to ~75px on a focused phone window. */
+     proportionally so it stays a sticker, not a beach ball. Radius
+     scales with size to keep the same iOS-icon ratio. */
   .mb-window .app-badge{
-    width:22px;height:22px;
-    border-radius:5.5px;
-    top:-6px;right:-6px;
+    width:28px;height:28px;
+    top:-8px;right:-8px;
+    border-radius:6px;
   }
   /* Palette must fit inside the on-screen rect of the MacBook PNG.
      Available height on a phone is ~170px — drop the kbd footer and
@@ -3146,15 +3160,13 @@ footer.site-foot{
   }
 
   async function loop(){
-    // First-time chaos reveal — fades in via the .shown class on .mb-windows
-    // (per-window stagger via --d on each window).
-    wins.classList.add('shown');
-    // Wait for the last window's stagger (max --d ≈ 800ms) plus its own
-    // duration (~500ms), so the chaos is fully painted before we cut in.
-    await wait(1500);
-
     while(true){
-      // Reset palette content — search bar stays put, list snaps to full.
+      // Beat 0 — reset to a clean slate so each cycle plays the chaos
+      // reveal from the beginning instead of staying mounted between
+      // cycles. Tear down .shown on the windows (per-window stagger via
+      // --d replays on the next add), clear palette state, drop focus.
+      wins.classList.remove('shown', 'dimmed');
+      wrap.classList.remove('shown', 'receded');
       typed.textContent = '';
       ghost.textContent = '';
       openHnt.textContent = '';
@@ -3163,6 +3175,16 @@ footer.site-foot{
       items.forEach(li => li.classList.remove('on'));
       if(items[0]) items[0].classList.add('on');
       clearFocus();
+      // Brief beat so the previous cycle's fade-out reads cleanly before
+      // the new chaos staggers back in.
+      await wait(400);
+
+      // Chaos reveal — fades in via the .shown class on .mb-windows
+      // (per-window stagger via --d on each window). Wait for the last
+      // window's stagger (max --d ≈ 800ms) plus its duration (~500ms)
+      // so the chaos is fully painted before we cut in.
+      wins.classList.add('shown');
+      await wait(1500);
 
       // Beat 1 — let the chaos breathe.
       await wait(900);
@@ -3194,8 +3216,8 @@ footer.site-foot{
       wrap.classList.add('receded');
       await wait(1700);
 
-      // Beat 6 — fade palette out, brighten windows, drop focus, hold the
-      // chaos briefly so the loop reads as a real cycle (not a re-mount).
+      // Beat 6 — fade palette and chaos out together, then loop back to
+      // the top where the chaos reveal replays from the beginning.
       wrap.classList.remove('shown', 'receded');
       wins.classList.remove('dimmed');
       clearFocus();
