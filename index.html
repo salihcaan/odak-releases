@@ -687,6 +687,127 @@ h2.section-h .mute{color:var(--dim)}
 }
 
 /* ==========================================================
+   FEATURE CAROUSEL — tabs at top, panels swap underneath,
+   auto-advances to walk users through the three features
+   without forcing them to scroll. Tabs hidden on mobile;
+   panels fall back to a normal stacked layout (see media
+   query below).
+   ========================================================== */
+.f-carousel{position:relative}
+.f-carousel .feature-pills{display:none}
+
+.f-tabs{
+  display:flex;
+  border-bottom:1px solid var(--border);
+  margin-bottom:56px;
+  gap:0;
+  position:relative;
+}
+.f-tab{
+  flex:1;
+  background:none;border:0;border-radius:0;
+  padding:18px 22px 20px;
+  cursor:pointer;
+  position:relative;
+  color:var(--mute);
+  font:inherit;
+  font-size:16px;font-weight:500;
+  letter-spacing:-.005em;
+  text-align:center;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:color .25s var(--ease-smooth);
+  font-family:var(--display);
+}
+.f-tab .kbd-hint{
+  display:inline-flex;gap:3px;
+  font-family:var(--mono);font-size:11px;color:var(--mute);
+  letter-spacing:.02em;font-weight:500;
+  padding:3px 7px;
+  border:1px solid var(--border);border-radius:5px;
+  background:var(--surface);
+  transition:color .25s var(--ease-smooth),
+             border-color .25s var(--ease-smooth),
+             background .25s var(--ease-smooth);
+}
+.f-tab:hover{color:var(--fg-2)}
+.f-tab:hover .kbd-hint{color:var(--fg-2);border-color:var(--border-2)}
+.f-tab.active{color:var(--fg)}
+.f-tab.active .kbd-hint{
+  color:var(--accent);
+  border-color:color-mix(in oklch, var(--accent) 36%, var(--border-2));
+  background:color-mix(in oklch, var(--accent) 8%, var(--surface));
+}
+.f-tab:focus-visible{outline:2px solid var(--accent);outline-offset:-4px;border-radius:6px}
+
+/* Progress fill under the active tab. JS sets --f-advance on the
+   carousel; the bar animation runs once per cycle and pauses on hover. */
+.f-tab .bar{
+  position:absolute;left:0;bottom:-1px;
+  height:2px;width:100%;
+  background:var(--accent);
+  transform:scaleX(0);transform-origin:left center;
+  border-radius:2px 2px 0 0;
+  box-shadow:0 0 10px var(--accent-glow);
+  pointer-events:none;
+}
+/* Bar only fills while the carousel is actively cycling — JS sets
+   .running once the carousel is in view and not paused. Without this
+   gate, the first tab's bar would empty out before the user scrolls
+   to it, leaving no progress signal on first sight. */
+.f-carousel.running .f-tab.active .bar{
+  animation:f-bar-fill var(--f-advance, 7000ms) linear forwards;
+}
+.f-carousel.running:hover .f-tab.active .bar,
+.f-carousel.running:focus-within .f-tab.active .bar{
+  animation-play-state:paused;
+}
+@keyframes f-bar-fill{
+  from{transform:scaleX(0)}
+  to{transform:scaleX(1)}
+}
+
+/* Panels stack via CSS grid so they share the same cell — the
+   container takes the height of the tallest panel and avoids the
+   layout jump that would come from animating heights. */
+.f-panels{
+  display:grid;
+  grid-template-areas:"stack";
+}
+.f-panel{
+  grid-area:stack;
+  opacity:0;
+  pointer-events:none;
+  z-index:1;
+  transform:translateY(8px);
+  transition:opacity .55s var(--ease-smooth),
+             transform .55s var(--ease-smooth);
+}
+.f-panel.active{
+  opacity:1;
+  pointer-events:auto;
+  z-index:2;
+  transform:none;
+}
+/* Sticky copy is meaningful when scrolling past a tall demo, but
+   inside a tab carousel the panel is fixed in view — drop sticky
+   so the copy doesn't fight the panel transition. */
+.f-carousel .f-copy{position:static;padding-top:0;padding-bottom:0}
+
+@media (max-width:960px){
+  /* Mobile: collapse the carousel into a stacked feature list — tabs
+     get cramped and the auto-advance distracts from a scrolling read. */
+  .f-tabs{display:none}
+  .f-panels{display:flex;flex-direction:column;gap:80px}
+  .f-panel{
+    grid-area:auto;
+    opacity:1;pointer-events:auto;transform:none;
+    transition:none;
+  }
+  .f-carousel .feature-pills{display:flex}
+  .f-carousel .f-copy{position:static}
+}
+
+/* ==========================================================
    ⌥Tab DEMO — vertical window list stacked, MRU
    ========================================================== */
 .tab-demo{
@@ -1313,77 +1434,48 @@ footer.site-foot{
   white-space:nowrap;overflow:hidden;
   font-family:-apple-system, system-ui, var(--sans);
   font-weight:500;
-  /* Reserve room so the title text doesn't run under the corner badge. */
-  padding-right:18px;
+  /* Reserve room so the title text doesn't run under the corner badge.
+     Badge is 32×32 with -9px overhang → ~23px intrudes into the window. */
+  padding-right:26px;
 }
 .mb-window .traffic{display:flex;gap:3px;flex-shrink:0;align-items:center}
 .mb-window .traffic span{width:5px;height:5px;border-radius:50%}
 .mb-window .traffic .r{background:#ff5f57}
 .mb-window .traffic .y{background:#febc2e}
 .mb-window .traffic .g{background:#28c840}
-.mb-window .ico{
-  width:11px;height:11px;border-radius:2.5px;overflow:hidden;
-  display:grid;place-items:center;flex-shrink:0;
-  margin-left:2px;
-}
-.mb-window .ico img,.mb-window .ico svg{width:100%;height:100%;object-fit:contain;display:block}
-/* Top-right IDE badge — clearer "what app is this" cue than the tiny
-   titlebar icon at chaos-window scale. Gets a halo on .focused. */
+/* Titlebar IDE icon is removed — the corner sticker is the single
+   identifier for which app a window is. */
+.mb-window .ico{display:none}
+/* Top-right IDE sticker — the only IDE identifier on the window.
+   Overhangs the corner; sized large so the logo reads at chaos
+   scale, then rides the window's transform: scale() into focus
+   so we don't double the icon at hand-off. PNG sources are 512px,
+   so they stay crisp even after the 3.4× grow into focus. */
 .mb-window .app-badge{
   position:absolute;
-  top:5px;right:6px;
-  width:14px;height:14px;
-  border-radius:3.5px;
+  top:-9px;right:-9px;
+  width:32px;height:32px;
+  border-radius:8px;
   overflow:hidden;
   display:grid;place-items:center;
-  background:rgba(0,0,0,.35);
+  background:rgba(0,0,0,.45);
   box-shadow:
-    0 1px 3px rgba(0,0,0,.5),
-    inset 0 0 0 .5px rgba(255,255,255,.18);
+    0 6px 14px rgba(0,0,0,.6),
+    inset 0 0 0 1px rgba(255,255,255,.22);
   z-index:2;
-  transition:transform .35s var(--ease-snappy), box-shadow .3s var(--ease-out);
+  transition:box-shadow .3s var(--ease-out);
 }
 .mb-window .app-badge img,
 .mb-window .app-badge svg{
-  width:100%;height:100%;object-fit:contain;display:block;
+  width:84%;height:84%;object-fit:contain;display:block;
 }
-/* On focus, the small corner badge hands off to .mb-focused-badge — a
-   sibling overlay rendered at native size, so the IDE icon stays crisp
-   when the window grows 3.4× into focus. */
-.mb-window.focused .app-badge{opacity:0}
-/* Floating IDE badge — sibling of .mb-window so the parent's scale
-   transform doesn't upscale a small bitmap. JS positions it on the
-   focused window's top-right corner and sizes it relative to the
-   grown window, then sets the icon via innerHTML clone. */
-.mb-focused-badge{
-  position:absolute;top:0;left:0;
-  pointer-events:none;
-  opacity:0;
-  z-index:60;
-  /* No-delay transition is the "out" path — when .shown drops, the badge
-     leaves instantly with the window. The "in" path overrides with a
-     delay below, so the badge appears once the window has mostly grown. */
-  transition:opacity .3s var(--ease-out), transform .3s var(--ease-snappy);
-  transform:scale(.7);
-  display:grid;place-items:center;
-  background:rgba(0,0,0,.42);
-  backdrop-filter:blur(8px) saturate(160%);
-  -webkit-backdrop-filter:blur(8px) saturate(160%);
+/* The badge rides the focused window's scale() into focus — the
+   focused window already carries an accent ring and glow, so the
+   badge just brightens its own inset edge for a touch more presence. */
+.mb-window.focused .app-badge{
   box-shadow:
-    0 18px 40px rgba(0,0,0,.6),
-    inset 0 0 0 1.5px rgba(255,255,255,.22),
-    0 0 56px var(--accent-glow);
-}
-.mb-focused-badge.shown{
-  opacity:1;
-  transform:scale(1);
-  /* Delay matches the window's grow transition (.72s) — badge appears
-     once the window has mostly arrived, like a brand reveal on settle. */
-  transition:opacity .35s var(--ease-out) .45s, transform .55s var(--ease-snappy) .35s;
-}
-.mb-focused-badge img,
-.mb-focused-badge svg{
-  width:78%;height:78%;object-fit:contain;display:block;
+    0 8px 20px rgba(0,0,0,.6),
+    inset 0 0 0 1.25px rgba(255,255,255,.32);
 }
 .mb-window .title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .mb-window .body{
@@ -1655,12 +1747,15 @@ footer.site-foot{
   .mb-menubar .ico.cc svg{height:11px}
   /* Hide menu items past Edit on phones — no room. Keep app name + 1-2 menus. */
   .mb-menubar .left .item:nth-of-type(n+3){display:none}
-  /* Drop the duplicate titlebar icon on mobile — at chaos-window scale on
-     a phone, both the titlebar icon and the corner app-badge show the
-     same IDE png within a few mm of each other. The corner badge is the
-     stronger identifier (gets the focus halo), so keep it and hide the
-     titlebar copy. */
-  .mb-window .titlebar .ico{display:none}
+  /* Chaos windows on phones are ~50px wide — pull the corner badge in
+     proportionally so it stays a sticker, not a beach ball. The badge
+     still rides the window's grow transform into focus, so this size
+     scales 3.4× to ~75px on a focused phone window. */
+  .mb-window .app-badge{
+    width:22px;height:22px;
+    border-radius:5.5px;
+    top:-6px;right:-6px;
+  }
   /* Palette must fit inside the on-screen rect of the MacBook PNG.
      Available height on a phone is ~170px — drop the kbd footer and
      the 4th project so search-bar + 3 items fit cleanly. */
@@ -2079,11 +2174,6 @@ footer.site-foot{
                 <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/intellij.png" alt=""></span><span class="title">plexo-cli · main.go</span></div>
                 <div class="body"><div class="ln" style="--lw:72%"></div><div class="ln" style="--lw:48%"></div><div class="ln" style="--lw:60%"></div><div class="ln b" style="--lw:35%"></div></div>
               </div>
-              <!-- Floating IDE badge — sibling of the windows so it isn't
-                   subject to the focused window's CSS transform: scale(),
-                   which would upscale the small bitmap into a blurry mess.
-                   JS sets size, position, and icon when a window grows. -->
-              <div class="mb-focused-badge" id="mb-focused-badge" aria-hidden="true"></div>
             </div>
 
             <!-- Palette materializes after the chaos beat -->
@@ -2168,11 +2258,35 @@ footer.site-foot{
 </section>
 
 <!-- ==========================================================
-     FEATURE 1 — ⌥Space: project search
+     FEATURE CAROUSEL — three features cycle in one frame so the
+     reader gets the full story without scrolling past three blocks.
+     Tabs auto-advance; pause on hover/focus.
      ========================================================== -->
 <section class="block" id="features">
-  <div class="f-split">
-    <div class="f-copy reveal">
+  <div class="f-carousel" data-advance-ms="7000">
+    <div class="f-tabs" role="tablist" aria-label="Features">
+      <button class="f-tab active" type="button" role="tab" aria-selected="true" aria-controls="f-panel-search" id="f-tab-search" data-idx="0">
+        <span>Find any repo</span>
+        <span class="kbd-hint">⌥ Space</span>
+        <span class="bar"></span>
+      </button>
+      <button class="f-tab" type="button" role="tab" aria-selected="false" aria-controls="f-panel-switch" id="f-tab-switch" data-idx="1" tabindex="-1">
+        <span>Switch windows</span>
+        <span class="kbd-hint">⌥ Tab</span>
+        <span class="bar"></span>
+      </button>
+      <button class="f-tab" type="button" role="tab" aria-selected="false" aria-controls="f-panel-actions" id="f-tab-actions" data-idx="2" tabindex="-1">
+        <span>Per-project actions</span>
+        <span class="kbd-hint">⌘ K</span>
+        <span class="bar"></span>
+      </button>
+    </div>
+
+    <div class="f-panels">
+      <!-- ===== PANEL 1 — ⌥Space: project search ===== -->
+      <div class="f-panel active" id="f-panel-search" role="tabpanel" aria-labelledby="f-tab-search" data-idx="0">
+        <div class="f-split">
+          <div class="f-copy reveal">
       <div class="feature-pills">
         <div class="fp primary"><kbd>⌥ Space</kbd><span>Search</span></div>
         <div class="fp"><kbd>⌥ Tab</kbd><span>Switch</span></div>
@@ -2264,13 +2378,37 @@ footer.site-foot{
       </div>
     </div>
   </div>
-</section>
+      </div>
 
-<!-- ==========================================================
-     FEATURE 2 — ⌥Tab: window switcher
-     ========================================================== -->
-<section class="block">
-  <div class="f-split rev">
+      <!-- ===== PANEL 2 — ⌥Tab: window switcher ===== -->
+      <div class="f-panel" id="f-panel-switch" role="tabpanel" aria-labelledby="f-tab-switch" data-idx="1" aria-hidden="true">
+        <div class="f-split">
+          <div class="f-copy reveal">
+      <div class="feature-pills">
+        <div class="fp"><kbd>⌥ Space</kbd><span>Search</span></div>
+        <div class="fp primary"><kbd>⌥ Tab</kbd><span>Switch</span></div>
+        <div class="fp"><kbd>⌘ K</kbd><span>Actions</span></div>
+      </div>
+      <h3>Every editor window. <span class="accent">One list.</span></h3>
+      <p class="lead">
+        Cmd+Tab groups by app — useless when ten Cursor windows share one icon. Odak shows every window as a labelled row, grouped by project, most-recent first.
+      </p>
+      <ul class="bullets">
+        <li>
+          <div class="ico"><svg viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="1"/><path d="M5 7h6"/></svg></div>
+          <div class="txt"><b>One list, not six</b><span>Cursor, VS Code, Xcode, IntelliJ, GoLand, RubyMine, Zed, Sublime, terminals, and Chrome tabs tied to a localhost preview — all in one place.</span></div>
+        </li>
+        <li>
+          <div class="ico"><svg viewBox="0 0 16 16"><path d="M3 8l3-3 3 3-3 3z"/><path d="M9 4l3 3-3 3"/></svg></div>
+          <div class="txt"><b>Most recent, first</b><span>The window you just left sits at the top — the keystroke you reach for is always the right one.</span></div>
+        </li>
+        <li>
+          <div class="ico"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="2"/><path d="M3 8a5 5 0 0 1 10 0M5 11a4 4 0 0 0 6 0"/></svg></div>
+          <div class="txt"><b>Event-driven, not polled</b><span>Wired into the macOS Accessibility API. No CPU spin, no lag — opens instantly.</span></div>
+        </li>
+      </ul>
+    </div>
+
     <div class="f-stage reveal">
       <div class="tab-demo">
         <div class="tab-chrome">
@@ -2331,41 +2469,13 @@ footer.site-foot{
         </ul>
       </div>
     </div>
-
-    <div class="f-copy reveal">
-      <div class="feature-pills">
-        <div class="fp"><kbd>⌥ Space</kbd><span>Search</span></div>
-        <div class="fp primary"><kbd>⌥ Tab</kbd><span>Switch</span></div>
-        <div class="fp"><kbd>⌘ K</kbd><span>Actions</span></div>
-      </div>
-      <h3>Every editor window. <span class="accent">One list.</span></h3>
-      <p class="lead">
-        Cmd+Tab groups by app — useless when ten Cursor windows share one icon. Odak shows every window as a labelled row, grouped by project, most-recent first.
-      </p>
-      <ul class="bullets">
-        <li>
-          <div class="ico"><svg viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="1"/><path d="M5 7h6"/></svg></div>
-          <div class="txt"><b>One list, not six</b><span>Cursor, VS Code, Xcode, IntelliJ, GoLand, RubyMine, Zed, Sublime, terminals, and Chrome tabs tied to a localhost preview — all in one place.</span></div>
-        </li>
-        <li>
-          <div class="ico"><svg viewBox="0 0 16 16"><path d="M3 8l3-3 3 3-3 3z"/><path d="M9 4l3 3-3 3"/></svg></div>
-          <div class="txt"><b>Most recent, first</b><span>The window you just left sits at the top — the keystroke you reach for is always the right one.</span></div>
-        </li>
-        <li>
-          <div class="ico"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="2"/><path d="M3 8a5 5 0 0 1 10 0M5 11a4 4 0 0 0 6 0"/></svg></div>
-          <div class="txt"><b>Event-driven, not polled</b><span>Wired into the macOS Accessibility API. No CPU spin, no lag — opens instantly.</span></div>
-        </li>
-      </ul>
-    </div>
   </div>
-</section>
+      </div>
 
-<!-- ==========================================================
-     FEATURE 3 — .odak file: per-project actions
-     ========================================================== -->
-<section class="block">
-  <div class="f-split">
-    <div class="f-copy reveal">
+      <!-- ===== PANEL 3 — .odak file: per-project actions ===== -->
+      <div class="f-panel" id="f-panel-actions" role="tabpanel" aria-labelledby="f-tab-actions" data-idx="2" aria-hidden="true">
+        <div class="f-split">
+          <div class="f-copy reveal">
       <div class="feature-pills">
         <div class="fp"><kbd>⌥ Space</kbd><span>Search</span></div>
         <div class="fp"><kbd>⌥ Tab</kbd><span>Switch</span></div>
@@ -2451,6 +2561,9 @@ footer.site-foot{
       </div>
     </div>
   </div>
+      </div><!-- /.f-panel#f-panel-actions -->
+    </div><!-- /.f-panels -->
+  </div><!-- /.f-carousel -->
 </section>
 
 <!-- ==========================================================
@@ -2975,7 +3088,6 @@ footer.site-foot{
   // the screen: scaled to ~72% of the screen height and translated so its
   // center lands on the screen center, regardless of its starting position.
   const winEls = Array.from(wins.querySelectorAll('.mb-window'));
-  const focusedBadge = document.getElementById('mb-focused-badge');
   function focusWindow(key){
     if(!key) return;
     const target = winEls.find(w => w.dataset.project === key);
@@ -2992,29 +3104,6 @@ footer.site-foot{
     target.style.setProperty('--cy', `${dy.toFixed(1)}px`);
     target.style.setProperty('--focus-scale', scale.toFixed(2));
     target.classList.add('focused');
-
-    // Floating IDE badge — sibling of the focused window, so it renders
-    // at native pixel size instead of being upscaled by the window's
-    // scale transform. Sized as ~26% of the focused window's grown
-    // height; positioned at the top-right corner with a 28% overhang
-    // to match the .chosen-window app-mark pattern.
-    if(focusedBadge){
-      const sourceBadge = target.querySelector('.app-badge');
-      if(sourceBadge){
-        focusedBadge.innerHTML = sourceBadge.innerHTML;
-        const scaledW = tRect.width * scale;
-        const scaledH = tRect.height * scale;
-        const cornerX = (winsRect.width / 2) + scaledW / 2;
-        const cornerY = (winsRect.height / 2) - scaledH / 2;
-        const badgeSize = scaledH * 0.26;
-        focusedBadge.style.width  = `${badgeSize.toFixed(1)}px`;
-        focusedBadge.style.height = `${badgeSize.toFixed(1)}px`;
-        focusedBadge.style.left   = `${(cornerX - badgeSize * 0.72).toFixed(1)}px`;
-        focusedBadge.style.top    = `${(cornerY - badgeSize * 0.28).toFixed(1)}px`;
-        focusedBadge.style.borderRadius = `${(badgeSize * 0.24).toFixed(1)}px`;
-        focusedBadge.classList.add('shown');
-      }
-    }
   }
   function clearFocus(){
     winEls.forEach(w => {
@@ -3023,7 +3112,6 @@ footer.site-foot{
       w.style.removeProperty('--cy');
       w.style.removeProperty('--focus-scale');
     });
-    if(focusedBadge) focusedBadge.classList.remove('shown');
   }
   function topVisibleKey(){
     const visible = items.filter(li => li.getAttribute('data-filtered') === '0');
@@ -3220,6 +3308,123 @@ footer.site-foot{
     entries.forEach(e => { if(e.isIntersecting){ play(); io.unobserve(file); } });
   }, { threshold: 0.3 });
   io.observe(file);
+})();
+
+/* ============================================================
+   FEATURE CAROUSEL — auto-advancing tabs over the three feature
+   panels. Pauses on hover/focus, resumes on leave; only runs when
+   the carousel is in view; disabled on mobile (CSS hides the tabs)
+   and when prefers-reduced-motion is set.
+   ============================================================ */
+(function(){
+  const carousel = document.querySelector('.f-carousel');
+  if(!carousel) return;
+  const tabs = Array.from(carousel.querySelectorAll('.f-tab'));
+  const panels = Array.from(carousel.querySelectorAll('.f-panel'));
+  if(tabs.length === 0 || tabs.length !== panels.length) return;
+
+  const ADVANCE_MS = parseInt(carousel.dataset.advanceMs, 10) || 7000;
+  carousel.style.setProperty('--f-advance', `${ADVANCE_MS}ms`);
+
+  const reducedMotion = window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Mobile breakpoint matches the CSS — under 960px the carousel
+  // collapses into a stacked feature list, so we don't auto-advance.
+  const mqMobile = window.matchMedia('(max-width:960px)');
+
+  let currentIdx = 0;
+  let timer = null;
+  let inView = false;
+  let userPaused = false;
+
+  function activate(idx){
+    currentIdx = idx;
+    tabs.forEach((t, i) => {
+      const active = i === idx;
+      t.classList.toggle('active', active);
+      t.setAttribute('aria-selected', String(active));
+      t.tabIndex = active ? 0 : -1;
+    });
+    panels.forEach((p, i) => {
+      const active = i === idx;
+      p.classList.toggle('active', active);
+      p.setAttribute('aria-hidden', active ? 'false' : 'true');
+    });
+    // Restart the bar fill cleanly so it always starts at 0% — CSS
+    // animations don't always replay just from a class swap when the
+    // same property values are reapplied.
+    const bar = tabs[idx] && tabs[idx].querySelector('.bar');
+    if(bar){
+      bar.style.animation = 'none';
+      // Force reflow so the next assignment is treated as a new animation.
+      void bar.offsetWidth;
+      bar.style.animation = '';
+    }
+  }
+  function next(){ activate((currentIdx + 1) % tabs.length); }
+
+  function clearTimer(){
+    if(timer){ clearInterval(timer); timer = null; }
+  }
+  // Sync timer + .running class with the latest state. Hover/focus
+  // only pauses the timer (CSS pauses the bar fill via :hover); going
+  // off-screen or hitting mobile/reduced-motion drops .running entirely.
+  function sync(){
+    if(reducedMotion || mqMobile.matches || !inView){
+      clearTimer();
+      carousel.classList.remove('running');
+      return;
+    }
+    carousel.classList.add('running');
+    if(userPaused){
+      clearTimer();
+    } else if(!timer){
+      timer = setInterval(next, ADVANCE_MS);
+    }
+  }
+  // Restart the timer fresh — used when the user manually picks a
+  // tab, so the next auto-advance is a full ADVANCE_MS away rather
+  // than firing immediately because the previous interval was nearly up.
+  function restart(){
+    clearTimer();
+    sync();
+  }
+
+  tabs.forEach((tab, i) => {
+    tab.addEventListener('click', () => {
+      activate(i);
+      restart();
+    });
+    tab.addEventListener('keydown', (e) => {
+      // Arrow-key navigation between tabs, per WAI-ARIA tablist pattern.
+      if(e.key === 'ArrowRight' || e.key === 'ArrowLeft'){
+        e.preventDefault();
+        const dir = e.key === 'ArrowRight' ? 1 : -1;
+        const nextIdx = (i + dir + tabs.length) % tabs.length;
+        tabs[nextIdx].focus();
+        activate(nextIdx);
+        restart();
+      }
+    });
+  });
+
+  carousel.addEventListener('mouseenter', () => { userPaused = true; sync(); });
+  carousel.addEventListener('mouseleave', () => { userPaused = false; sync(); });
+  carousel.addEventListener('focusin',    () => { userPaused = true; sync(); });
+  carousel.addEventListener('focusout',   () => { userPaused = false; sync(); });
+
+  if(mqMobile.addEventListener){
+    mqMobile.addEventListener('change', sync);
+  }
+
+  if('IntersectionObserver' in window){
+    new IntersectionObserver((entries) => {
+      entries.forEach(e => { inView = e.isIntersecting; sync(); });
+    }, { threshold: 0.3 }).observe(carousel);
+  } else {
+    inView = true;
+    sync();
+  }
 })();
 </script>
 </body>
