@@ -729,6 +729,8 @@ h2.section-h .mute{color:var(--dim)}
              border-color .25s var(--ease-smooth),
              background .25s var(--ease-smooth);
 }
+/* Compact label is mobile-only; default desktop hides it. */
+.f-tab .lbl-short{display:none}
 .f-tab:hover{color:var(--fg-2)}
 .f-tab:hover .kbd-hint{color:var(--fg-2);border-color:var(--border-2)}
 .f-tab.active{color:var(--fg)}
@@ -794,17 +796,26 @@ h2.section-h .mute{color:var(--dim)}
 .f-carousel .f-copy{position:static;padding-top:0;padding-bottom:0}
 
 @media (max-width:960px){
-  /* Mobile: collapse the carousel into a stacked feature list — tabs
-     get cramped and the auto-advance distracts from a scrolling read. */
-  .f-tabs{display:none}
-  .f-panels{display:flex;flex-direction:column;gap:80px}
-  .f-panel{
-    grid-area:auto;
-    opacity:1;pointer-events:auto;transform:none;
-    transition:none;
+  /* Mobile: keep the carousel — three stacked feature blocks would be
+     too much scrolling — but compact the tab strip so all three labels
+     fit a phone width. Swap full → short labels, drop the kbd hint,
+     trim padding. The grid-area:stack panel layout from the desktop
+     rules carries through unchanged. */
+  .f-tabs{margin-bottom:36px}
+  .f-tab{
+    padding:11px 6px 13px;
+    gap:0;
+    font-size:13.5px;
+    letter-spacing:-.01em;
   }
-  .f-carousel .feature-pills{display:flex}
-  .f-carousel .f-copy{position:static}
+  .f-tab .lbl-full{display:none}
+  .f-tab .lbl-short{display:inline}
+  .f-tab .kbd-hint{display:none}
+}
+@media (max-width:380px){
+  /* Very narrow phones — pull padding in another notch so labels
+     don't truncate. */
+  .f-tab{padding:10px 4px 12px;font-size:13px}
 }
 
 /* ==========================================================
@@ -2266,17 +2277,20 @@ footer.site-foot{
   <div class="f-carousel" data-advance-ms="7000">
     <div class="f-tabs" role="tablist" aria-label="Features">
       <button class="f-tab active" type="button" role="tab" aria-selected="true" aria-controls="f-panel-search" id="f-tab-search" data-idx="0">
-        <span>Find any repo</span>
+        <span class="lbl-full">Find any repo</span>
+        <span class="lbl-short">Search</span>
         <span class="kbd-hint">⌥ Space</span>
         <span class="bar"></span>
       </button>
       <button class="f-tab" type="button" role="tab" aria-selected="false" aria-controls="f-panel-switch" id="f-tab-switch" data-idx="1" tabindex="-1">
-        <span>Switch windows</span>
+        <span class="lbl-full">Switch windows</span>
+        <span class="lbl-short">Switch</span>
         <span class="kbd-hint">⌥ Tab</span>
         <span class="bar"></span>
       </button>
       <button class="f-tab" type="button" role="tab" aria-selected="false" aria-controls="f-panel-actions" id="f-tab-actions" data-idx="2" tabindex="-1">
-        <span>Per-project actions</span>
+        <span class="lbl-full">Per-project actions</span>
+        <span class="lbl-short">Actions</span>
         <span class="kbd-hint">⌘ K</span>
         <span class="bar"></span>
       </button>
@@ -3328,9 +3342,6 @@ footer.site-foot{
 
   const reducedMotion = window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // Mobile breakpoint matches the CSS — under 960px the carousel
-  // collapses into a stacked feature list, so we don't auto-advance.
-  const mqMobile = window.matchMedia('(max-width:960px)');
 
   let currentIdx = 0;
   let timer = null;
@@ -3368,9 +3379,9 @@ footer.site-foot{
   }
   // Sync timer + .running class with the latest state. Hover/focus
   // only pauses the timer (CSS pauses the bar fill via :hover); going
-  // off-screen or hitting mobile/reduced-motion drops .running entirely.
+  // off-screen or hitting reduced-motion drops .running entirely.
   function sync(){
-    if(reducedMotion || mqMobile.matches || !inView){
+    if(reducedMotion || !inView){
       clearTimer();
       carousel.classList.remove('running');
       return;
@@ -3412,10 +3423,6 @@ footer.site-foot{
   carousel.addEventListener('mouseleave', () => { userPaused = false; sync(); });
   carousel.addEventListener('focusin',    () => { userPaused = true; sync(); });
   carousel.addEventListener('focusout',   () => { userPaused = false; sync(); });
-
-  if(mqMobile.addEventListener){
-    mqMobile.addEventListener('change', sync);
-  }
 
   if('IntersectionObserver' in window){
     new IntersectionObserver((entries) => {
