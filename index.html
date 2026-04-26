@@ -1587,6 +1587,191 @@ section.mb-section{padding-top:24px}
 .mb-palette-wrap .palette .footer kbd{font-size:8.5px;padding:1px 4px}
 
 /* ==========================================================
+   ACTIONS PANEL — second floating layer that sits in the bottom-
+   right of the search panel for the ⌘K beat. Anchored from the
+   bottom (just above the footer) and right edge with small px
+   paddings, growing upward from there. Sizes to its content
+   (action rows + filter), so there is no empty space below the
+   filter row inside the panel.
+   ========================================================== */
+.mb-actions-panel{
+  position:absolute;
+  bottom:32px;
+  right:10px;
+  width:54%;
+  transform:translate(0, 8px) scale(.94);
+  transform-origin: bottom right;
+  z-index:8;opacity:0;pointer-events:none;
+  background:rgba(20,15,12,.94);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:12px;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.03),
+    0 28px 60px -12px rgba(0,0,0,.7),
+    inset 0 1px 0 rgba(255,255,255,.05);
+  backdrop-filter:blur(20px) saturate(160%);
+  -webkit-backdrop-filter:blur(20px) saturate(160%);
+  transition:opacity .32s var(--ease-out), transform .42s var(--ease-snappy);
+  contain:layout style paint;
+  overflow:hidden;
+}
+.mb-actions-panel.shown{
+  opacity:1;
+  transform:translate(0, 0) scale(1);
+  pointer-events:auto;
+}
+[data-theme="light"] .mb-actions-panel{
+  background:rgba(255,255,255,.96);
+  border-color:var(--border-2);
+}
+.mb-actions{
+  list-style:none;padding:6px;margin:0;display:flex;flex-direction:column;gap:1px;
+}
+.mb-actions li{
+  display:flex;align-items:center;gap:10px;
+  padding:7px 9px;border-radius:8px;
+  cursor:pointer;position:relative;
+  height:30px;
+}
+.mb-actions li.on{
+  background:linear-gradient(180deg,
+    color-mix(in oklch, var(--prod-blue) 95%, white 6%),
+    color-mix(in oklch, var(--prod-blue) 92%, black 4%));
+  color:#fff;
+}
+.mb-actions .action-ico{
+  width:18px;height:18px;flex-shrink:0;
+  border-radius:5px;
+  display:grid;place-items:center;
+  color:var(--fg);
+  font:600 10.5px var(--mono);
+  background:color-mix(in oklch, var(--fg) 6%, transparent);
+}
+.mb-actions .action-ico svg{display:block}
+.mb-actions .action-ico.ide-ico{background:transparent;padding:0;overflow:hidden}
+.mb-actions .action-ico.ide-ico img{width:100%;height:100%;display:block;object-fit:contain}
+.mb-actions li.on .action-ico:not(.ide-ico){background:rgba(255,255,255,.18);color:#fff}
+.mb-actions .action-name{
+  flex:1;min-width:0;
+  font-size:12px;font-weight:500;color:var(--fg);
+  letter-spacing:-.005em;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.mb-actions li.on .action-name{color:#fff;font-weight:600}
+.mb-actions kbd.action-key{
+  font-family:var(--mono);font-size:9.5px;font-weight:500;
+  padding:2px 5px;border-radius:4px;min-width:18px;text-align:center;
+  background:color-mix(in oklch, var(--bg-2) 90%, transparent);
+  border:1px solid var(--border);color:var(--fg);
+  white-space:nowrap;
+}
+.mb-actions li.on kbd.action-key{
+  background:rgba(255,255,255,.18);
+  border-color:rgba(255,255,255,.24);
+  color:#fff;
+}
+.mb-actions-filter{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 12px;
+  border-top:1px solid var(--border);
+  font-family:var(--mono);font-size:11px;color:var(--mute);
+}
+.mb-actions-filter svg.q{
+  width:11px;height:11px;stroke:var(--mute);fill:none;stroke-width:1.6;flex-shrink:0;
+}
+
+/* The search panel stays unchanged when actions open — the actions
+   panel just pops up anchored bottom-right. Matches the live Odak app
+   where the search list is fully visible behind the popover. */
+
+/* ==========================================================
+   CAPTION TRACK — short label that swaps per beat. Pinned to the
+   bottom-center of the macbook screen, fades in/out.
+   ========================================================== */
+.mb-caption{
+  position:absolute;left:50%;bottom:5%;
+  transform:translate(-50%, 8px);
+  z-index:6;
+  padding:6px 13px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.005em;
+  color:var(--fg);
+  background:rgba(0,0,0,.55);
+  border:1px solid color-mix(in oklch, var(--fg) 12%, transparent);
+  border-radius:999px;
+  backdrop-filter:blur(18px) saturate(160%);
+  -webkit-backdrop-filter:blur(18px) saturate(160%);
+  box-shadow:0 6px 20px -8px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06);
+  white-space:nowrap;
+  opacity:0;pointer-events:none;
+  transition:opacity .35s var(--ease-out), transform .35s var(--ease-out);
+}
+.mb-caption.shown{opacity:1;transform:translate(-50%, 0)}
+.mb-caption kbd{
+  font-family:var(--mono);font-size:10px;color:var(--fg);
+  padding:1px 5px;background:color-mix(in oklch, var(--fg) 10%, transparent);
+  border:1px solid color-mix(in oklch, var(--fg) 14%, transparent);
+  border-radius:4px;margin:0 2px;
+}
+[data-theme="light"] .mb-caption{
+  background:rgba(255,255,255,.85);color:var(--fg);border-color:var(--border-2);
+}
+
+/* ==========================================================
+   BROWSER MOCK — mini Chrome window that pops in for the
+   "Open on GitHub" beat. Traffic lights + URL bar with the
+   GitHub mark and the repo URL.
+   ========================================================== */
+.mb-browser{
+  position:absolute;
+  top:14%;left:50%;
+  width:54%;
+  transform:translate(-50%, 12px) scale(.92);
+  z-index:7;opacity:0;pointer-events:none;
+  background:linear-gradient(180deg, #1c1714 0%, #14100d 100%);
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:9px;overflow:hidden;
+  box-shadow:0 24px 60px -12px rgba(0,0,0,.6),
+             0 0 0 1px rgba(255,255,255,.04),
+             inset 0 1px 0 rgba(255,255,255,.05);
+  transition:opacity .35s var(--ease-out), transform .45s var(--ease-snappy);
+  contain:layout style paint;
+}
+.mb-browser.shown{opacity:1;transform:translate(-50%, 0) scale(1);pointer-events:auto}
+.mb-browser .browser-bar{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 12px;
+  background:rgba(0,0,0,.4);
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.mb-browser .traffic{display:inline-flex;gap:5px;flex-shrink:0}
+.mb-browser .traffic span{width:9px;height:9px;border-radius:50%}
+.mb-browser .traffic .r{background:#ff5f57}
+.mb-browser .traffic .y{background:#febc2e}
+.mb-browser .traffic .g{background:#28c840}
+.mb-browser .urlbar{
+  flex:1;display:flex;align-items:center;gap:7px;
+  padding:5px 11px;border-radius:6px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.06);
+  font-family:var(--mono);font-size:11px;color:var(--fg-2);
+  letter-spacing:-.005em;
+  overflow:hidden;
+}
+.mb-browser .favicon{
+  display:inline-flex;align-items:center;justify-content:center;
+  color:#fff;flex-shrink:0;
+}
+.mb-browser .url{
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.mb-browser .browser-body{
+  height:120px;
+  background:
+    radial-gradient(ellipse 60% 40% at 30% 25%, color-mix(in oklch, var(--accent) 18%, transparent), transparent 60%),
+    linear-gradient(180deg, #181311 0%, #100c0a 100%);
+}
+
+/* ==========================================================
    FEATURE MACBOOKS — each feature demo lives inside a Mac so
    the user sees the UI in real-product context. The macbook
    frame and screen rect are reused; per-feature wrappers size
@@ -1795,7 +1980,14 @@ section.mb-section{padding-top:24px}
   .mb-palette-wrap .palette li .ide-stack .ide{width:13px;height:13px;padding:1px;border-radius:3px}
   .mb-palette-wrap .palette li .ide-stack{gap:2px}
   .mb-palette-wrap .palette ul li:nth-child(n+4){display:none}
+  /* Hero palette runs the actions beat — show up to 5 rows so the
+     ⌘K popover lands over a populated list, not a single row. */
+  #mb-palette-wrap.mb-palette-wrap .palette ul li:nth-child(n+4){display:flex}
+  #mb-palette-wrap.mb-palette-wrap .palette ul li:nth-child(n+6){display:none}
   .mb-palette-wrap .palette .footer{display:none}
+  /* Re-anchor actions popover for the smaller mobile palette. Footer
+     is hidden on mobile, so bottom can sit close to the palette edge. */
+  .mb-actions-panel{bottom:6px;right:6px;width:60%}
 }
 @media (max-width:420px){
   .mb-palette-wrap{width:90%;transform:translateX(-50%) scale(.88);transform-origin:top center}
@@ -2071,7 +2263,8 @@ section.mb-section{padding-top:24px}
                   </div>
                   <div class="top-ide tinted" id="mb-topide"><img src="assets/ide/cursor.png" alt="Cursor"></div>
                 </div>
-                <ul id="mb-list">
+                <!-- Project list (default view; hidden when actions menu is shown) -->
+                <ul id="mb-list" class="mb-projects">
                   <li data-keys="web-app" class="on">
                     <div class="lang ts">TS</div>
                     <div class="body">
@@ -2086,6 +2279,7 @@ section.mb-section{padding-top:24px}
                       <div class="ide-stack">
                         <div class="ide" data-ide="cursor"><img src="assets/ide/cursor.png" alt="Cursor"></div>
                         <div class="ide" data-ide="vscode"><img src="assets/ide/vscode.png" alt="VS Code"></div>
+                        <div class="ide" data-ide="intellij"><img src="assets/ide/intellij.png" alt="IntelliJ"></div>
                       </div>
                     </div>
                   </li>
@@ -2129,12 +2323,102 @@ section.mb-section{padding-top:24px}
                     </div>
                     <div class="meta"></div>
                   </li>
+                  <li data-keys="platform-ios">
+                    <div class="lang sw">SW</div>
+                    <div class="body">
+                      <div class="title-row">platform-ios</div>
+                      <div class="path">
+                        <span>~/code/work/platform-ios</span>
+                        <span class="sep">·</span>
+                        <span class="branch">main</span>
+                      </div>
+                    </div>
+                    <div class="meta">
+                      <div class="ide-stack"><div class="ide"><img src="assets/ide/xcode.png" alt="Xcode"></div></div>
+                    </div>
+                  </li>
+                  <li data-keys="etl-pipeline">
+                    <div class="lang py">PY</div>
+                    <div class="body">
+                      <div class="title-row">etl-pipeline</div>
+                      <div class="path">
+                        <span>~/code/work/etl-pipeline</span>
+                        <span class="sep">·</span>
+                        <span class="branch">main</span>
+                      </div>
+                    </div>
+                    <div class="meta">
+                      <div class="ide-stack"><div class="ide"><img src="assets/ide/vscode.png" alt="VS Code"></div></div>
+                    </div>
+                  </li>
                 </ul>
+
                 <div class="footer">
                   <div class="row"><kbd>⌥K</kbd><kbd>⌥J</kbd> Navigate</div>
                   <div class="row"><kbd>⌘K</kbd> Actions</div>
                 </div>
               </div>
+
+              <!-- Actions panel — pops up bottom-right of the search panel
+                   for the ⌘K beat. Mirrors the real Odak ActionsPanelView
+                   anchor (a contextual popover over the selected row's
+                   right edge), with action rows + "Search for actions…"
+                   filter at the bottom. -->
+              <div class="mb-actions-panel" id="mb-actions-panel" aria-hidden="true">
+              <ul class="mb-actions" id="mb-actions-list">
+                <li class="on" data-action="github">
+                  <div class="action-ico" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="13" height="13"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.111.82-.261.82-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.91 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.218.694.825.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12"/></svg>
+                  </div>
+                  <span class="action-name">Open on GitHub</span>
+                  <kbd class="action-key">⌘G</kbd>
+                </li>
+                <li>
+                  <div class="action-ico ide-ico"><img src="assets/ide/cursor.png" alt=""></div>
+                  <span class="action-name">Open in Cursor</span>
+                  <kbd class="action-key">↵</kbd>
+                </li>
+                <li>
+                  <div class="action-ico ide-ico"><img src="assets/ide/intellij.png" alt=""></div>
+                  <span class="action-name">Open in IntelliJ</span>
+                  <kbd class="action-key">⇧↵</kbd>
+                </li>
+                <li>
+                  <div class="action-ico" aria-hidden="true">&gt;_</div>
+                  <span class="action-name">Open in Terminal</span>
+                  <kbd class="action-key">⌘↵</kbd>
+                </li>
+                <li>
+                  <div class="action-ico" aria-hidden="true">⎘</div>
+                  <span class="action-name">Copy Path</span>
+                  <kbd class="action-key">⌘C</kbd>
+                </li>
+              </ul>
+              <div class="mb-actions-filter">
+                <svg class="q" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg>
+                <span>Search for actions…</span>
+              </div>
+            </div><!-- /.mb-actions-panel -->
+          </div><!-- /#mb-palette-wrap -->
+
+            <!-- Caption track: short labels swap per beat to narrate the
+                 chaos→search→Tab→⌘K→GitHub arc. Empty between beats. -->
+            <div class="mb-caption" id="mb-caption" aria-hidden="true"></div>
+
+            <!-- Browser mock: pops up briefly during the "Open on GitHub"
+                 beat. A mini Chrome window with traffic lights + a URL bar
+                 carrying the GitHub mark and the repo URL. -->
+            <div class="mb-browser" id="mb-browser" aria-hidden="true">
+              <div class="browser-bar">
+                <span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span>
+                <div class="urlbar">
+                  <span class="favicon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="11" height="11"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.111.82-.261.82-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.91 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.218.694.825.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12"/></svg>
+                  </span>
+                  <span class="url">github.com/acme/web-app</span>
+                </div>
+              </div>
+              <div class="browser-body"></div>
             </div>
           </div>
         </div>
@@ -3094,35 +3378,48 @@ section.mb-section{padding-top:24px}
   start();
 })();
 
-// ===== MacBook stage: chaos → palette → search loop =====
+// ===== MacBook stage: full feature tour (chaos → search → ⇥ → ⌘K → GitHub) =====
 //
-// Story beats:
-//   1. 10 IDE/terminal/browser windows fade onto the desktop (the "before"
-//      — the chaos every developer recognizes).
-//   2. After a beat, the Odak palette materializes and the windows blur
-//      out of focus (the "after" — one input, all your projects).
-//   3. Query types in, list narrows, settle.
-//   4. Palette fades, windows brighten, loop.
+// Story beats (≈12s cycle):
+//   0. Chaos: 12 IDE windows scattered. Caption: "12 projects. Which one?"
+//   1. ⌥ Space pressed — palette materializes, windows dim. Caption: "⌥ Space"
+//   2. Type "we" — web-app row highlights (3 IDE icons). Caption: "Type a few letters"
+//   3. Tab cycle — top IDE swaps Cursor → VS Code → IntelliJ → Cursor.
+//      Caption: "⇥ Switch editor"
+//   4. ↵ — matching chaos window grows into focus.
+//   5. Palette returns, swaps to actions list (⌘K). Caption: "⌘ K — project actions"
+//   6. Highlight "Open on GitHub" — browser mock pops in.
+//      Caption: "↵ Open on GitHub"
+//   7. Fade everything, loop.
 (function(){
-  const stage   = document.querySelector('.mb-stage');
+  const stage    = document.querySelector('.mb-stage');
   if(!stage) return;
-  const typed   = document.getElementById('mb-typed');
-  const ghost   = document.getElementById('mb-ghost');
-  const openHnt = document.getElementById('mb-open-hint');
-  const topIde  = document.getElementById('mb-topide');
-  const list    = document.getElementById('mb-list');
-  const wins    = document.getElementById('mb-windows');
-  const wrap    = document.getElementById('mb-palette-wrap');
+  const typed    = document.getElementById('mb-typed');
+  const ghost    = document.getElementById('mb-ghost');
+  const openHnt  = document.getElementById('mb-open-hint');
+  const topIde   = document.getElementById('mb-topide');
+  const list     = document.getElementById('mb-list');
+  const actionsP = document.getElementById('mb-actions-panel');
+  const actionsL = document.getElementById('mb-actions-list');
+  const wins     = document.getElementById('mb-windows');
+  const wrap     = document.getElementById('mb-palette-wrap');
+  const cap      = document.getElementById('mb-caption');
+  const browser  = document.getElementById('mb-browser');
   if(!typed || !list || !wins || !wrap) return;
 
-  const items = Array.from(list.querySelectorAll('li'));
-  // QUERY differs from the hero on purpose. The hero's loop already runs
-  // `web` → web-app → Open in Cursor as its full-feature parade — repeating
-  // it here would make the macbook section feel like a second take. Two
-  // letters, different project, different rhythm: "da" → react-dashboard.
-  const QUERY = 'da';
+  const items   = Array.from(list.querySelectorAll('li'));
+  const actionItems = actionsL ? Array.from(actionsL.querySelectorAll('li')) : [];
+  const QUERY = 'we';
+
+  // Editors open on web-app — order matches the row's ide-stack.
+  const EDITORS = [
+    { key:'cursor',   src:'assets/ide/cursor.png',   name:'Cursor'   },
+    { key:'vscode',   src:'assets/ide/vscode.png',   name:'VS Code'  },
+    { key:'intellij', src:'assets/ide/intellij.png', name:'IntelliJ' },
+  ];
 
   function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
+
   function filterList(q){
     items.forEach(li => {
       const match = q.length === 0 || (li.dataset.keys || '').toLowerCase().includes(q.toLowerCase());
@@ -3140,10 +3437,68 @@ section.mb-section{padding-top:24px}
     ghost.textContent = full.toLowerCase().startsWith(q.toLowerCase()) ? full.slice(q.length) : '';
     openHnt.textContent = '— Open';
   }
+
+  // Caption track: short labels that swap per beat. Empty hides.
+  function setCaption(html){
+    if(!cap) return;
+    if(!html){ cap.classList.remove('shown'); return; }
+    cap.innerHTML = html;
+    cap.classList.add('shown');
+  }
+
+  // Tab swap: animate the top-IDE icon crossfade + ring the matching IDE
+  // inside the active row's ide-stack.
+  function setFocusedIde(key){
+    const row = list.querySelector('li.on');
+    if(!row) return;
+    row.querySelectorAll('.ide-stack .ide').forEach(el => {
+      el.classList.toggle('focused', el.dataset.ide === key);
+    });
+  }
+  function clearFocusedIde(){
+    list.querySelectorAll('.ide-stack .ide.focused').forEach(el => el.classList.remove('focused'));
+  }
+  async function tabSwap(editor){
+    topIde.classList.add('switching');
+    await wait(140);
+    const img = topIde.querySelector('img');
+    img.src = editor.src; img.alt = editor.name;
+    openHnt.textContent = '— Open in ' + editor.name;
+    setFocusedIde(editor.key);
+    await wait(40);
+    topIde.classList.remove('switching');
+  }
+  function resetTopIde(){
+    const img = topIde.querySelector('img');
+    img.src = EDITORS[0].src; img.alt = EDITORS[0].name;
+    topIde.classList.add('tinted');
+    clearFocusedIde();
+  }
+
+  // Open / close the actions panel as a second layer on top of the
+  // search panel. The search panel stays visible underneath but dims and
+  // pushes back so the actions popup reads as "on top". When actions
+  // open we restore visibility on all project rows (web-app stays
+  // selected) so the user sees ≥5 projects behind the popover, matching
+  // the real Odak ActionsPanelView where the project list is fully
+  // visible behind the contextual menu.
+  function openActions(){
+    if(!actionsP) return;
+    actionItems.forEach((li, i) => li.classList.toggle('on', i === 0));
+    items.forEach(li => li.setAttribute('data-filtered', '0'));
+    wrap.classList.add('actions-open');
+    actionsP.classList.add('shown');
+    actionsP.setAttribute('aria-hidden', 'false');
+  }
+  function closeActions(){
+    if(!actionsP) return;
+    wrap.classList.remove('actions-open');
+    actionsP.classList.remove('shown');
+    actionsP.setAttribute('aria-hidden', 'true');
+  }
+
   // Pop the matching chaos window out of the blur — visual confirmation
-  // that "search → open" lands on a real window. The window grows into
-  // the screen: scaled to ~72% of the screen height and translated so its
-  // center lands on the screen center, regardless of its starting position.
+  // that "search → open" lands on a real window.
   const winEls = Array.from(wins.querySelectorAll('.mb-window'));
 
   function focusWindow(key){
@@ -3155,8 +3510,6 @@ section.mb-section{padding-top:24px}
     const tRect = target.getBoundingClientRect();
     const dx = (winsRect.left + winsRect.width / 2) - (tRect.left + tRect.width / 2);
     const dy = (winsRect.top + winsRect.height / 2) - (tRect.top + tRect.height / 2);
-    // Scale to fill ~72% of the screen height; cap so wider windows don't
-    // overshoot the screen sideways.
     const scale = Math.min(3.6, (winsRect.height * 0.72) / Math.max(tRect.height, 1));
     target.style.setProperty('--cx', `${dx.toFixed(1)}px`);
     target.style.setProperty('--cy', `${dy.toFixed(1)}px`);
@@ -3177,81 +3530,105 @@ section.mb-section{padding-top:24px}
   }
 
   if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-    // Static end-state for reduced-motion users
+    // Static end-state for reduced-motion users — land on the actions
+    // beat with the browser mock visible (most informative single frame).
     wins.classList.add('shown', 'dimmed');
     wrap.classList.add('shown');
-    typed.textContent = QUERY;
+    typed.textContent = 'web-app';
     filterList(QUERY);
-    setGhost(QUERY);
-    topIde.classList.remove('tinted');
-    openHnt.textContent = '— Open in Cursor';
-    focusWindow(topVisibleKey());
+    openActions();
+    if(browser) browser.classList.add('shown');
+    setCaption('<kbd>⌘</kbd><kbd>K</kbd> · Open on GitHub');
     return;
   }
 
   async function loop(){
     while(true){
-      // Beat 0 — reset to a clean slate so each cycle plays the chaos
-      // reveal from the beginning instead of staying mounted between
-      // cycles. Tear down .shown on the windows (per-window stagger via
-      // --d replays on the next add), clear palette state, drop focus.
+      // ----- Beat 0: reset -----
       wins.classList.remove('shown', 'dimmed');
       wrap.classList.remove('shown', 'receded');
-      typed.textContent = '';
-      ghost.textContent = '';
-      openHnt.textContent = '';
-      topIde.classList.add('tinted');
+      typed.textContent = ''; ghost.textContent = ''; openHnt.textContent = '';
+      resetTopIde();
       filterList('');
       items.forEach(li => li.classList.remove('on'));
       if(items[0]) items[0].classList.add('on');
+      closeActions();
       clearFocus();
-      // Brief beat so the previous cycle's fade-out reads cleanly before
-      // the new chaos staggers back in.
-      await wait(220);
+      if(browser) browser.classList.remove('shown');
+      setCaption('');
+      await wait(260);
 
-      // Chaos reveal — fades in via the .shown class on .mb-windows
-      // (per-window stagger via --d on each window). Stagger is 40ms
-      // apart × 12 windows → max --d 480ms; opacity transition is
-      // 500ms; last window finishes at ~980ms.
+      // ----- Beat 1: chaos reveal -----
       wins.classList.add('shown');
-      await wait(1050);
+      setCaption('12 projects. Which one?');
+      await wait(1100);
+      await wait(500);  // breathe
 
-      // Beat 1 — let the chaos breathe.
-      await wait(550);
-
-      // Beat 2 — palette materializes, windows recede out of focus.
+      // ----- Beat 2: palette opens (⌥ Space) -----
       wins.classList.add('dimmed');
       wrap.classList.add('shown');
-      await wait(450);
+      setCaption('<kbd>⌥</kbd><kbd>Space</kbd> Search any repo');
+      await wait(700);
 
-      // Beat 3 — type query, list narrows under the fixed search bar.
+      // ----- Beat 3: type "we" -----
+      setCaption('Type a few letters');
       for(let i = 1; i <= QUERY.length; i++){
         const q = QUERY.slice(0, i);
         typed.textContent = q;
         filterList(q);
         setGhost(q);
-        await wait(130 + Math.random() * 60);
+        await wait(150 + Math.random() * 70);
       }
+      await wait(450);
 
-      // Beat 4 — settle. Un-tint the editor icon to signal "ready to open".
-      await wait(550);
+      // ----- Beat 4: settle, signal already-open Cursor -----
       topIde.classList.remove('tinted');
       openHnt.textContent = '— Open in Cursor';
+      setFocusedIde('cursor');
+      await wait(700);
 
-      // Beat 5 — short beat, then the matching chaos window wakes up.
-      // Read as: search → open → THIS one. Palette recedes to the
-      // background as the window grows into the foreground.
-      await wait(380);
+      // ----- Beat 5: Tab cycles through the 3 editors open on web-app -----
+      setCaption('<kbd>⇥</kbd> Switch editor');
+      await wait(450);
+      await tabSwap(EDITORS[1]);  // VS Code
+      await wait(700);
+      await tabSwap(EDITORS[2]);  // IntelliJ
+      await wait(700);
+      await tabSwap(EDITORS[0]);  // back to Cursor
+      await wait(550);
+
+      // ----- Beat 6: ↵ → matching window grows into focus -----
+      setCaption('<kbd>↵</kbd> Opens in Cursor');
+      await wait(280);
       focusWindow(topVisibleKey());
       wrap.classList.add('receded');
       await wait(1300);
 
-      // Beat 6 — fade palette and chaos out together, then loop back to
-      // the top where the chaos reveal replays from the beginning.
-      wrap.classList.remove('shown', 'receded');
-      wins.classList.remove('dimmed');
+      // ----- Beat 7: ⌘K — actions panel pops up bottom-right -----
+      // Search panel stays fully visible behind. Web-app row keeps its
+      // highlight on the backdrop; actions are scoped to that project.
       clearFocus();
-      await wait(550);
+      wrap.classList.remove('receded');
+      openActions();
+      setCaption('<kbd>⌘</kbd><kbd>K</kbd> Project actions');
+      await wait(1600);
+
+      // ----- Beat 8: caption swap, hint at the action ↵ fires -----
+      setCaption('<kbd>↵</kbd> Open on GitHub');
+      await wait(900);
+
+      // ----- Beat 9: actions close, browser mock pops up — read as
+      //  "the action just fired and Chrome opened the repo". -----
+      closeActions();
+      if(browser) browser.classList.add('shown');
+      await wait(2000);
+
+      // ----- Beat 10: fade everything, loop -----
+      if(browser) browser.classList.remove('shown');
+      wrap.classList.remove('shown');
+      wins.classList.remove('dimmed');
+      setCaption('');
+      await wait(700);
     }
   }
 
