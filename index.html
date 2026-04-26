@@ -386,6 +386,10 @@ h1.hero-h .mute{color:var(--dim);font-weight:600}
   max-width:580px;margin:0 auto;  /* real app width */
   backdrop-filter:blur(40px) saturate(160%);
   -webkit-backdrop-filter:blur(40px) saturate(160%);
+  /* Scope reflow + repaint to this subtree — keeps row collapses, dim,
+     and chosen-window rises from invalidating ancestors. */
+  contain:layout style paint;
+  will-change:transform, opacity, filter;
   /* reserve 56px at the top for the absolutely-positioned search bar — it
      is removed from the flow so nothing below (row collapse, etc.) can
      nudge its Y. */
@@ -487,7 +491,7 @@ h1.hero-h .mute{color:var(--dim);font-weight:600}
   0%,100%{opacity:1;transform:scale(1)}
   50%{opacity:.55;transform:scale(.85)}
 }
-.palette ul{list-style:none;padding:6px;margin:0;display:flex;flex-direction:column;gap:2px}
+.palette ul{list-style:none;padding:6px;margin:0;display:flex;flex-direction:column;gap:2px;contain:layout style}
 .palette li{
   display:flex;align-items:center;gap:10px;
   padding:12px 12px;border-radius:17px;      /* real app: resultSelectionCornerRadius */
@@ -963,14 +967,24 @@ footer.site-foot{
   padding:8px 12px;border-radius:10px;min-width:40px;text-align:center;
   background:var(--surface-2);border:1px solid var(--border-2);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.04), 0 4px 14px rgba(0,0,0,.2);
-  transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
+  position:relative;isolation:isolate;
+  /* Only animate compositor-friendly props on the cap itself.
+     Color + glow are handled by a pseudo-element below. */
+  transition:transform var(--dur-fast) var(--ease-snappy), color var(--dur-fast) var(--ease-out);
+  will-change:transform;
 }
-.hotkey-pill .kc.pressed{
-  transform:translateY(2px);
+/* Glow + blue fill layer — opacity-only swap. Avoids the gradient-to-
+   gradient background tween (which snaps) and gives a real fade. */
+.hotkey-pill .kc::before{
+  content:'';position:absolute;inset:-1px;border-radius:inherit;z-index:-1;
   background:linear-gradient(180deg, var(--prod-blue), var(--prod-blue-2));
-  color:#fff;
   box-shadow:inset 0 2px 4px rgba(0,0,0,.3), 0 0 18px var(--prod-blue-glow);
+  opacity:0;
+  transition:opacity var(--dur-fast) var(--ease-out);
+  pointer-events:none;
 }
+.hotkey-pill .kc.pressed{transform:translateY(2px) scale(.97);color:#fff}
+.hotkey-pill .kc.pressed::before{opacity:1}
 .hotkey-pill .plus{color:var(--mute);font-family:var(--mono);font-size:14px}
 /* open hint pill bottom — "press ⏎" */
 .enter-pill{
@@ -997,6 +1011,8 @@ footer.site-foot{
   z-index:50;opacity:0;pointer-events:none;
   transform:translate(-50%, -44%) scale(.86);
   transition:opacity var(--dur-smooth) var(--ease-smooth), transform var(--dur-smooth) var(--ease-snappy);
+  contain:layout style;
+  will-change:transform, opacity;
 }
 .chosen-window.shown{
   opacity:1;
@@ -1082,22 +1098,29 @@ footer.site-foot{
 
 .macbook{
   position:relative;width:100%;
+  contain:layout style;
 }
-/* Photoreal MacBook Air 13" Midnight frame (Apache 2.0, mockuphone.com).
-   Image aspect 2160x1408 ≈ 1.534. Screen rectangle within the PNG:
-   left 10.25%, right 10.28%, top 10.38%, bottom 10.43%. */
+/* MacBook Pro 16" Silver — Apple official mockup (M5 silver).
+   Image aspect 4260x2840 = 1.500. Screen rectangle within the PNG
+   (the transparent inner area, including the wings around the notch):
+   left 9.437%, right 9.437%, top 10.669%, bottom 10.669%. */
 .macbook .frame{
   display:block;width:100%;height:auto;
   user-select:none;-webkit-user-drag:none;
   filter:drop-shadow(0 60px 70px rgba(0,0,0,.45));
+  /* drop-shadow is expensive — promote to its own layer so it
+     repaints once instead of on every hover/scroll above. */
+  transform:translateZ(0);
 }
 [data-theme="light"] .macbook .frame{
   filter:drop-shadow(0 60px 70px rgba(26,20,16,.28));
 }
-/* Screen interior — the palette/menubar sit absolutely within these bounds */
+/* Screen interior — the palette/menubar sit absolutely within these bounds.
+   border-radius matches the rounded screen corners baked into the PNG. */
 .macbook .screen{
   position:absolute;
-  top:10.38%;left:10.25%;right:10.28%;bottom:10.43%;
+  top:10.669%;left:9.437%;right:9.437%;bottom:10.669%;
+  border-radius:1.4% / 2.1%;
   overflow:hidden;
   background:
     radial-gradient(ellipse 70% 50% at 25% 18%, oklch(72% 0.18 60 / .5), transparent 60%),
@@ -1110,34 +1133,163 @@ footer.site-foot{
   background:linear-gradient(115deg, transparent 0%, transparent 35%, rgba(255,255,255,.05) 50%, transparent 65%);
   mix-blend-mode:screen;
 }
+/* Camera notch — sits over the menubar at top center, painted in the
+   bezel color so the menubar reads as wrapping around the notch (matches
+   how macOS renders the menu bar on notched MacBook Pros). Dimensions
+   match the notch baked into the Apple PNG so the overlay aligns with
+   the lid's silhouette. Sized as % of the .macbook frame. */
+.macbook .notch{
+  position:absolute;
+  top:10.669%;left:50%;
+  width:8.685%;height:2.254%;
+  transform:translateX(-50%);
+  background:#0a0a0a;
+  border-radius:0 0 9px 9px;
+  z-index:8;
+  pointer-events:none;
+}
 
 /* Desktop chrome inside the screen */
 .mb-desk{position:absolute;inset:0}
+
+/* macOS Tahoe-style menu bar — translucent, system font, with the
+   classic left cluster (Apple, app name, menus) and right cluster
+   (status icons + date/time). Heights are scaled to the screen rect. */
 .mb-menubar{
   position:absolute;top:0;left:0;right:0;
   height:24px;
-  display:flex;align-items:center;gap:14px;
-  padding:0 18px 0 60px;
-  background:rgba(20,15,12,.5);
-  backdrop-filter:blur(20px) saturate(160%);
-  -webkit-backdrop-filter:blur(20px) saturate(160%);
-  font-size:11px;color:rgba(255,250,240,.82);
-  letter-spacing:-.005em;
+  display:flex;align-items:center;
+  padding:0 10px;
+  background:rgba(0,0,0,.32);
+  backdrop-filter:blur(22px) saturate(180%);
+  -webkit-backdrop-filter:blur(22px) saturate(180%);
+  font-family:-apple-system, system-ui, 'Inter', sans-serif;
+  font-size:11.5px;color:#fff;letter-spacing:-.005em;
   z-index:5;
+  box-shadow:0 1px 0 rgba(255,255,255,.04);
 }
-.mb-menubar .app{font-weight:700}
-.mb-menubar .item{opacity:.78}
-.mb-menubar .sp{flex:1}
-.mb-menubar .clock{font-variant-numeric:tabular-nums;opacity:.85}
+.mb-menubar .left{display:flex;align-items:center;gap:14px;flex-shrink:0}
+.mb-menubar .right{display:flex;align-items:center;gap:11px;margin-left:auto;flex-shrink:0}
+.mb-menubar .apple{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:14px;height:14px;color:#fff;
+}
+.mb-menubar .apple svg{width:13px;height:14px;display:block}
+.mb-menubar .app{font-weight:600;letter-spacing:-.01em}
+.mb-menubar .item{font-weight:400;color:rgba(255,255,255,.92)}
+.mb-menubar .ico{
+  display:inline-flex;align-items:center;justify-content:center;
+  height:18px;color:#fff;opacity:.95;
+}
+.mb-menubar .ico svg{display:block;height:13px;width:auto}
+.mb-menubar .ico.battery svg{height:10px}
+.mb-menubar .ico.cc svg{height:14px}
+.mb-menubar .clock{
+  font-variant-numeric:tabular-nums;font-weight:400;
+  letter-spacing:0;color:#fff;
+  margin-left:2px;
+}
 
-/* Palette inside the screen — permanently visible, like the hero palette.
-   Only the typed text and filtered list animate; the search bar stays put. */
-.mb-palette-wrap{
-  position:absolute;left:50%;top:54%;
-  transform:translate(-50%,-50%);
-  width:62%;max-width:480px;
-  z-index:2;
+/* ==========================================================
+   DESKTOP CHAOS — 10 mock app windows scattered behind the palette,
+   to dramatize the "before". Hero animation reveals these first,
+   then the palette materializes and they dim out of focus.
+   ========================================================== */
+.mb-windows{
+  position:absolute;
+  inset:24px 0 0 0;          /* below menubar */
+  z-index:1;
+  pointer-events:none;
+  contain:layout paint style;
+  transition:filter .55s var(--ease-smooth), opacity .55s var(--ease-smooth);
 }
+.mb-windows.dimmed{
+  filter:blur(1.8px) saturate(.7) brightness(.55);
+  opacity:.7;
+}
+.mb-window{
+  position:absolute;
+  left:var(--x);top:var(--y);
+  width:var(--w);height:var(--h);
+  background:rgba(20,15,12,.78);
+  backdrop-filter:blur(10px) saturate(160%);
+  -webkit-backdrop-filter:blur(10px) saturate(160%);
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:7px;
+  padding:5px 7px 6px;
+  display:flex;flex-direction:column;gap:5px;
+  box-shadow:
+    0 10px 24px rgba(0,0,0,.45),
+    0 2px 6px rgba(0,0,0,.3),
+    inset 0 1px 0 rgba(255,255,255,.06);
+  z-index:var(--z, 1);
+  transform-origin:center;
+  /* Initial entrance state — fade up from below with mild rotation */
+  opacity:0;
+  transform:rotate(var(--r, 0deg)) translateY(10px) scale(.97);
+  transition:
+    opacity .5s var(--ease-smooth) var(--d, 0ms),
+    transform .65s var(--ease-snappy) var(--d, 0ms);
+}
+.mb-windows.shown .mb-window{
+  opacity:1;
+  transform:rotate(var(--r, 0deg)) translateY(0) scale(1);
+}
+.mb-window .titlebar{
+  display:flex;align-items:center;gap:5px;
+  font-size:8px;color:rgba(255,255,255,.85);
+  letter-spacing:-.005em;
+  white-space:nowrap;overflow:hidden;
+  font-family:-apple-system, system-ui, var(--sans);
+  font-weight:500;
+}
+.mb-window .traffic{display:flex;gap:3px;flex-shrink:0;align-items:center}
+.mb-window .traffic span{width:5px;height:5px;border-radius:50%}
+.mb-window .traffic .r{background:#ff5f57}
+.mb-window .traffic .y{background:#febc2e}
+.mb-window .traffic .g{background:#28c840}
+.mb-window .ico{
+  width:11px;height:11px;border-radius:2.5px;overflow:hidden;
+  display:grid;place-items:center;flex-shrink:0;
+  margin-left:2px;
+}
+.mb-window .ico img,.mb-window .ico svg{width:100%;height:100%;object-fit:contain;display:block}
+.mb-window .title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.mb-window .body{
+  flex:1;display:flex;flex-direction:column;gap:3px;
+  margin-top:1px;
+}
+.mb-window .ln{
+  height:2px;border-radius:1px;
+  background:rgba(255,255,255,.18);
+  width:var(--lw, 60%);
+  flex-shrink:0;
+}
+.mb-window .ln.hl{background:color-mix(in oklch, var(--accent) 55%, transparent)}
+.mb-window .ln.b  {background:color-mix(in oklch, var(--prod-blue) 55%, transparent)}
+
+/* Palette inside the screen — anchored from the TOP edge (not center),
+   so the search bar stays fixed in place while rows below it collapse
+   during the typing animation. */
+.mb-palette-wrap{
+  position:absolute;left:50%;top:22%;
+  transform:translateX(-50%);
+  width:62%;max-width:480px;
+  z-index:3;
+  /* Containment for cqi-based radii on rows + chips below — keeps
+     the corner-to-row ratio stable as the palette width shrinks
+     (between media-query breakpoints the row height stays fixed
+     at ~48px, so a fixed 12px radius pills the lang chip). */
+  container-type:inline-size;
+}
+/* In-situ hero stage only: palette starts hidden and is summoned by the
+   JS loop after the chaos beat. Feature stages keep the palette always
+   visible (their own typewriter loops handle the rest). */
+#mb-palette-wrap{
+  opacity:0;
+  transition:opacity .35s var(--ease-out);
+}
+#mb-palette-wrap.shown{opacity:1}
 /* Compact palette inside the macbook screen */
 .mb-palette-wrap .palette{
   margin:0;max-width:100%;
@@ -1153,13 +1305,17 @@ footer.site-foot{
 .mb-palette-wrap .palette .search-bar .top-ide{width:28px;height:28px;border-radius:6px}
 .mb-palette-wrap .palette ul{padding:5px;gap:1px}
 .mb-palette-wrap .palette li{
-  padding:8px 9px;gap:8px;max-height:56px;border-radius:12px;
+  padding:8px 9px;gap:8px;max-height:56px;
+  /* Radius tracks the palette's inline-size so the row never reads as
+     a pill at intermediate widths. 2.5cqi lands on 12px at the 480px
+     max and falls smoothly toward 7px as the wrap narrows. */
+  border-radius:clamp(7px, 2.5cqi, 12px);
 }
-.mb-palette-wrap .palette li .lang{width:22px;height:22px;font-size:9px;border-radius:6px}
+.mb-palette-wrap .palette li .lang{width:22px;height:22px;font-size:9px;border-radius:clamp(4px, 1.25cqi, 6px)}
 .mb-palette-wrap .palette li .title-row{font-size:11.5px;gap:6px}
 .mb-palette-wrap .palette li .path{font-size:9.5px;margin-top:2px}
 .mb-palette-wrap .palette li .ide-stack .ide{
-  width:20px;height:20px;padding:2px;border-radius:5px;
+  width:20px;height:20px;padding:2px;border-radius:clamp(3px, 1cqi, 5px);
 }
 .mb-palette-wrap .palette li .ide-stack{gap:3px}
 .mb-palette-wrap .palette .footer{padding:7px 12px;font-size:9.5px;gap:14px}
@@ -1175,16 +1331,17 @@ footer.site-foot{
 
 /* F1 — palette demo: tighter than the standalone stage so it fits the
    smaller screen rect. Drops the 4th project + footer like the mobile rules. */
-.f-stage .mb-palette-wrap{width:88%;top:55%}
+.f-stage .mb-palette-wrap{width:88%;top:24%}
 .f-stage .mb-palette-wrap .palette{padding-top:32px}
 .f-stage .mb-palette-wrap .palette .search-bar{height:38px;padding:7px 12px;gap:8px}
 .f-stage .mb-palette-wrap .palette .search-bar .input{font-size:14px;height:20px;line-height:20px}
 .f-stage .mb-palette-wrap .palette .search-bar .input .caret{height:16px}
 /* F1's row is 46px tall — keep the hero's 21% radius:height ratio so
-   the rounded corners don't eat the selected row's visible fill. */
-.f-stage .mb-palette-wrap .palette li{max-height:46px;padding:6px 8px;border-radius:9px}
-.f-stage .mb-palette-wrap .palette li .lang{width:20px;height:20px;font-size:8.5px;border-radius:5px}
-.f-stage .mb-palette-wrap .palette li .ide-stack .ide{width:18px;height:18px;border-radius:4px}
+   the rounded corners don't eat the selected row's visible fill.
+   cqi tracks the wrap (container-type set on the base .mb-palette-wrap). */
+.f-stage .mb-palette-wrap .palette li{max-height:46px;padding:6px 8px;border-radius:clamp(6px, 2.2cqi, 9px)}
+.f-stage .mb-palette-wrap .palette li .lang{width:20px;height:20px;font-size:8.5px;border-radius:clamp(3px, 1.2cqi, 5px)}
+.f-stage .mb-palette-wrap .palette li .ide-stack .ide{width:18px;height:18px;border-radius:clamp(3px, 1cqi, 4px)}
 .f-stage .mb-palette-wrap .palette ul li:nth-child(n+4){display:none}
 .f-stage .mb-palette-wrap .palette .footer{display:none}
 
@@ -1251,6 +1408,39 @@ footer.site-foot{
 .reveal{opacity:0;transform:translateY(24px);transition:opacity var(--dur-smooth) var(--ease-smooth), transform var(--dur-smooth) var(--ease-snappy)}
 .reveal.in{opacity:1;transform:translateY(0)}
 
+/* Scroll-driven enhancement: when the browser can drive an animation
+   directly off the scroll position (Chromium 115+, Safari TP), do it on
+   the compositor — frame-perfect, no main-thread work, no JS scroll
+   listener. Falls back to the IntersectionObserver-toggled .in above. */
+@supports (animation-timeline: view()){
+  .reveal{
+    /* opacity/transform already declared above are the "from" state */
+    animation:reveal-in linear both;
+    animation-timeline:view();
+    animation-range:entry 5% cover 25%;
+  }
+  /* Once the IO has tagged it .in, lock to the resolved state — prevents
+     the animation from reversing if the user scrolls back up. */
+  .reveal.in{animation:none}
+
+  /* Hero stage parallax — pure CSS, runs on the compositor instead of a
+     scroll handler in JS. Constrained to the first viewport so it stops
+     past the fold. */
+  #stage-inner{
+    animation:hero-parallax linear both;
+    animation-timeline:scroll(root);
+    animation-range:0 100vh;
+  }
+}
+@keyframes reveal-in{
+  from{opacity:0;transform:translateY(24px)}
+  to  {opacity:1;transform:translateY(0)}
+}
+@keyframes hero-parallax{
+  from{transform:translateY(0) rotateX(3deg)}
+  to  {transform:translateY(-20px) rotateX(-1deg)}
+}
+
 @media (prefers-reduced-motion: reduce){
   .aurora::before,.aurora::after,.palette .search-bar .input .caret,.hint-pill .dot-live{animation:none !important}
   .reveal{opacity:1;transform:none;transition:none}
@@ -1300,11 +1490,19 @@ footer.site-foot{
 @media (max-width:760px){
   .mb-section{padding-top:48px}
   .mb-section .section-head{margin-bottom:36px}
-  .mb-menubar{font-size:9px;padding:0 10px 0 46px;height:18px;gap:8px}
+  .mb-menubar{font-size:9px;padding:0 8px;height:18px}
+  .mb-menubar .left{gap:9px}
+  .mb-menubar .right{gap:8px}
+  .mb-menubar .apple svg{width:10px;height:11px}
+  .mb-menubar .ico svg{height:10px}
+  .mb-menubar .ico.battery svg{height:8px}
+  .mb-menubar .ico.cc svg{height:11px}
+  /* Hide menu items past Edit on phones — no room. Keep app name + 1-2 menus. */
+  .mb-menubar .left .item:nth-of-type(n+3){display:none}
   /* Palette must fit inside the on-screen rect of the MacBook PNG.
      Available height on a phone is ~170px — drop the kbd footer and
      the 4th project so search-bar + 3 items fit cleanly. */
-  .mb-palette-wrap{width:86%;top:56%;transform:translate(-50%,-50%) scale(.95)}
+  .mb-palette-wrap{width:86%;top:22%;transform:translateX(-50%) scale(.95);transform-origin:top center}
   .mb-palette-wrap .palette{padding-top:24px}
   .mb-palette-wrap .palette .search-bar{height:32px;padding:5px 9px;gap:6px}
   .mb-palette-wrap .palette .search-bar svg.q{width:13px;height:13px}
@@ -1322,7 +1520,7 @@ footer.site-foot{
   .mb-palette-wrap .palette .footer{display:none}
 }
 @media (max-width:420px){
-  .mb-palette-wrap{width:90%;transform:translate(-50%,-50%) scale(.88)}
+  .mb-palette-wrap{width:90%;transform:translateX(-50%) scale(.88);transform-origin:top center}
 }
 
 /* Feature MacBooks on mobile — same fit-into-screen-rect logic */
@@ -1382,6 +1580,39 @@ footer.site-foot{
       <path d="M24.26 26.5 A13 13 0 0 1 4.74 22.5 L12.5 18 A6 6 0 0 0 19.5 18 Z" fill="#34A853"/>
       <circle cx="16" cy="16" r="6" fill="#4285F4"/>
       <circle cx="16" cy="16" r="6" fill="none" stroke="#fff" stroke-width="1.5" opacity=".85"/>
+    </symbol>
+
+    <!-- macOS menu-bar status icons. White, kept simple so the bar reads
+         like the real translucent strip on macOS Tahoe. -->
+    <symbol id="mb-apple" viewBox="0 0 14 17">
+      <path fill="currentColor" d="M11.6 13.3c-.2.5-.5 1-.8 1.4-.4.6-.8 1-1.1 1.2-.4.4-.9.6-1.4.6-.4 0-.8-.1-1.4-.3-.5-.2-1-.3-1.5-.3-.5 0-1 .1-1.5.3-.5.2-1 .3-1.4.3-.5 0-1-.2-1.4-.6-.3-.2-.7-.6-1.1-1.2C.8 13.7.4 12.9.1 12-.1 11.1-.2 10.3-.2 9.5c0-.9.2-1.7.6-2.4C.7 6.5 1.2 6 1.8 5.7c.6-.3 1.2-.5 1.9-.5.4 0 .9.1 1.5.3.6.2 1 .4 1.2.4.1 0 .6-.1 1.4-.4.7-.3 1.3-.4 1.8-.4 1.3.1 2.3.6 2.9 1.5-1.2.7-1.8 1.7-1.8 3 0 1 .4 1.8 1.1 2.5.3.3.7.5 1.1.7l-.3.5zM9 .3c0 .7-.3 1.3-.8 1.9-.6.7-1.4 1.1-2.2 1-.1-.7.2-1.4.6-1.9.5-.6 1.2-.9 2-1 .3.1.4.1.4 0z"/>
+    </symbol>
+    <symbol id="mb-battery" viewBox="0 0 25 12">
+      <rect x=".5" y=".5" width="21" height="11" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".6"/>
+      <rect x="2.5" y="2.5" width="14" height="7" rx="1" fill="currentColor"/>
+      <path d="M23 4v4" stroke="currentColor" stroke-opacity=".6" stroke-linecap="round" stroke-width="1.5" fill="none"/>
+    </symbol>
+    <symbol id="mb-wifi" viewBox="0 0 16 12">
+      <g fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+        <path d="M1.5 5.2A8 8 0 0 1 14.5 5.2"/>
+        <path d="M3.8 7.4A5 5 0 0 1 12.2 7.4"/>
+        <path d="M6 9.6A2 2 0 0 1 10 9.6"/>
+      </g>
+      <circle cx="8" cy="11" r=".6" fill="currentColor"/>
+    </symbol>
+    <symbol id="mb-cc" viewBox="0 0 14 14">
+      <g fill="currentColor">
+        <rect x="1" y="1" width="5.5" height="5.5" rx="1.4" opacity=".95"/>
+        <rect x="7.5" y="1" width="5.5" height="5.5" rx="1.4" opacity=".55"/>
+        <rect x="1" y="7.5" width="5.5" height="5.5" rx="1.4" opacity=".55"/>
+        <rect x="7.5" y="7.5" width="5.5" height="5.5" rx="1.4" opacity=".95"/>
+      </g>
+    </symbol>
+    <symbol id="mb-spotlight" viewBox="0 0 14 14">
+      <g fill="none" stroke="currentColor" stroke-width="1.4">
+        <circle cx="6" cy="6" r="4.4"/>
+        <line x1="9.3" y1="9.3" x2="12.8" y2="12.8" stroke-linecap="round"/>
+      </g>
     </symbol>
   </defs>
 </svg>
@@ -1602,21 +1833,78 @@ footer.site-foot{
   <div class="mb-stage reveal">
     <div class="glow"></div>
     <div class="macbook">
-      <img class="frame" src="assets/devices/macbook-air-13-midnight.png" alt="" aria-hidden="true" width="2160" height="1408">
+      <img class="frame" src="assets/devices/macbook-pro-16.png" alt="" aria-hidden="true" width="4260" height="2840">
+      <div class="notch" aria-hidden="true"></div>
       <div class="screen">
           <div class="mb-desk">
             <div class="mb-menubar">
-              <span class="app">Cursor</span>
-              <span class="item">File</span>
-              <span class="item">Edit</span>
-              <span class="item">Selection</span>
-              <span class="item">View</span>
-              <span class="sp"></span>
-              <span class="item">100%</span>
-              <span class="clock">10:24 AM</span>
+              <div class="left">
+                <span class="apple" aria-hidden="true"><svg viewBox="0 0 14 17"><use href="#mb-apple"/></svg></span>
+                <span class="app">Cursor</span>
+                <span class="item">File</span>
+                <span class="item">Edit</span>
+                <span class="item">Selection</span>
+                <span class="item">View</span>
+                <span class="item">Go</span>
+                <span class="item">Window</span>
+                <span class="item">Help</span>
+              </div>
+              <div class="right">
+                <span class="ico battery" aria-hidden="true"><svg viewBox="0 0 25 12"><use href="#mb-battery"/></svg></span>
+                <span class="ico" aria-hidden="true"><svg viewBox="0 0 16 12"><use href="#mb-wifi"/></svg></span>
+                <span class="ico cc" aria-hidden="true"><svg viewBox="0 0 14 14"><use href="#mb-cc"/></svg></span>
+                <span class="ico" aria-hidden="true"><svg viewBox="0 0 14 14"><use href="#mb-spotlight"/></svg></span>
+                <span class="clock">Sat 25 Apr  23:33</span>
+              </div>
             </div>
 
-            <!-- Palette permanently visible on the desktop, like the hero -->
+            <!-- Desktop chaos: 10 mock IDE/terminal/browser windows scattered
+                 behind the palette. They fade in first to dramatize the
+                 "before"; once the palette materializes they dim away. -->
+            <div class="mb-windows" id="mb-windows">
+              <div class="mb-window" style="--x:2%;--y:4%;--w:18%;--h:24%;--r:-3deg;--z:2;--d:80ms">
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/cursor.png" alt=""></span><span class="title">web-app · page.tsx</span></div>
+                <div class="body"><div class="ln" style="--lw:65%"></div><div class="ln hl" style="--lw:42%"></div><div class="ln" style="--lw:78%"></div><div class="ln" style="--lw:50%"></div></div>
+              </div>
+              <div class="mb-window" style="--x:79%;--y:5%;--w:19%;--h:26%;--r:3deg;--z:2;--d:160ms">
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/vscode.png" alt=""></span><span class="title">react-dashboard</span></div>
+                <div class="body"><div class="ln" style="--lw:70%"></div><div class="ln" style="--lw:38%"></div><div class="ln b" style="--lw:60%"></div><div class="ln" style="--lw:82%"></div></div>
+              </div>
+              <div class="mb-window" style="--x:2%;--y:31%;--w:16%;--h:30%;--r:-1deg;--z:3;--d:240ms">
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/intellij.png" alt=""></span><span class="title">api-gateway</span></div>
+                <div class="body"><div class="ln" style="--lw:55%"></div><div class="ln" style="--lw:80%"></div><div class="ln hl" style="--lw:45%"></div><div class="ln" style="--lw:70%"></div><div class="ln" style="--lw:38%"></div></div>
+              </div>
+              <div class="mb-window" style="--x:82%;--y:33%;--w:16%;--h:28%;--r:2deg;--z:3;--d:320ms">
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/xcode.png" alt=""></span><span class="title">platform-ios</span></div>
+                <div class="body"><div class="ln" style="--lw:60%"></div><div class="ln" style="--lw:48%"></div><div class="ln b" style="--lw:72%"></div><div class="ln" style="--lw:55%"></div></div>
+              </div>
+              <div class="mb-window" style="--x:14%;--y:50%;--w:18%;--h:22%;--r:2deg;--z:1;--d:400ms">
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><svg viewBox="0 0 32 32"><use href="#ide-iterm"/></svg></span><span class="title">~ pnpm dev</span></div>
+                <div class="body"><div class="ln" style="--lw:42%"></div><div class="ln" style="--lw:65%"></div><div class="ln" style="--lw:30%"></div><div class="ln hl" style="--lw:55%"></div></div>
+              </div>
+              <div class="mb-window" style="--x:67%;--y:48%;--w:18%;--h:22%;--r:-2deg;--z:1;--d:480ms">
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><svg viewBox="0 0 32 32"><use href="#ide-chrome"/></svg></span><span class="title">localhost:3000</span></div>
+                <div class="body"><div class="ln" style="--lw:80%"></div><div class="ln" style="--lw:55%"></div><div class="ln b" style="--lw:38%"></div></div>
+              </div>
+              <div class="mb-window" style="--x:4%;--y:65%;--w:22%;--h:31%;--r:-2deg;--z:4;--d:560ms">
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/cursor.png" alt=""></span><span class="title">admin-panel</span></div>
+                <div class="body"><div class="ln" style="--lw:70%"></div><div class="ln" style="--lw:45%"></div><div class="ln" style="--lw:60%"></div><div class="ln hl" style="--lw:78%"></div><div class="ln" style="--lw:40%"></div></div>
+              </div>
+              <div class="mb-window" style="--x:28%;--y:68%;--w:22%;--h:28%;--r:1deg;--z:5;--d:640ms">
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/vscode.png" alt=""></span><span class="title">etl-pipeline.py</span></div>
+                <div class="body"><div class="ln" style="--lw:65%"></div><div class="ln b" style="--lw:50%"></div><div class="ln" style="--lw:78%"></div><div class="ln" style="--lw:42%"></div></div>
+              </div>
+              <div class="mb-window" style="--x:52%;--y:66%;--w:22%;--h:30%;--r:-1deg;--z:6;--d:720ms">
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/xcode.png" alt=""></span><span class="title">odak-mac</span></div>
+                <div class="body"><div class="ln" style="--lw:55%"></div><div class="ln" style="--lw:72%"></div><div class="ln hl" style="--lw:38%"></div><div class="ln" style="--lw:65%"></div><div class="ln" style="--lw:48%"></div></div>
+              </div>
+              <div class="mb-window" style="--x:76%;--y:69%;--w:22%;--h:28%;--r:2deg;--z:5;--d:800ms">
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/intellij.png" alt=""></span><span class="title">plexo-cli · main.go</span></div>
+                <div class="body"><div class="ln" style="--lw:72%"></div><div class="ln" style="--lw:48%"></div><div class="ln" style="--lw:60%"></div><div class="ln b" style="--lw:35%"></div></div>
+              </div>
+            </div>
+
+            <!-- Palette materializes after the chaos beat -->
             <div class="mb-palette-wrap" id="mb-palette-wrap">
               <div class="palette palette-fx shown">
                 <div class="search-bar">
@@ -1729,20 +2017,6 @@ footer.site-foot{
     </div>
 
     <div class="f-stage reveal">
-      <div class="macbook">
-        <img class="frame" src="assets/devices/macbook-air-13-midnight.png" alt="" aria-hidden="true" width="2160" height="1408">
-        <div class="screen">
-          <div class="mb-desk">
-            <div class="mb-menubar">
-              <span class="app">Xcode</span>
-              <span class="item">File</span>
-              <span class="item">Edit</span>
-              <span class="item">Source Control</span>
-              <span class="sp"></span>
-              <span class="item">100%</span>
-              <span class="clock">9:42 AM</span>
-            </div>
-            <div class="mb-palette-wrap">
       <div class="palette palette-fx shown">
         <div class="search-bar">
           <svg class="q" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg>
@@ -1806,10 +2080,6 @@ footer.site-foot{
           <div class="row"><kbd>⌘K</kbd> Actions</div>
         </div>
       </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </section>
@@ -1820,20 +2090,6 @@ footer.site-foot{
 <section class="block">
   <div class="f-split rev">
     <div class="f-stage reveal">
-      <div class="macbook">
-        <img class="frame" src="assets/devices/macbook-air-13-midnight.png" alt="" aria-hidden="true" width="2160" height="1408">
-        <div class="screen">
-          <div class="mb-desk">
-            <div class="mb-menubar">
-              <span class="app">Cursor</span>
-              <span class="item">File</span>
-              <span class="item">Edit</span>
-              <span class="item">View</span>
-              <span class="item">Window</span>
-              <span class="sp"></span>
-              <span class="clock">2:18 PM</span>
-            </div>
-            <div class="mb-tab-wrap">
       <div class="tab-demo">
         <div class="tab-chrome">
           <span class="dot-accent"></span>
@@ -1891,10 +2147,6 @@ footer.site-foot{
             <div class="mru">1h</div>
           </li>
         </ul>
-      </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -1958,20 +2210,7 @@ footer.site-foot{
     </div>
 
     <div class="f-stage reveal">
-      <div class="macbook">
-        <img class="frame" src="assets/devices/macbook-air-13-midnight.png" alt="" aria-hidden="true" width="2160" height="1408">
-        <div class="screen">
-          <div class="mb-desk">
-            <div class="mb-menubar">
-              <span class="app">Cursor</span>
-              <span class="item">File</span>
-              <span class="item">Edit</span>
-              <span class="item">Selection</span>
-              <span class="item">View</span>
-              <span class="sp"></span>
-              <span class="clock">5:07 PM</span>
-            </div>
-            <div class="mb-odak-wrap">
+      <div class="odak-demo">
         <div class="odak-file">
           <div class="head">
             <span style="color:var(--mute)">📄</span>
@@ -2035,9 +2274,6 @@ footer.site-foot{
               <span class="key">⌘S</span>
             </li>
           </ul>
-        </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -2213,10 +2449,15 @@ footer.site-foot{
 })();
 
 // ===== Parallax on hero stage =====
+// JS fallback for browsers without scroll-driven CSS animations
+// (Safari pre-TP, etc.). Modern Chromium/Safari TP run the same effect
+// natively via @supports (animation-timeline) in the stylesheet — we
+// no-op here in that case so we don't double-drive the transform.
 (function(){
   const stageInner = document.getElementById('stage-inner');
   if(!stageInner) return;
   if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if(CSS.supports && CSS.supports('animation-timeline','scroll()')) return;
   let rafId = null;
   function updateParallax(){
     const sc = window.scrollY;
@@ -2443,7 +2684,15 @@ footer.site-foot{
   start();
 })();
 
-// ===== MacBook stage: typewriter loop (palette stays put, like the hero) =====
+// ===== MacBook stage: chaos → palette → search loop =====
+//
+// Story beats:
+//   1. 10 IDE/terminal/browser windows fade onto the desktop (the "before"
+//      — the chaos every developer recognizes).
+//   2. After a beat, the Odak palette materializes and the windows blur
+//      out of focus (the "after" — one input, all your projects).
+//   3. Query types in, list narrows, settle.
+//   4. Palette fades, windows brighten, loop.
 (function(){
   const stage   = document.querySelector('.mb-stage');
   if(!stage) return;
@@ -2452,10 +2701,16 @@ footer.site-foot{
   const openHnt = document.getElementById('mb-open-hint');
   const topIde  = document.getElementById('mb-topide');
   const list    = document.getElementById('mb-list');
-  if(!typed || !list) return;
+  const wins    = document.getElementById('mb-windows');
+  const wrap    = document.getElementById('mb-palette-wrap');
+  if(!typed || !list || !wins || !wrap) return;
 
   const items = Array.from(list.querySelectorAll('li'));
-  const QUERY = 'web';
+  // QUERY differs from the hero on purpose. The hero's loop already runs
+  // `web` → web-app → Open in Cursor as its full-feature parade — repeating
+  // it here would make the macbook section feel like a second take. Two
+  // letters, different project, different rhythm: "da" → react-dashboard.
+  const QUERY = 'da';
 
   function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
   function filterList(q){
@@ -2477,6 +2732,9 @@ footer.site-foot{
   }
 
   if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    // Static end-state for reduced-motion users
+    wins.classList.add('shown', 'dimmed');
+    wrap.classList.add('shown');
     typed.textContent = QUERY;
     filterList(QUERY);
     setGhost(QUERY);
@@ -2486,8 +2744,15 @@ footer.site-foot{
   }
 
   async function loop(){
+    // First-time chaos reveal — fades in via the .shown class on .mb-windows
+    // (per-window stagger via --d on each window).
+    wins.classList.add('shown');
+    // Wait for the last window's stagger (max --d ≈ 800ms) plus its own
+    // duration (~500ms), so the chaos is fully painted before we cut in.
+    await wait(1500);
+
     while(true){
-      // Reset content (palette frame stays in place)
+      // Reset palette content — search bar stays put, list snaps to full.
       typed.textContent = '';
       ghost.textContent = '';
       openHnt.textContent = '';
@@ -2495,9 +2760,16 @@ footer.site-foot{
       filterList('');
       items.forEach(li => li.classList.remove('on'));
       if(items[0]) items[0].classList.add('on');
+
+      // Beat 1 — let the chaos breathe.
       await wait(900);
 
-      // Type query letter by letter, list narrows
+      // Beat 2 — palette materializes, windows recede out of focus.
+      wins.classList.add('dimmed');
+      wrap.classList.add('shown');
+      await wait(700);
+
+      // Beat 3 — type query, list narrows under the fixed search bar.
       for(let i = 1; i <= QUERY.length; i++){
         const q = QUERY.slice(0, i);
         typed.textContent = q;
@@ -2506,11 +2778,17 @@ footer.site-foot{
         await wait(160 + Math.random() * 80);
       }
 
-      // Settle: un-tint editor icon to signal "ready to open"
+      // Beat 4 — settle. Un-tint the editor icon to signal "ready to open".
       await wait(800);
       topIde.classList.remove('tinted');
       openHnt.textContent = '— Open in Cursor';
-      await wait(2400);
+      await wait(2200);
+
+      // Beat 5 — fade palette out, brighten windows, hold the chaos
+      // briefly so the loop reads as a real cycle (not a re-mount).
+      wrap.classList.remove('shown');
+      wins.classList.remove('dimmed');
+      await wait(900);
     }
   }
 
