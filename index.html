@@ -1569,7 +1569,11 @@ section.mb-section{padding-top:24px}
 .mb-palette-wrap .palette{
   margin:0;max-width:100%;
   padding-top:44px;
-  border-radius:18px;
+  /* Outer radius scales with the wrap and is capped at 14px so the
+     panel doesn't read as puffy on mobile-sized macbooks. The row
+     radius below tracks (outer − ul padding) so inner corners nest
+     cleanly inside the palette curve. */
+  border-radius:clamp(7px, 3cqi, 14px);
 }
 .mb-palette-wrap .palette .search-bar{
   height:44px;padding:8px 14px;gap:10px;
@@ -1582,10 +1586,11 @@ section.mb-section{padding-top:24px}
 .mb-palette-wrap .palette ul{padding:5px;gap:1px}
 .mb-palette-wrap .palette li{
   padding:8px 9px;gap:8px;max-height:56px;
-  /* Radius tracks the palette's inline-size so the row never reads as
-     a pill at intermediate widths. 2.5cqi lands on 12px at the 480px
-     max and falls smoothly toward 7px as the wrap narrows. */
-  border-radius:clamp(7px, 2.5cqi, 12px);
+  /* Row radius = outer radius − ul padding (5px). Tracks the outer
+     formula (3cqi) above with the same 5px offset so the row's
+     rounded corners stay parallel to the palette's curve at every
+     width, instead of one shape looking puffy and the other square. */
+  border-radius:clamp(2px, calc(3cqi - 5px), 9px);
 }
 .mb-palette-wrap .palette li .lang{width:22px;height:22px;font-size:9px;border-radius:clamp(4px, 1.25cqi, 6px)}
 .mb-palette-wrap .palette li .title-row{font-size:11.5px;gap:6px}
@@ -1991,7 +1996,9 @@ section.mb-section{padding-top:24px}
   .mb-palette-wrap .palette .search-bar .input .caret{height:12px}
   .mb-palette-wrap .palette .search-bar .top-ide{width:20px;height:20px}
   .mb-palette-wrap .palette ul{padding:3px;gap:1px}
-  .mb-palette-wrap .palette li{padding:4px 6px;max-height:34px;border-radius:7px}
+  /* Mobile uses 3px ul padding (vs 5px desktop), so the row radius must
+     track outer−3px to nest cleanly inside the palette curve. */
+  .mb-palette-wrap .palette li{padding:4px 6px;max-height:34px;border-radius:clamp(2px, calc(3cqi - 3px), 9px)}
   .mb-palette-wrap .palette li .lang{width:16px;height:16px;font-size:7px;border-radius:4px}
   .mb-palette-wrap .palette li .title-row{font-size:9.5px}
   .mb-palette-wrap .palette li .path{font-size:7.5px}
