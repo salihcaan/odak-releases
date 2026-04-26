@@ -2149,51 +2149,71 @@ footer.site-foot{
               </div>
             </div>
 
-            <!-- Desktop chaos: 8 mock IDE windows scattered behind the
+            <!-- Desktop chaos: 12 mock IDE windows scattered behind the
                  palette. They fade in first to dramatize the "before";
                  once the palette materializes they dim away. Odak only
                  tracks editor windows, so no terminal/browser windows
                  here — what shows up is what we can actually open. -->
             <div class="mb-windows" id="mb-windows">
-              <div class="mb-window" data-project="web-app" style="--x:2%;--y:4%;--w:18%;--h:24%;--r:-3deg;--z:2;--d:80ms">
+              <div class="mb-window" data-project="web-app" style="--x:2%;--y:4%;--w:18%;--h:24%;--r:-3deg;--z:2;--d:40ms">
                 <div class="app-badge"><img src="assets/ide/cursor.png" alt=""></div>
                 <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/cursor.png" alt=""></span><span class="title">web-app · page.tsx</span></div>
                 <div class="body"><div class="ln" style="--lw:65%"></div><div class="ln hl" style="--lw:42%"></div><div class="ln" style="--lw:78%"></div><div class="ln" style="--lw:50%"></div></div>
               </div>
-              <div class="mb-window" data-project="react-dashboard" style="--x:79%;--y:5%;--w:19%;--h:26%;--r:3deg;--z:2;--d:160ms">
+              <div class="mb-window" data-project="ios-app" style="--x:36%;--y:6%;--w:15%;--h:20%;--r:2deg;--z:1;--d:80ms">
+                <div class="app-badge"><img src="assets/ide/xcode.png" alt=""></div>
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/xcode.png" alt=""></span><span class="title">ios-app</span></div>
+                <div class="body"><div class="ln" style="--lw:58%"></div><div class="ln b" style="--lw:42%"></div><div class="ln" style="--lw:70%"></div></div>
+              </div>
+              <div class="mb-window" data-project="react-dashboard" style="--x:79%;--y:5%;--w:19%;--h:26%;--r:3deg;--z:2;--d:120ms">
                 <div class="app-badge"><img src="assets/ide/cursor.png" alt=""></div>
                 <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/cursor.png" alt=""></span><span class="title">react-dashboard</span></div>
                 <div class="body"><div class="ln" style="--lw:70%"></div><div class="ln" style="--lw:38%"></div><div class="ln b" style="--lw:60%"></div><div class="ln" style="--lw:82%"></div></div>
               </div>
-              <div class="mb-window" data-project="api-gateway" style="--x:2%;--y:31%;--w:16%;--h:30%;--r:-1deg;--z:3;--d:240ms">
+              <div class="mb-window" data-project="api-gateway" style="--x:2%;--y:31%;--w:16%;--h:30%;--r:-1deg;--z:3;--d:160ms">
                 <div class="app-badge"><img src="assets/ide/intellij.png" alt=""></div>
                 <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/intellij.png" alt=""></span><span class="title">api-gateway</span></div>
                 <div class="body"><div class="ln" style="--lw:55%"></div><div class="ln" style="--lw:80%"></div><div class="ln hl" style="--lw:45%"></div><div class="ln" style="--lw:70%"></div><div class="ln" style="--lw:38%"></div></div>
               </div>
-              <div class="mb-window" data-project="platform-ios" style="--x:82%;--y:33%;--w:16%;--h:28%;--r:2deg;--z:3;--d:320ms">
+              <div class="mb-window" data-project="design-tokens" style="--x:23%;--y:35%;--w:17%;--h:23%;--r:1deg;--z:2;--d:200ms">
+                <div class="app-badge"><img src="assets/ide/cursor.png" alt=""></div>
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/cursor.png" alt=""></span><span class="title">design-tokens</span></div>
+                <div class="body"><div class="ln hl" style="--lw:50%"></div><div class="ln" style="--lw:72%"></div><div class="ln" style="--lw:38%"></div><div class="ln" style="--lw:60%"></div></div>
+              </div>
+              <div class="mb-window" data-project="payments-svc" style="--x:60%;--y:36%;--w:18%;--h:24%;--r:-2deg;--z:2;--d:240ms">
+                <div class="app-badge"><img src="assets/ide/intellij.png" alt=""></div>
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/intellij.png" alt=""></span><span class="title">payments-svc · main.kt</span></div>
+                <div class="body"><div class="ln" style="--lw:64%"></div><div class="ln" style="--lw:48%"></div><div class="ln b" style="--lw:72%"></div><div class="ln" style="--lw:35%"></div></div>
+              </div>
+              <div class="mb-window" data-project="platform-ios" style="--x:82%;--y:33%;--w:16%;--h:28%;--r:2deg;--z:3;--d:280ms">
                 <div class="app-badge"><img src="assets/ide/xcode.png" alt=""></div>
                 <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/xcode.png" alt=""></span><span class="title">platform-ios</span></div>
                 <div class="body"><div class="ln" style="--lw:60%"></div><div class="ln" style="--lw:48%"></div><div class="ln b" style="--lw:72%"></div><div class="ln" style="--lw:55%"></div></div>
               </div>
-              <div class="mb-window" data-project="admin-panel" style="--x:4%;--y:65%;--w:22%;--h:31%;--r:-2deg;--z:4;--d:560ms">
+              <div class="mb-window" data-project="admin-panel" style="--x:4%;--y:65%;--w:22%;--h:31%;--r:-2deg;--z:4;--d:320ms">
                 <div class="app-badge"><img src="assets/ide/cursor.png" alt=""></div>
                 <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/cursor.png" alt=""></span><span class="title">admin-panel</span></div>
                 <div class="body"><div class="ln" style="--lw:70%"></div><div class="ln" style="--lw:45%"></div><div class="ln" style="--lw:60%"></div><div class="ln hl" style="--lw:78%"></div><div class="ln" style="--lw:40%"></div></div>
               </div>
-              <div class="mb-window" data-project="etl-pipeline" style="--x:28%;--y:68%;--w:22%;--h:28%;--r:1deg;--z:5;--d:640ms">
+              <div class="mb-window" data-project="etl-pipeline" style="--x:28%;--y:68%;--w:22%;--h:28%;--r:1deg;--z:5;--d:360ms">
                 <div class="app-badge"><img src="assets/ide/vscode.png" alt=""></div>
                 <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/vscode.png" alt=""></span><span class="title">etl-pipeline.py</span></div>
                 <div class="body"><div class="ln" style="--lw:65%"></div><div class="ln b" style="--lw:50%"></div><div class="ln" style="--lw:78%"></div><div class="ln" style="--lw:42%"></div></div>
               </div>
-              <div class="mb-window" data-project="odak-mac" style="--x:52%;--y:66%;--w:22%;--h:30%;--r:-1deg;--z:6;--d:720ms">
+              <div class="mb-window" data-project="odak-mac" style="--x:52%;--y:66%;--w:22%;--h:30%;--r:-1deg;--z:6;--d:400ms">
                 <div class="app-badge"><img src="assets/ide/xcode.png" alt=""></div>
                 <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/xcode.png" alt=""></span><span class="title">odak-mac</span></div>
                 <div class="body"><div class="ln" style="--lw:55%"></div><div class="ln" style="--lw:72%"></div><div class="ln hl" style="--lw:38%"></div><div class="ln" style="--lw:65%"></div><div class="ln" style="--lw:48%"></div></div>
               </div>
-              <div class="mb-window" data-project="plexo-cli" style="--x:76%;--y:69%;--w:22%;--h:28%;--r:2deg;--z:5;--d:800ms">
+              <div class="mb-window" data-project="plexo-cli" style="--x:76%;--y:69%;--w:22%;--h:28%;--r:2deg;--z:5;--d:440ms">
                 <div class="app-badge"><img src="assets/ide/intellij.png" alt=""></div>
                 <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/intellij.png" alt=""></span><span class="title">plexo-cli · main.go</span></div>
                 <div class="body"><div class="ln" style="--lw:72%"></div><div class="ln" style="--lw:48%"></div><div class="ln" style="--lw:60%"></div><div class="ln b" style="--lw:35%"></div></div>
+              </div>
+              <div class="mb-window" data-project="ml-notebook" style="--x:38%;--y:42%;--w:18%;--h:22%;--r:-1deg;--z:1;--d:480ms">
+                <div class="app-badge"><img src="assets/ide/vscode.png" alt=""></div>
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/vscode.png" alt=""></span><span class="title">ml-notebook.ipynb</span></div>
+                <div class="body"><div class="ln" style="--lw:60%"></div><div class="ln" style="--lw:75%"></div><div class="ln hl" style="--lw:42%"></div></div>
               </div>
             </div>
 
@@ -3193,7 +3213,7 @@ footer.site-foot{
       clearFocus();
       // Brief beat so the previous cycle's fade-out reads cleanly before
       // the new chaos staggers back in.
-      await wait(400);
+      await wait(220);
 
       // Reshuffle which window lands in which slot before the next
       // chaos reveal — each cycle reads as a fresh desktop, not a
@@ -3202,19 +3222,19 @@ footer.site-foot{
       shuffleSlots();
 
       // Chaos reveal — fades in via the .shown class on .mb-windows
-      // (per-window stagger via --d on each window). Wait for the last
-      // window's stagger (max --d ≈ 800ms) plus its duration (~500ms)
-      // so the chaos is fully painted before we cut in.
+      // (per-window stagger via --d on each window). Stagger is 40ms
+      // apart × 12 windows → max --d 480ms; opacity transition is
+      // 500ms; last window finishes at ~980ms.
       wins.classList.add('shown');
-      await wait(1500);
+      await wait(1050);
 
       // Beat 1 — let the chaos breathe.
-      await wait(900);
+      await wait(550);
 
       // Beat 2 — palette materializes, windows recede out of focus.
       wins.classList.add('dimmed');
       wrap.classList.add('shown');
-      await wait(700);
+      await wait(450);
 
       // Beat 3 — type query, list narrows under the fixed search bar.
       for(let i = 1; i <= QUERY.length; i++){
@@ -3222,28 +3242,28 @@ footer.site-foot{
         typed.textContent = q;
         filterList(q);
         setGhost(q);
-        await wait(160 + Math.random() * 80);
+        await wait(130 + Math.random() * 60);
       }
 
       // Beat 4 — settle. Un-tint the editor icon to signal "ready to open".
-      await wait(800);
+      await wait(550);
       topIde.classList.remove('tinted');
       openHnt.textContent = '— Open in Cursor';
 
       // Beat 5 — short beat, then the matching chaos window wakes up.
       // Read as: search → open → THIS one. Palette recedes to the
       // background as the window grows into the foreground.
-      await wait(550);
+      await wait(380);
       focusWindow(topVisibleKey());
       wrap.classList.add('receded');
-      await wait(1700);
+      await wait(1300);
 
       // Beat 6 — fade palette and chaos out together, then loop back to
       // the top where the chaos reveal replays from the beginning.
       wrap.classList.remove('shown', 'receded');
       wins.classList.remove('dimmed');
       clearFocus();
-      await wait(900);
+      await wait(550);
     }
   }
 
