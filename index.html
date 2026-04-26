@@ -3146,25 +3146,6 @@ section.mb-section{padding-top:24px}
   // center lands on the screen center, regardless of its starting position.
   const winEls = Array.from(wins.querySelectorAll('.mb-window'));
 
-  // Capture each window's original slot (position/size/rotation/z/delay)
-  // so we can reshuffle assignments on every loop restart. The first
-  // chaos beat reads as a fresh desktop each cycle instead of the same
-  // memorized layout.
-  const SLOT_VARS = ['--x', '--y', '--w', '--h', '--r', '--z', '--d'];
-  const slots = winEls.map(w => SLOT_VARS.map(v => w.style.getPropertyValue(v)));
-  function shuffleSlots(){
-    // Fisher-Yates over a copy of the original slot list, then assign
-    // each window the i-th slot. Windows keep their data-project (so
-    // 'da' still focuses react-dashboard) but appear in new positions.
-    const order = slots.slice();
-    for(let i = order.length - 1; i > 0; i--){
-      const j = Math.floor(Math.random() * (i + 1));
-      [order[i], order[j]] = [order[j], order[i]];
-    }
-    winEls.forEach((w, i) => {
-      SLOT_VARS.forEach((v, k) => w.style.setProperty(v, order[i][k]));
-    });
-  }
   function focusWindow(key){
     if(!key) return;
     const target = winEls.find(w => w.dataset.project === key);
@@ -3227,12 +3208,6 @@ section.mb-section{padding-top:24px}
       // Brief beat so the previous cycle's fade-out reads cleanly before
       // the new chaos staggers back in.
       await wait(220);
-
-      // Reshuffle which window lands in which slot before the next
-      // chaos reveal — each cycle reads as a fresh desktop, not a
-      // replay of the same layout. Done while .shown is off so users
-      // never see the windows jump positions.
-      shuffleSlots();
 
       // Chaos reveal — fades in via the .shown class on .mb-windows
       // (per-window stagger via --d on each window). Stagger is 40ms
