@@ -1347,12 +1347,43 @@ footer.site-foot{
 .mb-window .app-badge svg{
   width:100%;height:100%;object-fit:contain;display:block;
 }
-.mb-window.focused .app-badge{
-  transform:scale(1.15);
+/* On focus, the small corner badge hands off to .mb-focused-badge — a
+   sibling overlay rendered at native size, so the IDE icon stays crisp
+   when the window grows 3.4× into focus. */
+.mb-window.focused .app-badge{opacity:0}
+/* Floating IDE badge — sibling of .mb-window so the parent's scale
+   transform doesn't upscale a small bitmap. JS positions it on the
+   focused window's top-right corner and sizes it relative to the
+   grown window, then sets the icon via innerHTML clone. */
+.mb-focused-badge{
+  position:absolute;top:0;left:0;
+  pointer-events:none;
+  opacity:0;
+  z-index:60;
+  /* No-delay transition is the "out" path — when .shown drops, the badge
+     leaves instantly with the window. The "in" path overrides with a
+     delay below, so the badge appears once the window has mostly grown. */
+  transition:opacity .3s var(--ease-out), transform .3s var(--ease-snappy);
+  transform:scale(.7);
+  display:grid;place-items:center;
+  background:rgba(0,0,0,.42);
+  backdrop-filter:blur(8px) saturate(160%);
+  -webkit-backdrop-filter:blur(8px) saturate(160%);
   box-shadow:
-    0 2px 8px rgba(0,0,0,.55),
-    inset 0 0 0 .5px rgba(255,255,255,.22),
-    0 0 10px var(--accent-glow);
+    0 18px 40px rgba(0,0,0,.6),
+    inset 0 0 0 1.5px rgba(255,255,255,.22),
+    0 0 56px var(--accent-glow);
+}
+.mb-focused-badge.shown{
+  opacity:1;
+  transform:scale(1);
+  /* Delay matches the window's grow transition (.72s) — badge appears
+     once the window has mostly arrived, like a brand reveal on settle. */
+  transition:opacity .35s var(--ease-out) .45s, transform .55s var(--ease-snappy) .35s;
+}
+.mb-focused-badge img,
+.mb-focused-badge svg{
+  width:78%;height:78%;object-fit:contain;display:block;
 }
 .mb-window .title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .mb-window .body{
@@ -1624,6 +1655,12 @@ footer.site-foot{
   .mb-menubar .ico.cc svg{height:11px}
   /* Hide menu items past Edit on phones — no room. Keep app name + 1-2 menus. */
   .mb-menubar .left .item:nth-of-type(n+3){display:none}
+  /* Drop the duplicate titlebar icon on mobile — at chaos-window scale on
+     a phone, both the titlebar icon and the corner app-badge show the
+     same IDE png within a few mm of each other. The corner badge is the
+     stronger identifier (gets the focus halo), so keep it and hide the
+     titlebar copy. */
+  .mb-window .titlebar .ico{display:none}
   /* Palette must fit inside the on-screen rect of the MacBook PNG.
      Available height on a phone is ~170px — drop the kbd footer and
      the 4th project so search-bar + 3 items fit cleanly. */
@@ -2042,6 +2079,11 @@ footer.site-foot{
                 <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/intellij.png" alt=""></span><span class="title">plexo-cli · main.go</span></div>
                 <div class="body"><div class="ln" style="--lw:72%"></div><div class="ln" style="--lw:48%"></div><div class="ln" style="--lw:60%"></div><div class="ln b" style="--lw:35%"></div></div>
               </div>
+              <!-- Floating IDE badge — sibling of the windows so it isn't
+                   subject to the focused window's CSS transform: scale(),
+                   which would upscale the small bitmap into a blurry mess.
+                   JS sets size, position, and icon when a window grows. -->
+              <div class="mb-focused-badge" id="mb-focused-badge" aria-hidden="true"></div>
             </div>
 
             <!-- Palette materializes after the chaos beat -->
@@ -2933,6 +2975,7 @@ footer.site-foot{
   // the screen: scaled to ~72% of the screen height and translated so its
   // center lands on the screen center, regardless of its starting position.
   const winEls = Array.from(wins.querySelectorAll('.mb-window'));
+  const focusedBadge = document.getElementById('mb-focused-badge');
   function focusWindow(key){
     if(!key) return;
     const target = winEls.find(w => w.dataset.project === key);
@@ -2949,6 +2992,29 @@ footer.site-foot{
     target.style.setProperty('--cy', `${dy.toFixed(1)}px`);
     target.style.setProperty('--focus-scale', scale.toFixed(2));
     target.classList.add('focused');
+
+    // Floating IDE badge — sibling of the focused window, so it renders
+    // at native pixel size instead of being upscaled by the window's
+    // scale transform. Sized as ~26% of the focused window's grown
+    // height; positioned at the top-right corner with a 28% overhang
+    // to match the .chosen-window app-mark pattern.
+    if(focusedBadge){
+      const sourceBadge = target.querySelector('.app-badge');
+      if(sourceBadge){
+        focusedBadge.innerHTML = sourceBadge.innerHTML;
+        const scaledW = tRect.width * scale;
+        const scaledH = tRect.height * scale;
+        const cornerX = (winsRect.width / 2) + scaledW / 2;
+        const cornerY = (winsRect.height / 2) - scaledH / 2;
+        const badgeSize = scaledH * 0.26;
+        focusedBadge.style.width  = `${badgeSize.toFixed(1)}px`;
+        focusedBadge.style.height = `${badgeSize.toFixed(1)}px`;
+        focusedBadge.style.left   = `${(cornerX - badgeSize * 0.72).toFixed(1)}px`;
+        focusedBadge.style.top    = `${(cornerY - badgeSize * 0.28).toFixed(1)}px`;
+        focusedBadge.style.borderRadius = `${(badgeSize * 0.24).toFixed(1)}px`;
+        focusedBadge.classList.add('shown');
+      }
+    }
   }
   function clearFocus(){
     winEls.forEach(w => {
@@ -2957,6 +3023,7 @@ footer.site-foot{
       w.style.removeProperty('--cy');
       w.style.removeProperty('--focus-scale');
     });
+    if(focusedBadge) focusedBadge.classList.remove('shown');
   }
   function topVisibleKey(){
     const visible = items.filter(li => li.getAttribute('data-filtered') === '0');
