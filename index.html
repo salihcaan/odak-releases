@@ -1968,6 +1968,12 @@ section.mb-section{padding-top:24px}
 /* MacBook section — scale down on tablets/phones */
 @media (max-width:760px){
   section.mb-section{padding-top:16px}
+  /* Crop the silver base/hinge and trim a bit off the side bezels —
+     they eat vertical/horizontal space on a phone without adding info.
+     clip-path also drops the bottom drop-shadow, which is barely
+     visible at this size anyway; margin-bottom pulls the next section
+     up to absorb the now-empty band where the base used to be. */
+  .macbook{clip-path:inset(0 4% 9% 4%);margin-bottom:-4%}
   .mb-menubar{font-size:9px;padding:0 8px;height:18px}
   .mb-menubar .left{gap:9px}
   .mb-menubar .right{gap:8px}
