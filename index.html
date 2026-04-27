@@ -2073,9 +2073,28 @@ section.mb-section{padding-top:24px}
   /* Re-anchor actions popover for the smaller mobile palette. Footer
      is hidden on mobile, so bottom can sit close to the palette edge. */
   .mb-actions-panel{bottom:6px;right:6px;width:60%}
+  /* Caption pill: scale with the screen interior so the desktop
+     padding (10px 20px / 13px font) doesn't read as a giant pill on a
+     phone-sized macbook. */
+  .mb-caption{padding:5px 11px;font-size:clamp(10px, 3.4cqi, 12.5px);border-radius:999px}
+  .mb-caption kbd{padding:1px 4px;margin:0 2px;border-radius:4px}
+  /* When actions are open the bottom of the screen is owned by the
+     popover. Hop the caption up under the menubar so it doesn't sit
+     on top of the action rows and obscure them. */
+  .mb-palette-wrap.actions-open ~ .mb-caption{
+    bottom:auto;
+    top:calc(var(--menubar-h, 18px) + 5px);
+  }
+  .mb-palette-wrap.actions-open ~ .mb-caption.shown{
+    transform:translate(-50%, 0) scale(1);
+  }
 }
 @media (max-width:420px){
   .mb-palette-wrap{width:90%;transform:translateX(-50%) scale(.88);transform-origin:top center}
+  /* Tighter still on small phones — the macbook screen is ~200px tall
+     so even a 5/11 pill reads chunky. */
+  .mb-caption{padding:4px 9px;font-size:10.5px}
+  .mb-caption kbd{padding:0 3px;margin:0 1.5px}
 }
 
 /* Feature MacBooks on mobile — same fit-into-screen-rect logic */
