@@ -948,6 +948,157 @@ h2.section-h .mute{color:var(--dim)}
 }
 
 /* ==========================================================
+   NOTCH — live project state on the menubar
+   A trimmed menubar slice with the notch baked in. The status
+   pill (project · branch · dirty) sits left of the cutout, the
+   popover drops from the right side of the notch with recent
+   windows + per-project actions.
+   ========================================================== */
+.notch-demo{
+  --nb-h:30px;
+  --notch-w:96px;
+  --notch-h:22px;
+  --bezel:#0a0a0a;
+  display:flex;flex-direction:column;align-items:center;
+  width:100%;max-width:560px;margin:0 auto;
+  font-family:var(--mono);
+}
+.notch-bar{
+  position:relative;
+  width:100%;
+  height:var(--nb-h);
+  display:grid;
+  grid-template-columns:1fr var(--notch-w) 1fr;
+  align-items:stretch;
+  background:linear-gradient(180deg, rgba(20,20,22,.94), rgba(14,14,16,.96));
+  border:1px solid var(--border);
+  border-radius:14px 14px 4px 4px;
+  box-shadow:
+    0 24px 50px -22px rgba(0,0,0,.55),
+    inset 0 1px 0 color-mix(in oklch, var(--fg) 5%, transparent);
+  overflow:hidden;
+}
+.notch-bar .nb-cutout{
+  background:var(--bezel);
+  border-radius:0 0 12px 12px;
+  align-self:start;
+  height:var(--notch-h);
+  width:100%;
+  box-shadow:inset 0 -1px 0 rgba(255,255,255,.04);
+}
+.notch-bar .nb-side{
+  display:flex;align-items:center;gap:10px;
+  padding:0 14px;
+  font-size:11.5px;color:rgba(255,255,255,.92);
+  letter-spacing:-.005em;
+  white-space:nowrap;overflow:hidden;
+}
+.notch-bar .nb-side.right{justify-content:flex-end;gap:8px}
+.notch-bar .nb-apple svg{width:11px;height:13px;display:block;fill:rgba(255,255,255,.94)}
+.notch-bar .nb-app{font-weight:600;font-family:var(--display);font-size:12px;letter-spacing:-.01em}
+.notch-bar .nb-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:3px 8px 3px 7px;margin-left:2px;
+  background:color-mix(in oklch, var(--accent) 14%, rgba(255,255,255,.04));
+  border:1px solid color-mix(in oklch, var(--accent) 30%, transparent);
+  border-radius:7px;
+  font-size:10.5px;color:rgba(255,255,255,.96);
+}
+.notch-bar .nb-pill .nb-proj{color:var(--accent);font-weight:600}
+.notch-bar .nb-pill .nb-sep{color:rgba(255,255,255,.4)}
+.notch-bar .nb-pill .nb-branch{color:rgba(255,255,255,.78)}
+.notch-bar .nb-pill .nb-dirty{
+  display:inline-flex;align-items:center;gap:4px;
+  margin-left:4px;padding-left:7px;
+  border-left:1px solid color-mix(in oklch, var(--accent) 25%, transparent);
+  color:rgba(255,255,255,.92);
+}
+.notch-bar .nb-pill .nb-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:#ff5f5f;box-shadow:0 0 6px rgba(255,95,95,.55);
+}
+.notch-bar .nb-ico svg{display:block;height:11px;width:auto;fill:rgba(255,255,255,.88);color:rgba(255,255,255,.88)}
+.notch-bar .nb-ico.cc svg{height:12px}
+.notch-bar .nb-time{font-size:11px;color:rgba(255,255,255,.92);font-feature-settings:"tnum" 1}
+
+/* Drop popover. Anchors under the right wing of the notch and
+   reads as if it pulled down from the bezel. The arrow nudges
+   under the cutout so the popover lineage is obvious. */
+.notch-popover{
+  position:relative;
+  margin-top:10px;
+  /* Shift right of center so the arrow lines up under the right
+     side of the notch wing, not dead-center. */
+  transform:translateX(calc(var(--notch-w) / 2 - 24px));
+  width:min(360px, 100%);
+  background:color-mix(in oklch, var(--bg-2) 96%, transparent);
+  border:1px solid var(--border-2);
+  border-radius:14px;
+  box-shadow:
+    0 30px 60px -22px rgba(0,0,0,.55),
+    inset 0 1px 0 color-mix(in oklch, var(--fg) 6%, transparent);
+  overflow:hidden;
+}
+.notch-popover::before{
+  content:'';position:absolute;top:-6px;left:32px;
+  width:12px;height:12px;
+  background:inherit;
+  border-left:1px solid var(--border-2);
+  border-top:1px solid var(--border-2);
+  transform:rotate(45deg);
+  border-radius:2px 0 0 0;
+}
+.notch-popover .np-section + .np-section{
+  border-top:1px solid var(--border);
+}
+.notch-popover .np-head{
+  font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--mute);padding:10px 14px 4px;
+}
+.notch-popover .np-list{
+  list-style:none;margin:0;padding:2px 6px 8px;
+}
+.notch-popover .np-list li{
+  display:flex;align-items:center;gap:10px;
+  padding:7px 10px;border-radius:7px;
+  font-size:12px;color:var(--fg-2);
+  transition:background var(--dur-fast) var(--ease-out);
+}
+.notch-popover .np-list li:hover{background:var(--surface-2)}
+.notch-popover .np-ide{
+  width:18px;height:18px;border-radius:4px;flex-shrink:0;
+  display:grid;place-items:center;
+  background:var(--surface);border:1px solid var(--border);
+}
+.notch-popover .np-ide img,
+.notch-popover .np-ide svg{width:13px;height:13px;display:block;color:var(--fg-2)}
+.notch-popover .np-name{flex:1;color:var(--fg);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.notch-popover .np-var{color:var(--accent)}
+.notch-popover .np-meta{font-size:10.5px;color:var(--mute);flex-shrink:0}
+.notch-popover .np-glyph{
+  width:18px;height:18px;border-radius:4px;flex-shrink:0;
+  background:var(--surface);border:1px solid var(--border);
+  display:grid;place-items:center;color:var(--dim);font-size:11px;
+}
+.notch-popover .np-key{
+  font-size:10px;color:var(--dim);flex-shrink:0;
+  padding:1px 6px;border:1px solid var(--border-2);border-radius:4px;background:var(--surface);
+}
+
+[data-theme="light"] .notch-bar{
+  background:linear-gradient(180deg, #1f1f22, #161618);
+}
+
+@media (max-width:720px){
+  .notch-demo{--nb-h:26px;--notch-w:78px;--notch-h:18px}
+  .notch-bar .nb-side{padding:0 10px;gap:7px;font-size:10.5px}
+  .notch-bar .nb-pill{font-size:9.5px;padding:2px 7px}
+  .notch-bar .nb-app{font-size:11px}
+  .notch-popover{transform:translateX(0);max-width:100%}
+  .notch-popover::before{left:50%;margin-left:-6px}
+}
+
+/* ==========================================================
    POSITIONING DIAGRAM — 3 column
    ========================================================== */
 .pos-diagram{
@@ -2698,7 +2849,7 @@ section.mb-section{padding-top:24px}
   <div class="f-carousel" data-advance-ms="10000">
     <div class="f-tabs" role="tablist" aria-label="Features">
       <button class="f-tab active" type="button" role="tab" aria-selected="true" aria-controls="f-panel-search" id="f-tab-search" data-idx="0">
-        <span class="lbl-full">Find any repo</span>
+        <span class="lbl-full">Find &amp; focus</span>
         <span class="lbl-short">Search</span>
         <span class="kbd-hint">⌥ Space</span>
         <span class="bar"></span>
@@ -2715,10 +2866,9 @@ section.mb-section{padding-top:24px}
         <span class="kbd-hint">⌘ K</span>
         <span class="bar"></span>
       </button>
-      <button class="f-tab" type="button" role="tab" aria-selected="false" aria-controls="f-panel-editor" id="f-tab-editor" data-idx="3" tabindex="-1">
-        <span class="lbl-full">Pick the editor</span>
-        <span class="lbl-short">Editor</span>
-        <span class="kbd-hint">⇥</span>
+      <button class="f-tab" type="button" role="tab" aria-selected="false" aria-controls="f-panel-notch" id="f-tab-notch" data-idx="3" tabindex="-1">
+        <span class="lbl-full">Live on the notch</span>
+        <span class="lbl-short">Notch</span>
         <span class="bar"></span>
       </button>
     </div>
@@ -2733,88 +2883,151 @@ section.mb-section{padding-top:24px}
         <div class="fp"><kbd>⌥ Tab</kbd><span>Switch</span></div>
         <div class="fp"><kbd>⌘ K</kbd><span>Actions</span></div>
       </div>
-      <h3>Find any repo. <span class="accent">In three letters.</span></h3>
+      <h3>Three letters in. <span class="accent">Window in focus.</span></h3>
       <p class="lead">
-        Every trip through Finder is a broken thought. Every dock-bounce is a thread lost. Hit ⌥ Space, type three letters, land in the right repo — your focus stays on the problem, not on hunting for the folder.
+        Every trip through Finder is a broken thought. Every dock-bounce is a thread lost. Hit ⌥ Space, type three letters, hit ↵ — the right window snaps to focus. Your attention stays on the problem, not on hunting for the folder.
       </p>
       <ul class="bullets">
         <li>
           <div class="ico"><svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg></div>
-          <div class="txt"><b>No syntax to remember</b><span>"wba" finds web-app. "adak" finds odak. Typos forgiven.</span></div>
+          <div class="txt"><b>Fuzzy, frecency-ranked</b><span>"wba" finds web-app. "adak" finds odak. Recent + frequent rises to the top, so the repos you live in land on the first letter.</span></div>
         </li>
         <li>
-          <div class="ico"><svg viewBox="0 0 16 16"><path d="M2 12l4-4 3 3 5-6"/><path d="M9 5h4v4"/></svg></div>
-          <div class="txt"><b>Frecency, not alphabetical</b><span>Recent + frequent rises to the top. The repos you live in hit on the first letter.</span></div>
+          <div class="ico"><svg viewBox="0 0 16 16"><path d="M3 5l3 3-3 3M9 11h4"/></svg></div>
+          <div class="txt"><b>⇥ flips the editor</b><span>Same repo, three editors open — Cursor, VS Code, Xcode. Tab cycles through the ones already running; ↵ focuses the one you picked.</span></div>
         </li>
         <li>
           <div class="ico"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="3"/><path d="M8 2v2M8 12v2M2 8h2M12 8h2"/></svg></div>
-          <div class="txt"><b>Dirty-state badges</b><span>A red dot on repos with uncommitted work — never lose track of what you started.</span></div>
+          <div class="txt"><b>Dirty-state at a glance</b><span>A red dot on repos with uncommitted work — never lose track of what you started.</span></div>
         </li>
       </ul>
     </div>
 
     <div class="f-stage reveal">
-      <div class="palette palette-fx shown">
-        <div class="search-bar">
-          <svg class="q" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg>
-          <div class="input"><span class="typed">odk</span><span class="caret"></span><span class="ghost">-mac</span><span class="open-hint">— Open</span></div>
-          <div class="top-ide"><img src="assets/ide/xcode.png" alt="Xcode"></div>
-        </div>
-        <ul>
-          <li class="on">
-            <div class="lang sw">SW</div>
-            <div class="body">
-              <div class="title-row"><span><span style="color:var(--accent)">od</span>a<span style="color:var(--accent)">k</span>-mac</span></div>
-              <div class="path">
-                <span>~/code/odak-mac</span>
-                <span class="sep">·</span>
-                <span class="branch">feat/liquid-glass</span>
-                <span class="sep">·</span>
-                <span class="dirty"><span class="dot"></span>4</span>
+      <!-- Live find→Tab→Enter→focus animation. The hero IIFE selects
+           #hero-stage / #hero-* IDs; markup must stay verbatim so the
+           type/cycle-IDE/zoom-into-focus loop keeps running here. -->
+      <div class="hero-stage" id="hero-stage">
+        <div class="stage-glow"></div>
+        <div class="stage-inner" id="stage-inner">
+          <div class="palette palette-fx shown" id="hero-palette">
+            <div class="hotkey-pill" id="hero-hotkey">
+              <div class="kc" data-key="opt">⌥</div>
+              <div class="plus">+</div>
+              <div class="kc" data-key="space">Space</div>
+            </div>
+            <div class="search-bar">
+              <svg class="q" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg>
+              <div class="input">
+                <span class="typed" id="hero-typed"></span><span class="caret" id="hero-caret"></span><span class="ghost" id="hero-ghost"></span><span class="open-hint" id="hero-open-hint"></span>
+              </div>
+              <div class="hint-pill" id="hero-hint"></div>
+              <div class="top-ide tinted" id="hero-topide"><img src="assets/ide/cursor.png" alt="Cursor"></div>
+            </div>
+            <ul id="hero-list">
+              <li data-keys="web-app" class="on">
+                <div class="lang ts">TS</div>
+                <div class="body">
+                  <div class="title-row">web-app</div>
+                  <div class="path">
+                    <span>~/code/web-app</span>
+                    <span class="sep">·</span>
+                    <span class="branch">feat/pricing</span>
+                    <span class="sep">·</span>
+                    <span class="dirty"><span class="dot"></span>7</span>
+                  </div>
+                </div>
+                <div class="meta">
+                  <div class="ide-stack" title="Open windows">
+                    <div class="ide" data-ide="cursor"   title="Cursor"><img src="assets/ide/cursor.png" alt="Cursor"></div>
+                    <div class="ide" data-ide="vscode"   title="VS Code"><img src="assets/ide/vscode.png" alt="VS Code"></div>
+                    <div class="ide" data-ide="intellij" title="IntelliJ IDEA"><img src="assets/ide/intellij.png" alt="IntelliJ IDEA"></div>
+                  </div>
+                </div>
+              </li>
+              <li data-keys="plexo-cli">
+                <div class="lang go">GO</div>
+                <div class="body">
+                  <div class="title-row">plexo-cli</div>
+                  <div class="path">
+                    <span>~/code/side/plexo-cli</span>
+                    <span class="sep">·</span>
+                    <span class="branch">main</span>
+                  </div>
+                </div>
+                <div class="meta">
+                  <div class="ide-stack"><div class="ide"><img src="assets/ide/intellij.png" alt="IntelliJ IDEA"></div></div>
+                </div>
+              </li>
+              <li data-keys="api-gateway">
+                <div class="lang go">GO</div>
+                <div class="body">
+                  <div class="title-row">api-gateway</div>
+                  <div class="path">
+                    <span>~/code/work/api-gateway</span>
+                    <span class="sep">·</span>
+                    <span class="branch">main</span>
+                  </div>
+                </div>
+                <div class="meta">
+                  <div class="ide-stack"><div class="ide"><img src="assets/ide/intellij.png" alt="IntelliJ IDEA"></div></div>
+                </div>
+              </li>
+              <li data-keys="react-dashboard">
+                <div class="lang ts">TS</div>
+                <div class="body">
+                  <div class="title-row">react-dashboard</div>
+                  <div class="path">
+                    <span>~/code/work/react-dashboard</span>
+                    <span class="sep">·</span>
+                    <span class="branch">feat/onboarding</span>
+                    <span class="sep">·</span>
+                    <span class="dirty"><span class="dot"></span>3</span>
+                  </div>
+                </div>
+                <div class="meta">
+                  <div class="ide-stack"><div class="ide"><img src="assets/ide/cursor.png" alt="Cursor"></div></div>
+                </div>
+              </li>
+              <li data-keys="notion-clone">
+                <div class="lang rb">RB</div>
+                <div class="body">
+                  <div class="title-row">notion-clone</div>
+                  <div class="path">
+                    <span>~/code/side/notion-clone</span>
+                    <span class="sep">·</span>
+                    <span class="branch">main</span>
+                  </div>
+                </div>
+                <div class="meta"></div>
+              </li>
+            </ul>
+            <div class="footer">
+              <div class="row"><kbd>⌥K</kbd><kbd>⌥J</kbd> Navigate</div>
+              <div class="row"><kbd>⌘K</kbd> Actions</div>
+            </div>
+            <div class="enter-pill" id="hero-enter"><span>Press</span><kbd>↵</kbd><span>to open</span></div>
+          </div>
+
+          <div class="chosen-window" id="hero-chosen" aria-hidden="true">
+            <div class="frame">
+              <div class="titlebar">
+                <span class="tl-dot tl-r"></span>
+                <span class="tl-dot tl-y"></span>
+                <span class="tl-dot tl-g"></span>
+                <span>web-app — pricing.tsx</span>
+              </div>
+              <div class="body">
+                <div class="line"><span style="width:44px"></span><span class="hl" style="width:78px"></span><span style="width:32px"></span></div>
+                <div class="line"><span style="width:96px"></span><span style="width:24px"></span><span class="hl" style="width:58px"></span></div>
+                <div class="line"><span style="width:140px"></span></div>
+                <div class="line"><span style="width:62px"></span><span style="width:36px"></span><span style="width:88px"></span></div>
+                <div class="line"><span class="hl" style="width:44px"></span><span style="width:112px"></span></div>
+                <div class="line"><span style="width:70px"></span><span style="width:30px"></span></div>
               </div>
             </div>
-            <div class="meta"><div class="ide-stack"><div class="ide"><img src="assets/ide/xcode.png" alt="Xcode"></div></div></div>
-          </li>
-          <li>
-            <div class="lang ts">TS</div>
-            <div class="body">
-              <div class="title-row"><span><span style="color:var(--accent)">od</span>a<span style="color:var(--accent)">k</span>-site</span></div>
-              <div class="path">
-                <span>~/code/odak-site</span>
-                <span class="sep">·</span>
-                <span class="branch">main</span>
-              </div>
-            </div>
-            <div class="meta"><div class="ide-stack"><div class="ide"><img src="assets/ide/cursor.png" alt="Cursor"></div></div></div>
-          </li>
-          <li>
-            <div class="lang py">PY</div>
-            <div class="body">
-              <div class="title-row"><span><span style="color:var(--accent)">od</span>a<span style="color:var(--accent)">k</span>-scripts</span></div>
-              <div class="path">
-                <span>~/code/odak-scripts</span>
-                <span class="sep">·</span>
-                <span class="branch">main</span>
-              </div>
-            </div>
-            <div class="meta"></div>
-          </li>
-          <li>
-            <div class="lang sw">SW</div>
-            <div class="body">
-              <div class="title-row">audi<span style="color:var(--accent)">o</span>-<span style="color:var(--accent)">d</span>oc<span style="color:var(--accent)">k</span></div>
-              <div class="path">
-                <span>~/code/side/audio-dock</span>
-                <span class="sep">·</span>
-                <span class="branch">main</span>
-              </div>
-            </div>
-            <div class="meta"></div>
-          </li>
-        </ul>
-        <div class="footer">
-          <div class="row"><kbd>⌥K</kbd><kbd>⌥J</kbd> Navigate</div>
-          <div class="row"><kbd>⌘K</kbd> Actions</div>
+            <span class="app-mark"><img src="assets/ide/cursor.png" alt=""></span>
+          </div>
         </div>
       </div>
     </div>
@@ -3004,168 +3217,109 @@ section.mb-section{padding-top:24px}
   </div>
       </div><!-- /.f-panel#f-panel-actions -->
 
-      <!-- ===== PANEL 4 — ⇥: pick the editor (parked from hero) =====
-           Moved over from the original hero stage. The bare-palette
-           layout still has its hotkey-pill on top and enter-pill below;
-           we'll redesign this beat in a follow-up pass. -->
-      <div class="f-panel" id="f-panel-editor" role="tabpanel" aria-labelledby="f-tab-editor" data-idx="3" aria-hidden="true">
+      <!-- ===== PANEL 4 — the notch: live project status =====
+           Mini menubar slice with the notch front-and-center. Odak
+           parks the active project + branch + dirty count over the
+           menubar; hover drops a popover with recent windows and
+           per-project actions. -->
+      <div class="f-panel" id="f-panel-notch" role="tabpanel" aria-labelledby="f-tab-notch" data-idx="3" aria-hidden="true">
         <div class="f-split">
           <div class="f-copy reveal">
       <div class="feature-pills">
         <div class="fp"><kbd>⌥ Space</kbd><span>Search</span></div>
         <div class="fp"><kbd>⌥ Tab</kbd><span>Switch</span></div>
-        <div class="fp primary"><kbd>⇥</kbd><span>Editor</span></div>
+        <div class="fp"><kbd>⌘ K</kbd><span>Actions</span></div>
       </div>
-      <h3>Pick the editor <span class="accent">without leaving the palette.</span></h3>
+      <h3>The notch, <span class="accent">finally useful.</span></h3>
       <p class="lead">
-        Same repo, three editors open — Cursor for code, VS Code for review, IntelliJ for refactors. Type to land on the project, then ⇥ to flip through the editors that already have it open. ↵ focuses the one you picked.
+        Apple gave you a strip of screen back. Odak parks the active project, branch, and uncommitted-file count above the menubar — so a glance up tells you exactly where you are. Hover for recent windows and per-project actions, no shortcut required.
       </p>
       <ul class="bullets">
         <li>
-          <div class="ico"><svg viewBox="0 0 16 16"><path d="M3 5l3 3-3 3M9 11h4"/></svg></div>
-          <div class="txt"><b>Tab cycles open editors</b><span>The IDE icon in the search bar shows where ↵ will land. ⇥ flips through the others without re-typing.</span></div>
+          <div class="ico"><svg viewBox="0 0 16 16"><path d="M2 8h4l2-4 2 8 2-4h2"/></svg></div>
+          <div class="txt"><b>Project, branch, dirty count</b><span>The status you'd ⌘Tab-roulette to check, now always in your peripheral vision. Red dot when work is uncommitted.</span></div>
         </li>
         <li>
-          <div class="ico"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="3"/><path d="M8 2v2M8 12v2M2 8h2M12 8h2"/></svg></div>
-          <div class="txt"><b>Already-open glow</b><span>Editors holding this repo light up. The ones that aren't running take a launch — same shortcut, different cost, you decide.</span></div>
+          <div class="ico"><svg viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/><circle cx="8" cy="3" r="1.5"/></svg></div>
+          <div class="txt"><b>Hover drops the menu</b><span>Recent windows for this project, plus the same actions you fire from ⌘K. No keystroke to remember — your cursor's already up there.</span></div>
         </li>
         <li>
-          <div class="ico"><svg viewBox="0 0 16 16"><path d="M2 12l4-4 3 3 5-6"/><path d="M9 5h4v4"/></svg></div>
-          <div class="txt"><b>Default per repo</b><span>Drop <code style="font-family:var(--mono);font-size:.85em">"ide": "Xcode"</code> in <code style="font-family:var(--mono);font-size:.85em">.odak</code> and that repo always lands in Xcode — even when you live in Cursor.</span></div>
+          <div class="ico"><svg viewBox="0 0 16 16"><path d="M2 5h4a2 2 0 0 1 2 2v0a2 2 0 0 0 2 2h4M2 5v6h12"/></svg></div>
+          <div class="txt"><b>Wraps the notch, doesn't fight it</b><span>The status pill sits left of the cutout, the popover drops from beneath. Apple's lid stays Apple's lid.</span></div>
         </li>
       </ul>
     </div>
 
     <div class="f-stage reveal">
-      <!-- Bare-palette demo (was the hero animation). The hero IIFE
-           selects #hero-stage / #hero-* IDs, so the markup stays
-           verbatim — only the surrounding wrapper changed. -->
-      <div class="hero-stage" id="hero-stage">
-        <div class="stage-glow"></div>
-        <div class="stage-inner" id="stage-inner">
-          <div class="palette palette-fx shown" id="hero-palette">
-            <div class="hotkey-pill" id="hero-hotkey">
-              <div class="kc" data-key="opt">⌥</div>
-              <div class="plus">+</div>
-              <div class="kc" data-key="space">Space</div>
-            </div>
-            <div class="search-bar">
-              <svg class="q" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg>
-              <div class="input">
-                <span class="typed" id="hero-typed"></span><span class="caret" id="hero-caret"></span><span class="ghost" id="hero-ghost"></span><span class="open-hint" id="hero-open-hint"></span>
-              </div>
-              <div class="hint-pill" id="hero-hint"></div>
-              <div class="top-ide tinted" id="hero-topide"><img src="assets/ide/cursor.png" alt="Cursor"></div>
-            </div>
-            <ul id="hero-list">
-              <li data-keys="web-app" class="on">
-                <div class="lang ts">TS</div>
-                <div class="body">
-                  <div class="title-row">web-app</div>
-                  <div class="path">
-                    <span>~/code/web-app</span>
-                    <span class="sep">·</span>
-                    <span class="branch">feat/pricing</span>
-                    <span class="sep">·</span>
-                    <span class="dirty"><span class="dot"></span>7</span>
-                  </div>
-                </div>
-                <div class="meta">
-                  <div class="ide-stack" title="Open windows">
-                    <div class="ide" data-ide="cursor"   title="Cursor"><img src="assets/ide/cursor.png" alt="Cursor"></div>
-                    <div class="ide" data-ide="vscode"   title="VS Code"><img src="assets/ide/vscode.png" alt="VS Code"></div>
-                    <div class="ide" data-ide="intellij" title="IntelliJ IDEA"><img src="assets/ide/intellij.png" alt="IntelliJ IDEA"></div>
-                  </div>
-                </div>
+      <div class="notch-demo">
+        <div class="notch-bar">
+          <div class="nb-side left">
+            <span class="nb-apple" aria-hidden="true">
+              <svg viewBox="0 0 14 17"><use href="#mb-apple"/></svg>
+            </span>
+            <span class="nb-app">Odak</span>
+            <span class="nb-pill">
+              <span class="nb-proj">web-app</span>
+              <span class="nb-sep">·</span>
+              <span class="nb-branch">feat/pricing</span>
+              <span class="nb-dirty"><span class="nb-dot"></span>7</span>
+            </span>
+          </div>
+          <div class="nb-cutout" aria-hidden="true"></div>
+          <div class="nb-side right">
+            <span class="nb-ico" aria-hidden="true"><svg viewBox="0 0 25 12"><use href="#mb-battery"/></svg></span>
+            <span class="nb-ico" aria-hidden="true"><svg viewBox="0 0 16 12"><use href="#mb-wifi"/></svg></span>
+            <span class="nb-ico cc" aria-hidden="true"><svg viewBox="0 0 14 14"><use href="#mb-cc"/></svg></span>
+            <span class="nb-time">23:33</span>
+          </div>
+        </div>
+
+        <div class="notch-popover" aria-hidden="true">
+          <div class="np-section">
+            <div class="np-head">Recent windows</div>
+            <ul class="np-list">
+              <li>
+                <span class="np-ide"><img src="assets/ide/cursor.png" alt=""></span>
+                <span class="np-name">pricing.tsx</span>
+                <span class="np-meta">just now</span>
               </li>
-              <li data-keys="plexo-cli">
-                <div class="lang go">GO</div>
-                <div class="body">
-                  <div class="title-row">plexo-cli</div>
-                  <div class="path">
-                    <span>~/code/side/plexo-cli</span>
-                    <span class="sep">·</span>
-                    <span class="branch">main</span>
-                  </div>
-                </div>
-                <div class="meta">
-                  <div class="ide-stack"><div class="ide"><img src="assets/ide/intellij.png" alt="IntelliJ IDEA"></div></div>
-                </div>
+              <li>
+                <span class="np-ide"><svg><use href="#ide-iterm"/></svg></span>
+                <span class="np-name">pnpm dev</span>
+                <span class="np-meta">2m ago</span>
               </li>
-              <li data-keys="api-gateway">
-                <div class="lang go">GO</div>
-                <div class="body">
-                  <div class="title-row">api-gateway</div>
-                  <div class="path">
-                    <span>~/code/work/api-gateway</span>
-                    <span class="sep">·</span>
-                    <span class="branch">main</span>
-                  </div>
-                </div>
-                <div class="meta">
-                  <div class="ide-stack"><div class="ide"><img src="assets/ide/intellij.png" alt="IntelliJ IDEA"></div></div>
-                </div>
-              </li>
-              <li data-keys="react-dashboard">
-                <div class="lang ts">TS</div>
-                <div class="body">
-                  <div class="title-row">react-dashboard</div>
-                  <div class="path">
-                    <span>~/code/work/react-dashboard</span>
-                    <span class="sep">·</span>
-                    <span class="branch">feat/onboarding</span>
-                    <span class="sep">·</span>
-                    <span class="dirty"><span class="dot"></span>3</span>
-                  </div>
-                </div>
-                <div class="meta">
-                  <div class="ide-stack"><div class="ide"><img src="assets/ide/cursor.png" alt="Cursor"></div></div>
-                </div>
-              </li>
-              <li data-keys="notion-clone">
-                <div class="lang rb">RB</div>
-                <div class="body">
-                  <div class="title-row">notion-clone</div>
-                  <div class="path">
-                    <span>~/code/side/notion-clone</span>
-                    <span class="sep">·</span>
-                    <span class="branch">main</span>
-                  </div>
-                </div>
-                <div class="meta"></div>
+              <li>
+                <span class="np-ide"><svg><use href="#ide-chrome"/></svg></span>
+                <span class="np-name">localhost:3000</span>
+                <span class="np-meta">3m ago</span>
               </li>
             </ul>
-            <div class="footer">
-              <div class="row"><kbd>⌥K</kbd><kbd>⌥J</kbd> Navigate</div>
-              <div class="row"><kbd>⌘K</kbd> Actions</div>
-            </div>
-            <div class="enter-pill" id="hero-enter"><span>Press</span><kbd>↵</kbd><span>to open</span></div>
           </div>
-
-          <div class="chosen-window" id="hero-chosen" aria-hidden="true">
-            <div class="frame">
-              <div class="titlebar">
-                <span class="tl-dot tl-r"></span>
-                <span class="tl-dot tl-y"></span>
-                <span class="tl-dot tl-g"></span>
-                <span>web-app — pricing.tsx</span>
-              </div>
-              <div class="body">
-                <div class="line"><span style="width:44px"></span><span class="hl" style="width:78px"></span><span style="width:32px"></span></div>
-                <div class="line"><span style="width:96px"></span><span style="width:24px"></span><span class="hl" style="width:58px"></span></div>
-                <div class="line"><span style="width:140px"></span></div>
-                <div class="line"><span style="width:62px"></span><span style="width:36px"></span><span style="width:88px"></span></div>
-                <div class="line"><span class="hl" style="width:44px"></span><span style="width:112px"></span></div>
-                <div class="line"><span style="width:70px"></span><span style="width:30px"></span></div>
-              </div>
-            </div>
-            <span class="app-mark"><img src="assets/ide/cursor.png" alt=""></span>
+          <div class="np-section">
+            <div class="np-head">Project actions</div>
+            <ul class="np-list np-actions">
+              <li>
+                <span class="np-glyph">↗</span>
+                <span class="np-name">Open on GitHub</span>
+                <span class="np-key">⌘G</span>
+              </li>
+              <li>
+                <span class="np-glyph">◉</span>
+                <span class="np-name">Open <span class="np-var">staging.acme.dev</span></span>
+                <span class="np-key">⌘S</span>
+              </li>
+              <li>
+                <span class="np-glyph">≡</span>
+                <span class="np-name">Tail Kibana logs</span>
+                <span class="np-key">⌘L</span>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
     </div>
   </div>
-      </div><!-- /.f-panel#f-panel-editor -->
+      </div><!-- /.f-panel#f-panel-notch -->
     </div><!-- /.f-panels -->
   </div><!-- /.f-carousel -->
 </section>
@@ -3446,8 +3600,11 @@ section.mb-section{padding-top:24px}
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 })();
 
-// ===== Hero palette animation loop =====
-// Palette stays visible always; loop demos the product interaction inside it.
+// ===== Hero palette animation =====
+// One-shot demo synced to its carousel panel. Story beats fit inside
+// the carousel's 10s window so the focus-beat (chosen window appears)
+// always lands before the panel switches. Token system aborts the
+// in-flight demo if the panel re-activates mid-run.
 (function(){
   const stage   = document.getElementById('hero-stage');
   const palette = document.getElementById('hero-palette');
@@ -3469,8 +3626,6 @@ section.mb-section{padding-top:24px}
     { key: 'vscode',   src: 'assets/ide/vscode.png',   alt: 'VS Code',  name: 'VS Code'  },
     { key: 'intellij', src: 'assets/ide/intellij.png', alt: 'IntelliJ', name: 'IntelliJ' },
   ];
-  // Highlight the matching IDE inside the currently-selected row's
-  // ide-stack — mirrors OnboardingSearchAnimation's focusedIDE ring.
   function setFocusedIde(key){
     const row = list.querySelector('li.on');
     if(!row) return;
@@ -3483,7 +3638,7 @@ section.mb-section{padding-top:24px}
   }
   async function tabSwap(editor){
     topIde.classList.add('switching');
-    await wait(140);
+    await wait(120);
     const img = topIde.querySelector('img');
     img.src = editor.src;
     img.alt = editor.alt;
@@ -3515,16 +3670,12 @@ section.mb-section{padding-top:24px}
     openHnt.textContent = '— Open';
   }
 
-  // Light up the stage (fades in the hotkey pill)
   function lightStage(){ stage.classList.add('lit'); }
 
-  // Swap the hint pill content with a brief fade so the new label reads
-  // as a crisp replacement rather than a morph. Each demo phase owns a
-  // hint: fuzzy match → already open → switch editor → press ↵.
   async function setHint(html){
     if(hintPill.classList.contains('shown')){
       hintPill.classList.remove('shown');
-      await wait(220);
+      await wait(180);
     }
     hintPill.innerHTML = html;
     hintPill.classList.add('shown');
@@ -3538,107 +3689,117 @@ section.mb-section{padding-top:24px}
     enter:    '<kbd>↵</kbd><span>Focuses open window</span>',
   };
 
+  function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
+  const heroKeyEls = Array.from(hotkey.querySelectorAll('[data-key]'));
+  function pressChord(ms=240){
+    heroKeyEls.forEach(el => el.classList.add('pressed'));
+    return wait(ms).then(() => heroKeyEls.forEach(el => el.classList.remove('pressed')));
+  }
+
+  // Snap everything back to the pre-demo idle state.
+  function resetState(){
+    typed.textContent = '';
+    ghost.textContent = '';
+    openHnt.textContent = '';
+    filterList('');
+    const img = topIde.querySelector('img');
+    img.src = 'assets/ide/cursor.png';
+    img.alt = 'Cursor';
+    topIde.classList.add('tinted');
+    topIde.classList.remove('switching');
+    clearFocusedIde();
+    hideHint();
+    enterP.classList.remove('shown');
+    chosen.classList.remove('shown');
+    palette.classList.remove('dimmed');
+    items.forEach(li => li.classList.remove('on'));
+    items[0].classList.add('on');
+  }
+
   if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-    // Static fallback — final "typed" state, no loop
     typed.textContent = QUERY;
     filterList(QUERY);
     setGhost(QUERY);
     topIde.classList.remove('tinted');
     openHnt.textContent = '— Open in Cursor';
     setFocusedIde('cursor');
-    hintPill.innerHTML = '<span class="dot-live"></span><span>Already open · 3 editors</span>';
+    hintPill.innerHTML = HINT.alreadyOpen;
     hintPill.classList.add('shown');
     lightStage();
     return;
   }
 
-  function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
-  const heroKeyEls = Array.from(hotkey.querySelectorAll('[data-key]'));
-  function pressChord(ms=260){
-    heroKeyEls.forEach(el => el.classList.add('pressed'));
-    return wait(ms).then(() => heroKeyEls.forEach(el => el.classList.remove('pressed')));
-  }
+  // Token aborts the in-flight demo when the panel re-activates,
+  // so a fresh run never collides with a still-running prior one.
+  let runToken = 0;
+  async function runDemo(){
+    const myToken = ++runToken;
+    const alive = () => myToken === runToken;
 
-  async function runLoop(){
+    resetState();
     lightStage();
-    await wait(1100);
+    await wait(380); if(!alive()) return;
 
-    while(true){
-      // Pulse the hotkey chord — both keys depress simultaneously
-      await pressChord(280);
-      await wait(420);
+    // ⌥ Space chord — quick visual confirmation
+    await pressChord(220); if(!alive()) return;
+    await wait(220);       if(!alive()) return;
 
-      // First keystroke → fuzzy-match hint appears
-      setHint(HINT.fuzzy);
-
-      // Type the full query letter-by-letter. The list narrows naturally
-      // until only web-app (item 2) remains — fuzzy filtering
-      // alone lands the selection, no ↑/↓ needed.
-      for(let i = 1; i <= QUERY.length; i++){
-        const q = QUERY.slice(0, i);
-        typed.textContent = q;
-        filterList(q);
-        setGhost(q);
-        await wait(160 + Math.random() * 80);
-      }
-      await wait(800);
-
-      // Un-tint Cursor to signal "already open" + highlight Cursor inside
-      // the selected row's IDE stack (matches OpenIDEIconsView's focus ring).
-      topIde.classList.remove('tinted');
-      openHnt.textContent = '— Open in Cursor';
-      setFocusedIde('cursor');
-      setHint(HINT.alreadyOpen);
-      await wait(1100);
-
-      // Tab cycle: swap hint to "⇥ Switch editor", then walk through
-      // the 3 editors open on this project (VS Code → IntelliJ → back to Cursor)
-      await setHint(HINT.tab);
-      await wait(380);
-      await tabSwap(EDITORS[1]); // VS Code
-      await wait(760);
-      await tabSwap(EDITORS[2]); // IntelliJ
-      await wait(760);
-      await tabSwap(EDITORS[0]); // Cursor (land on the default)
-      await wait(460);
-
-      // "Press ↵" — swap hint to reinforce what Enter does
-      await setHint(HINT.enter);
-      enterP.classList.add('shown');
-      await wait(900);
-
-      // Window rises — mirrors onboarding's chosen-window "rushes forward"
-      // beat. Palette dims slightly so the new window reads as the hero.
-      chosen.classList.add('shown');
-      palette.classList.add('dimmed');
-      enterP.classList.remove('shown');
-      hideHint();
-      await wait(1600);
-
-      // Settle back down for the next iteration
-      chosen.classList.remove('shown');
-      palette.classList.remove('dimmed');
-      await wait(700);
-      topIde.classList.add('tinted');
-      typed.textContent = '';
-      ghost.textContent = '';
-      openHnt.textContent = '';
-      filterList('');
-      clearFocusedIde();
-      items.forEach(li => li.classList.remove('on'));
-      items[0].classList.add('on');
-      await wait(1000);
+    // Type "web" — list shrinks as non-matches filter out
+    setHint(HINT.fuzzy);
+    for(let i = 1; i <= QUERY.length; i++){
+      if(!alive()) return;
+      const q = QUERY.slice(0, i);
+      typed.textContent = q;
+      filterList(q);
+      setGhost(q);
+      await wait(190);
     }
+    await wait(620); if(!alive()) return;
+
+    // Un-tint Cursor — "already open"
+    topIde.classList.remove('tinted');
+    openHnt.textContent = '— Open in Cursor';
+    setFocusedIde('cursor');
+    setHint(HINT.alreadyOpen);
+    await wait(820); if(!alive()) return;
+
+    // Tab cycle through the 3 open editors
+    await setHint(HINT.tab);
+    await wait(260);          if(!alive()) return;
+    await tabSwap(EDITORS[1]); if(!alive()) return;
+    await wait(440);          if(!alive()) return;
+    await tabSwap(EDITORS[2]); if(!alive()) return;
+    await wait(440);          if(!alive()) return;
+    await tabSwap(EDITORS[0]); if(!alive()) return;
+    await wait(320);          if(!alive()) return;
+
+    // ↵ — focus the chosen window
+    await setHint(HINT.enter);
+    enterP.classList.add('shown');
+    await wait(620); if(!alive()) return;
+
+    chosen.classList.add('shown');
+    palette.classList.add('dimmed');
+    enterP.classList.remove('shown');
+    hideHint();
+    // Stay in the focused state until the next activation re-runs the demo.
   }
 
-  // Start only when visible; also kick off immediately since hero is above the fold.
-  let started = false;
-  function start(){ if(!started){ started = true; runLoop(); } }
+  // Trigger on initial intersection (page-load arrival) AND whenever
+  // the hosting carousel panel becomes active again.
+  let firstFireDone = false;
+  function start(){ if(!firstFireDone){ firstFireDone = true; runDemo(); } }
   const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if(e.isIntersecting) start(); });
+    entries.forEach(e => { if(e.isIntersecting){ start(); io.unobserve(e.target); } });
   }, { threshold: 0.15 });
   io.observe(palette);
-  start();
+
+  const panel = palette.closest('.f-panel');
+  if(panel){
+    panel.addEventListener('panel:active', () => { runDemo(); });
+  } else {
+    start();
+  }
 })();
 
 // ===== MacBook stage: full feature tour (chaos → search → ⇥ → ⌘K → GitHub) =====
@@ -4031,35 +4192,6 @@ section.mb-section{padding-top:24px}
   io.observe(stage);
 })();
 
-// ===== Feature 1 palette: gentle typewriter loop =====
-(function(){
-  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const palette = document.querySelector('#features .palette');
-  if(!palette) return;
-  const typed = palette.querySelector('.search-bar .input span:first-child');
-  if(!typed) return;
-  const QUERY = 'odk';
-
-  function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
-
-  async function loop(){
-    while(true){
-      typed.textContent = '';
-      await wait(900);
-      for(let i = 1; i <= QUERY.length; i++){
-        typed.textContent = QUERY.slice(0, i);
-        await wait(160 + Math.random() * 80);
-      }
-      await wait(2400);
-    }
-  }
-
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if(e.isIntersecting){ loop(); io.unobserve(palette); } });
-  }, { threshold: 0.3 });
-  io.observe(palette);
-})();
-
 // ===== Feature 2 (⌥Tab) switcher: selection slides between rows =====
 (function(){
   if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -4175,6 +4307,7 @@ section.mb-section{padding-top:24px}
       const active = i === idx;
       p.classList.toggle('active', active);
       p.setAttribute('aria-hidden', active ? 'false' : 'true');
+      if(active) p.dispatchEvent(new CustomEvent('panel:active'));
     });
     // Restart the bar fill cleanly so it always starts at 0% — CSS
     // animations don't always replay just from a class swap when the
