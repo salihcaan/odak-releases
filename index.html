@@ -1335,21 +1335,32 @@ section.mb-section{padding-top:24px}
   width:8.685%;height:2.254%;
   transform:translateX(-50%);
   background:#0a0a0a;
-  border-radius:0 0 9px 9px;
+  /* Bottom corners as % of the notch box (was fixed 9px) so the corner
+     shape stays consistent as the macbook scales. Horizontal radius is
+     ~9.7% of notch width, vertical ~56% of notch height — matches the
+     desktop 9×9 px feel and prevents the notch turning into a stadium
+     pill at small viewports. */
+  border-radius:0 0 9.7% 9.7% / 0 0 56% 56%;
   z-index:8;
   pointer-events:none;
 }
 
 /* Desktop chrome inside the screen. container-type lets descendants
    (caption, etc.) size against the screen rect rather than the viewport. */
-.mb-desk{position:absolute;inset:0;container-type:inline-size}
+/* container-type:inline-size makes 1cqi = 1% of the macbook screen
+   width, so chaos-window internals (padding, font-size, traffic dots,
+   app-badge…) below scale proportionally with the frame instead of
+   stepping at the mobile breakpoint. --menubar-h is the bar height,
+   reused by .mb-windows so the chaos area starts flush with the bar
+   at every viewport (no dead-band when the bar shrinks on mobile). */
+.mb-desk{position:absolute;inset:0;container-type:inline-size;--menubar-h:24px}
 
 /* macOS Tahoe-style menu bar — translucent, system font, with the
    classic left cluster (Apple, app name, menus) and right cluster
    (status icons + date/time). Lives inside the macbook screen
    (.mb-menubar). */
 .menubar{
-  height:24px;
+  height:var(--menubar-h, 24px);
   display:flex;align-items:center;
   padding:0 10px;
   background:rgba(0,0,0,.55);
@@ -1396,7 +1407,9 @@ section.mb-section{padding-top:24px}
    ========================================================== */
 .mb-windows{
   position:absolute;
-  inset:24px 0 0 0;          /* below menubar */
+  /* Tracks .mb-desk's --menubar-h so the chaos area starts flush with
+     the bar at every breakpoint (24px desktop / 18px mobile). */
+  inset:var(--menubar-h, 24px) 0 0 0;
   z-index:1;
   pointer-events:none;
   contain:layout paint style;
@@ -1409,12 +1422,16 @@ section.mb-section{padding-top:24px}
   backdrop-filter:blur(10px) saturate(160%);
   -webkit-backdrop-filter:blur(10px) saturate(160%);
   border:1px solid rgba(255,255,255,.13);
-  border-radius:7px;
-  padding:5px 7px 6px;
-  display:flex;flex-direction:column;gap:5px;
+  /* Internals sized in cqi (1cqi ≈ 8.76px at the desktop reference
+     where .mb-desk hits its 876px max) so padding, gaps, traffic
+     lights, font-sizes, and the corner badge all shrink proportionally
+     with the frame instead of staying chunky on a phone-sized macbook. */
+  border-radius:0.8cqi;
+  padding:0.57cqi 0.8cqi 0.685cqi;
+  display:flex;flex-direction:column;gap:0.57cqi;
   box-shadow:
-    0 10px 24px rgba(0,0,0,.45),
-    0 2px 6px rgba(0,0,0,.3),
+    0 1.14cqi 2.74cqi rgba(0,0,0,.45),
+    0 0.23cqi 0.685cqi rgba(0,0,0,.3),
     inset 0 1px 0 rgba(255,255,255,.06);
   z-index:var(--z, 1);
   transform-origin:center;
@@ -1454,18 +1471,19 @@ section.mb-section{padding-top:24px}
     0 0 48px var(--accent-glow);
 }
 .mb-window .titlebar{
-  display:flex;align-items:center;gap:5px;
-  font-size:8px;color:rgba(255,255,255,.85);
+  display:flex;align-items:center;gap:0.57cqi;
+  font-size:0.91cqi;color:rgba(255,255,255,.85);
   letter-spacing:-.005em;
   white-space:nowrap;overflow:hidden;
   font-family:-apple-system, system-ui, var(--sans);
   font-weight:500;
   /* Reserve room so the title text doesn't run under the corner badge.
-     Badge is 48×48 with -14px overhang → ~34px intrudes into the window. */
-  padding-right:38px;
+     Badge is 5.48×5.48cqi with -1.6cqi overhang → ~3.88cqi intrudes
+     into the window; pad right a touch beyond that. */
+  padding-right:4.34cqi;
 }
-.mb-window .traffic{display:flex;gap:3px;flex-shrink:0;align-items:center}
-.mb-window .traffic span{width:5px;height:5px;border-radius:50%}
+.mb-window .traffic{display:flex;gap:0.342cqi;flex-shrink:0;align-items:center}
+.mb-window .traffic span{width:0.57cqi;height:0.57cqi;border-radius:50%}
 .mb-window .traffic .r{background:#ff5f57}
 .mb-window .traffic .y{background:#febc2e}
 .mb-window .traffic .g{background:#28c840}
@@ -1480,8 +1498,8 @@ section.mb-section{padding-top:24px}
    stay crisp even after the 3.4× grow into focus. */
 .mb-window .app-badge{
   position:absolute;
-  top:-14px;right:-14px;
-  width:48px;height:48px;
+  top:-1.6cqi;right:-1.6cqi;
+  width:5.48cqi;height:5.48cqi;
   display:block;
   z-index:2;
   pointer-events:none;
@@ -1492,7 +1510,7 @@ section.mb-section{padding-top:24px}
      shape — no visible frame, just clean dark blending. No border, no
      shadow: this is a flat mat, not a glassy bezel. */
   background:#000;
-  border-radius:11px;
+  border-radius:1.26cqi;
   overflow:hidden;
 }
 .mb-window .app-badge img,
@@ -1520,11 +1538,11 @@ section.mb-section{padding-top:24px}
 }
 .mb-window .title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .mb-window .body{
-  flex:1;display:flex;flex-direction:column;gap:3px;
-  margin-top:1px;
+  flex:1;display:flex;flex-direction:column;gap:0.342cqi;
+  margin-top:0.114cqi;
 }
 .mb-window .ln{
-  height:2px;border-radius:1px;
+  height:0.228cqi;border-radius:0.114cqi;
   background:rgba(255,255,255,.18);
   width:var(--lw, 60%);
   flex-shrink:0;
@@ -1975,7 +1993,10 @@ section.mb-section{padding-top:24px}
      from 92% back to 100% of the container, which proportionally
      enlarges the screen interior (and everything in it) on mobile. */
   .macbook{clip-path:inset(0 7% 0 7%);width:116.3%;margin-left:-8.15%}
-  .mb-menubar{font-size:9px;padding:0 8px;height:18px}
+  /* Drop menubar height to 18px via the shared variable so .mb-windows
+     also re-anchors flush with the bar (no 6px dead-band like before). */
+  .mb-desk{--menubar-h:18px}
+  .mb-menubar{font-size:9px;padding:0 8px}
   .mb-menubar .left{gap:9px}
   .mb-menubar .right{gap:8px}
   .mb-menubar .apple svg{width:10px;height:11px}
@@ -1984,14 +2005,8 @@ section.mb-section{padding-top:24px}
   .mb-menubar .ico.cc svg{height:11px}
   /* Hide menu items past Edit on phones — no room. Keep app name + 1-2 menus. */
   .mb-menubar .left .item:nth-of-type(n+3){display:none}
-  /* Chaos windows on phones are ~50px wide — pull the corner badge in
-     proportionally so it stays a sticker, not a beach ball. Radius
-     scales with size to keep the same iOS-icon ratio. */
-  .mb-window .app-badge{
-    width:28px;height:28px;
-    top:-8px;right:-8px;
-    border-radius:6px;
-  }
+  /* (chaos-window app-badge override removed — sized in cqi above so it
+     scales smoothly with the macbook frame on every viewport.) */
   /* Palette must fit inside the on-screen rect of the MacBook PNG.
      Available height on a phone is ~170px — drop the kbd footer and
      the 4th project so search-bar + 3 items fit cleanly. */
