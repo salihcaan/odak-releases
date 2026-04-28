@@ -12,10 +12,18 @@
 <meta property="og:type" content="website"/>
 <meta property="og:url" content="https://odak.fyi/"/>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23d89a4e' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='4' width='4' height='4' rx='.4'/%3E%3Ccircle cx='3' cy='3' r='1.2'/%3E%3Ccircle cx='9' cy='3' r='1.2'/%3E%3Ccircle cx='3' cy='9' r='1.2'/%3E%3Ccircle cx='9' cy='9' r='1.2'/%3E%3C/svg%3E"/>
+<!-- Bundled hero/heading fonts: Inter 700 and JetBrains Mono 600 ship from
+     /assets/bundled so the H1 doesn't flicker through a system fallback
+     while Google Fonts roundtrips. Preload guarantees the woff2 starts
+     downloading before CSS parses the @font-face. -->
+<link rel="preload" as="font" type="font/woff2" href="assets/bundled/inter-700-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="assets/bundled/jetbrains-mono-600-latin.woff2" crossorigin>
+<!-- Body weights (400/500/600 Inter, 400/500 JetBrains Mono) still come
+     from Google Fonts — deferred via preload→onload so they don't block. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript>
 <style>
 /* ==========================================================
    TOKENS — dual theme, warm-not-cool
@@ -107,6 +115,43 @@
   font-weight:400;font-style:italic;font-display:swap;
 }
 
+/* Bundled Inter 700 — the hero H1, section headings, and any bold copy
+   above the fold. Self-hosted so first paint of the H1 lands in Inter
+   immediately instead of swapping in after a Google Fonts roundtrip.
+   Latin + latin-ext cover the page's English content; other Inter 700
+   subsets (cyrillic/greek/vietnamese) are bundled but not wired up
+   because no copy needs them today. unicode-range mirrors the canonical
+   Google Fonts subset boundaries so the browser only fetches the file
+   it actually needs. */
+@font-face{
+  font-family:'Inter';
+  src:url('assets/bundled/inter-700-latin.woff2') format('woff2');
+  font-weight:700;font-style:normal;font-display:swap;
+  unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face{
+  font-family:'Inter';
+  src:url('assets/bundled/inter-700-latin-ext.woff2') format('woff2');
+  font-weight:700;font-style:normal;font-display:swap;
+  unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF0-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* Bundled JetBrains Mono 600 — hero pills, key caps, the live ⌥ Space
+   chord. Same rationale as Inter 700: visible above the fold, so we
+   self-host to avoid the first-paint swap. */
+@font-face{
+  font-family:'JetBrains Mono';
+  src:url('assets/bundled/jetbrains-mono-600-latin.woff2') format('woff2');
+  font-weight:600;font-style:normal;font-display:swap;
+  unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face{
+  font-family:'JetBrains Mono';
+  src:url('assets/bundled/jetbrains-mono-600-latin-ext.woff2') format('woff2');
+  font-weight:600;font-style:normal;font-display:swap;
+  unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF0-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 html{background:var(--bg);scroll-behavior:smooth;overflow-x:clip;scroll-padding-top:64px}
@@ -133,8 +178,12 @@ button{font-family:inherit}
 }
 .aurora::before,
 .aurora::after{
-  content:'';position:absolute;border-radius:50%;filter:blur(120px);
-  will-change:transform;
+  /* blur(60px) was 120px — the radial-gradient already softens the
+     edges, so doubling that with a heavy blur was paying compositor
+     cost for diminishing returns. translateZ(0) pins each blob to its
+     own GPU layer so the blur rasterizes once instead of every frame. */
+  content:'';position:absolute;border-radius:50%;filter:blur(60px);
+  will-change:transform;transform:translateZ(0);
 }
 .aurora::before{
   width:60vw;height:60vw;top:-20vw;left:-10vw;
@@ -181,14 +230,30 @@ button{font-family:inherit}
    ========================================================== */
 .nav{
   position:sticky;top:0;z-index:80;
-  backdrop-filter:blur(28px) saturate(180%);
-  -webkit-backdrop-filter:blur(28px) saturate(180%);
-  background:color-mix(in oklch, var(--bg) 55%, transparent);
+  /* backdrop-filter recomputes every frame the underlying content
+     scrolls, so it is the single biggest scroll-time cost on the page.
+     Dropped blur 28→18 and saturate 180→150 — still reads as Tahoe
+     glass, costs about half as much per frame. The slightly more
+     opaque background (55→62%) compensates for the lower blur so
+     small text behind the bar still reads cleanly. */
+  backdrop-filter:blur(18px) saturate(150%);
+  -webkit-backdrop-filter:blur(18px) saturate(150%);
+  background:color-mix(in oklch, var(--bg) 62%, transparent);
   border-bottom:1px solid var(--border);
   /* Subtle top-edge highlight — the signature of macOS Tahoe glass
      surfaces, makes the bar read as a translucent panel rather than
      a flat tinted strip. */
   box-shadow:inset 0 1px 0 color-mix(in oklch, var(--fg) 6%, transparent);
+}
+/* Mobile devices struggle with backdrop-filter and the saved compositor
+   budget is more useful for scrolling smoothness than for the glass
+   effect. Fall back to a slightly more opaque tinted bar instead. */
+@media (max-width:760px){
+  .nav{
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+    background:color-mix(in oklch, var(--bg) 88%, transparent);
+  }
 }
 .nav-inner{
   max-width:var(--maxw);margin:0 auto;
@@ -2508,6 +2573,23 @@ section.mb-section{padding-top:24px;max-width:none}
   background:linear-gradient(180deg, #f7f4ef 0%, #efe9df 100%);
 }
 
+
+/* ==========================================================
+   PERF — defer offscreen sections
+   ========================================================== */
+/* Skip layout/paint of below-the-fold sections until they scroll near
+   the viewport. The browser still parses the markup, so #anchors and
+   the IntersectionObserver-driven reveal animations keep working — but
+   the heavy carousel, pricing cards, FAQ grid, and footer don't tax
+   first paint. contain-intrinsic-size is a deliberate over-estimate
+   per section so the scrollbar doesn't jump when each one rehydrates. */
+@supports (content-visibility: auto){
+  #features      { content-visibility:auto; contain-intrinsic-size:1px 2400px; }
+  #positioning   { content-visibility:auto; contain-intrinsic-size:1px 800px;  }
+  #pricing       { content-visibility:auto; contain-intrinsic-size:1px 700px;  }
+  #faq           { content-visibility:auto; contain-intrinsic-size:1px 700px;  }
+  .site-foot     { content-visibility:auto; contain-intrinsic-size:1px 360px;  }
+}
 
 /* ==========================================================
    REVEAL — scroll-linked animation
