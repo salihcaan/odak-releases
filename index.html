@@ -14,11 +14,6 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23d89a4e' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='4' width='4' height='4' rx='.4'/%3E%3Ccircle cx='3' cy='3' r='1.2'/%3E%3Ccircle cx='9' cy='3' r='1.2'/%3E%3Ccircle cx='3' cy='9' r='1.2'/%3E%3Ccircle cx='9' cy='9' r='1.2'/%3E%3C/svg%3E"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="image" type="image/webp"
-      href="assets/devices/macbook-pro-16-1200.webp"
-      imagesrcset="assets/devices/macbook-pro-16-800.webp 800w, assets/devices/macbook-pro-16-1200.webp 1200w, assets/devices/macbook-pro-16-1800.webp 1800w, assets/devices/macbook-pro-16-2400.webp 2400w"
-      imagesizes="(min-width:1200px) 1080px, 100vw"
-      fetchpriority="high">
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
 <style>
@@ -1658,10 +1653,17 @@ footer.site-foot{
    ========================================================== */
 /* Macbook section sits directly under the hero — no section-head, so
    trim the top padding right down. Element+class beats section.block. */
-section.mb-section{padding-top:24px}
+/* Hero device — break out of the 1200px page container so the frame
+   reads as a hero subject, not a small inset. The macbook section is
+   the only section that overrides section.block's max-width cap. */
+section.mb-section{padding-top:24px;max-width:none}
 
+/* Three-way cap on the stage so the device stays a "device" instead of
+   dominating the viewport on ultra-wide monitors. The vh*1.642 term
+   ensures the macbook (aspect 1.642) fits in roughly 80% of viewport
+   height — frame + base + feet visible without scrolling. */
 .mb-stage{
-  max-width:1080px;margin:0 auto;
+  max-width:min(1600px, 92vw, calc(90vh * 1.642));margin:0 auto;
   perspective:2400px;position:relative;
   transform-style:preserve-3d;
 }
@@ -1685,20 +1687,10 @@ section.mb-section{padding-top:24px}
      closer container set on .mb-desk. */
   container-type:inline-size;
 }
-/* Black underlay at the screen rect — the .frame PNG has the screen
-   area cut transparent, and .screen sits on top with rounded corners.
-   Without this, the four corners outside the rounded shape leak the
-   page background through the cutout (visible as cream in light mode). */
-.macbook::before{
-  content:'';position:absolute;
-  top:10.669%;left:9.437%;right:9.437%;bottom:10.669%;
-  background:#000;
-  pointer-events:none;
-}
-/* MacBook Pro 16" Silver — Apple official mockup (M5 silver).
-   Image aspect 4260x2840 = 1.500. Screen rectangle within the PNG
-   (the transparent inner area, including the wings around the notch):
-   left 9.437%, right 9.437%, top 10.669%, bottom 10.669%. */
+/* MacBook Pro 16" Silver — inline SVG mockup (open-lid view with
+   visible base + feet). Frame aspect 619x377 = 1.642. Screen rectangle
+   within the SVG (interior of the dark-gray bezel):
+   left 8.17%, right 8.24%, top 0.6%, bottom 9.7%. */
 .macbook .frame{
   display:block;width:100%;height:auto;
   user-select:none;-webkit-user-drag:none;
@@ -1714,12 +1706,41 @@ section.mb-section{padding-top:24px}
 [data-theme="light"] .macbook .frame{
   filter:drop-shadow(0 5.56cqi 6.48cqi rgba(26,20,16,.28));
 }
-/* Screen interior — the palette/menubar sit absolutely within these bounds.
-   border-radius matches the rounded screen corners baked into the PNG. */
+/* Notch + camera overlay. Inlined SVG slice from the original
+   macbook-pro-frame.svg (the notch path + camera radial gradient
+   were both lost in the first inline pass). Positioned absolutely
+   over .screen using the same 619×377 viewBox so the path/circle
+   coordinates land in their original spots. */
+.macbook .notch-overlay{
+  position:absolute;inset:0;width:100%;height:auto;
+  display:block;pointer-events:none;
+  /* z-index higher than every overlay that lives inside .screen — the
+     title card (z-index:70), caption pill (60), focused window (50),
+     palette wrap, etc. — so the notch reads as physical hardware that
+     is never covered by writings, captions, or chapter intros. */
+  z-index:100;
+  /* Shift the whole notch SVG up by 1.92 viewBox units (-0.51% of frame
+     height) so the notch's top edge tracks the (thinner) top bezel set
+     on .screen below. The SVG path coordinates are preserved verbatim
+     from macbook-pro-frame.svg — only the rendered position translates,
+     so the notch keeps its original size and shape. */
+  transform:translateY(-0.51%);
+}
+/* Screen interior — palette/menubar sit absolutely within these bounds.
+   All four bezels match at ~3.5 viewBox units (top:+0.93% / sides:
+   +0.57% / bottom:+0.93%) — uniform black border around the active
+   display. The .notch-overlay above is translated up by the same 1.92
+   units (translateY -0.51%) so its top edge tracks this top bezel
+   without resizing the notch. Corner radius is set so the screen's
+   curve is concentric with the SVG frame's top corners: the frame's
+   inner-black rounding is r=10.83 viewBox units around center (61.40,
+   13.09), so a 3.5-unit bezel inward gives screen r=7.33 — that's
+   1.44% horizontal / 2.22% vertical of the screen rect. Same radius
+   is applied to bottom corners so all four match. */
 .macbook .screen{
   position:absolute;
-  top:10.669%;left:9.437%;right:9.437%;bottom:10.669%;
-  border-radius:1.4% / 2.1%;
+  top:1.53%;left:8.74%;right:8.81%;bottom:10.63%;
+  border-radius:1.44% / 2.22%;
   overflow:hidden;
   background:
     radial-gradient(ellipse 70% 50% at 25% 18%, oklch(72% 0.18 60 / .5), transparent 60%),
@@ -1731,26 +1752,6 @@ section.mb-section{padding-top:24px}
   content:'';position:absolute;inset:0;z-index:7;pointer-events:none;
   background:linear-gradient(115deg, transparent 0%, transparent 35%, rgba(255,255,255,.05) 50%, transparent 65%);
   mix-blend-mode:screen;
-}
-/* Camera notch — sits over the menubar at top center, painted in the
-   bezel color so the menubar reads as wrapping around the notch (matches
-   how macOS renders the menu bar on notched MacBook Pros). Dimensions
-   match the notch baked into the Apple PNG so the overlay aligns with
-   the lid's silhouette. Sized as % of the .macbook frame. */
-.macbook .notch{
-  position:absolute;
-  top:10.669%;left:50%;
-  width:8.685%;height:2.254%;
-  transform:translateX(-50%);
-  background:#0a0a0a;
-  /* Bottom corners as % of the notch box (was fixed 9px) so the corner
-     shape stays consistent as the macbook scales. Horizontal radius is
-     ~9.7% of notch width, vertical ~56% of notch height — matches the
-     desktop 9×9 px feel and prevents the notch turning into a stadium
-     pill at small viewports. */
-  border-radius:0 0 9.7% 9.7% / 0 0 56% 56%;
-  z-index:8;
-  pointer-events:none;
 }
 
 /* Desktop chrome inside the screen. container-type lets descendants
@@ -2775,13 +2776,84 @@ section.mb-section{padding-top:24px}
   <div class="mb-stage reveal">
     <div class="glow"></div>
     <div class="macbook">
-      <picture>
-        <source type="image/webp"
-                srcset="assets/devices/macbook-pro-16-800.webp 800w, assets/devices/macbook-pro-16-1200.webp 1200w, assets/devices/macbook-pro-16-1800.webp 1800w, assets/devices/macbook-pro-16-2400.webp 2400w"
-                sizes="(min-width:1200px) 1080px, 100vw">
-        <img class="frame" src="assets/devices/macbook-pro-16.png" alt="" aria-hidden="true" width="4260" height="2840" fetchpriority="high" decoding="async">
-      </picture>
-      <div class="notch" aria-hidden="true"></div>
+      <svg class="frame" viewBox="0 0 619 377" preserveAspectRatio="xMidYMid meet" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M29.7988 374.291H65.9186L63.4741 376.736C63.3047 376.905 63.075 377 62.8355 377H32.8818C32.6423 377 32.4126 376.905 32.2433 376.736L29.7988 374.291Z" fill="url(#mb-p0)"/>
+        <path d="M29.7988 374.291H65.9186L63.4741 376.736C63.3047 376.905 63.075 377 62.8355 377H32.8818C32.6423 377 32.4126 376.905 32.2433 376.736L29.7988 374.291Z" fill="url(#mb-p1)" fill-opacity="0.7"/>
+        <path d="M29.3473 374.291H66.37L65.5445 375.117C65.2058 375.455 64.7465 375.646 64.2675 375.646H31.4498C30.9709 375.646 30.5115 375.455 30.1728 375.117L29.3473 374.291Z" fill="url(#mb-p2)"/>
+        <path d="M552.632 374.291H588.752L586.308 376.736C586.138 376.905 585.909 377 585.669 377H555.715C555.476 377 555.246 376.905 555.077 376.736L552.632 374.291Z" fill="url(#mb-p3)"/>
+        <path d="M552.632 374.291H588.752L586.308 376.736C586.138 376.905 585.909 377 585.669 377H555.715C555.476 377 555.246 376.905 555.077 376.736L552.632 374.291Z" fill="url(#mb-p4)" fill-opacity="0.7"/>
+        <path d="M552.181 374.291H589.204L588.378 375.117C588.039 375.455 587.58 375.646 587.101 375.646H554.283C553.804 375.646 553.345 375.455 553.006 375.117L552.181 374.291Z" fill="url(#mb-p5)"/>
+        <g filter="url(#mb-f0)">
+          <path d="M0 353.522C0 353.023 0.404284 352.619 0.902994 352.619H617.648C618.147 352.619 618.551 353.023 618.551 353.522V363.004C618.551 369.237 613.497 374.291 607.263 374.291H11.2874C5.05353 374.291 0 369.237 0 363.004V353.522Z" fill="url(#mb-p6)"/>
+          <path d="M0 353.522C0 353.023 0.404284 352.619 0.902994 352.619H617.648C618.147 352.619 618.551 353.023 618.551 353.522V363.004C618.551 369.237 613.497 374.291 607.263 374.291H11.2874C5.05353 374.291 0 369.237 0 363.004V353.522Z" fill="url(#mb-p7)" fill-opacity="0.7"/>
+        </g>
+        <g filter="url(#mb-f1)">
+          <path d="M261.868 352.619H356.683V352.619C356.683 356.359 353.65 359.392 349.91 359.392H268.641C264.9 359.392 261.868 356.359 261.868 352.619V352.619Z" fill="url(#mb-p8)"/>
+        </g>
+        <g filter="url(#mb-f2)">
+          <path d="M48.3102 13.0934C48.3102 5.86213 54.1723 0 61.4036 0H557.147C564.379 0 570.241 5.86212 570.241 13.0934V352.619H48.3102V13.0934Z" fill="#6D6E70"/>
+        </g>
+        <path d="M49.2132 13.0934C49.2132 6.36087 54.671 0.903015 61.4036 0.903015H557.147C563.88 0.903015 569.338 6.36085 569.338 13.0934V352.619H49.2132V13.0934Z" fill="#1F1F1F"/>
+        <path d="M50.5677 13.0935C50.5677 7.10894 55.4191 2.25751 61.4036 2.25751H557.147C563.132 2.25751 567.983 7.10892 567.983 13.0934V340.429H50.5677V13.0935Z" fill="black"/>
+        <rect x="50.5677" y="340.429" width="517.416" height="12.1904" fill="url(#mb-p9)"/>
+        <defs>
+          <filter id="mb-f0" x="0" y="352.619" width="618.551" height="22.1234" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+            <feOffset dy="0.451497"/>
+            <feGaussianBlur stdDeviation="0.225748"/>
+            <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+            <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.36 0"/>
+            <feBlend mode="normal" in2="shape" result="effect1_innerShadow"/>
+          </filter>
+          <filter id="mb-f1" x="260.514" y="351.716" width="97.5233" height="7.67545" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+            <feMorphology radius="1.35449" operator="dilate" in="SourceAlpha" result="effect1_innerShadow"/>
+            <feOffset dx="1.80599"/>
+            <feGaussianBlur stdDeviation="1.35449"/>
+            <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0"/>
+            <feBlend mode="normal" in2="shape" result="effect1_innerShadow"/>
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+            <feMorphology radius="1.35449" operator="dilate" in="SourceAlpha" result="effect2_innerShadow"/>
+            <feOffset dx="-1.80599"/>
+            <feGaussianBlur stdDeviation="1.35449"/>
+            <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0"/>
+            <feBlend mode="normal" in2="effect1_innerShadow" result="effect2_innerShadow"/>
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+            <feOffset dy="-0.902994"/>
+            <feGaussianBlur stdDeviation="0.451497"/>
+            <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+            <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.4 0"/>
+            <feBlend mode="normal" in2="effect2_innerShadow" result="effect3_innerShadow"/>
+          </filter>
+          <filter id="mb-f2" x="48.3102" y="0" width="521.93" height="352.619" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+            <feMorphology radius="0.225748" operator="erode" in="SourceAlpha" result="effect1_innerShadow"/>
+            <feOffset/>
+            <feGaussianBlur stdDeviation="0.225748"/>
+            <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+            <feColorMatrix type="matrix" values="0 0 0 0 0.666667 0 0 0 0 0.666667 0 0 0 0 0.666667 0 0 0 1 0"/>
+            <feBlend mode="normal" in2="shape" result="effect1_innerShadow"/>
+          </filter>
+          <linearGradient id="mb-p0" x1="31.1533" y1="376.323" x2="64.3383" y2="376.323" gradientUnits="userSpaceOnUse"><stop stop-color="#494949"/><stop offset="0.202928" stop-color="#202020"/><stop offset="0.790963" stop-color="#202020"/><stop offset="1" stop-color="#494949"/></linearGradient>
+          <linearGradient id="mb-p1" x1="47.8587" y1="377" x2="47.8587" y2="375.646" gradientUnits="userSpaceOnUse"><stop offset="0.462197" stop-color="#555555"/><stop offset="1" stop-color="#494949" stop-opacity="0"/></linearGradient>
+          <linearGradient id="mb-p2" x1="29.3473" y1="375.194" x2="65.9185" y2="375.194" gradientUnits="userSpaceOnUse"><stop stop-color="#8E8F93"/><stop offset="0.0520804" stop-color="#A7A7A9"/><stop offset="0.153" stop-color="#535459"/><stop offset="0.380607" stop-color="#A7A7A9"/><stop offset="0.57171" stop-color="#A7A7A9"/><stop offset="0.835819" stop-color="#535459"/><stop offset="0.943181" stop-color="#A7A7A9"/><stop offset="1" stop-color="#8E8F93"/></linearGradient>
+          <linearGradient id="mb-p3" x1="553.987" y1="376.323" x2="587.172" y2="376.323" gradientUnits="userSpaceOnUse"><stop stop-color="#494949"/><stop offset="0.202928" stop-color="#202020"/><stop offset="0.790963" stop-color="#202020"/><stop offset="1" stop-color="#494949"/></linearGradient>
+          <linearGradient id="mb-p4" x1="570.692" y1="377" x2="570.692" y2="375.646" gradientUnits="userSpaceOnUse"><stop offset="0.462197" stop-color="#555555"/><stop offset="1" stop-color="#494949" stop-opacity="0"/></linearGradient>
+          <linearGradient id="mb-p5" x1="552.181" y1="375.194" x2="588.752" y2="375.194" gradientUnits="userSpaceOnUse"><stop stop-color="#8E8F93"/><stop offset="0.0520804" stop-color="#A7A7A9"/><stop offset="0.153" stop-color="#535459"/><stop offset="0.380607" stop-color="#A7A7A9"/><stop offset="0.57171" stop-color="#A7A7A9"/><stop offset="0.835819" stop-color="#535459"/><stop offset="0.943181" stop-color="#A7A7A9"/><stop offset="1" stop-color="#8E8F93"/></linearGradient>
+          <linearGradient id="mb-p6" x1="0" y1="363.455" x2="618.551" y2="363.455" gradientUnits="userSpaceOnUse"><stop stop-color="#A0A1A5"/><stop offset="0.0182411" stop-color="#D3D4D9"/><stop offset="0.0572677" stop-color="#6A6B70"/><stop offset="0.0871115" stop-color="#797A7F"/><stop offset="0.213824" stop-color="#A8A9AE"/><stop offset="0.786959" stop-color="#A8A9AE"/><stop offset="0.917556" stop-color="#797A7F"/><stop offset="0.946746" stop-color="#6A6B70"/><stop offset="0.978072" stop-color="#D3D4D9"/><stop offset="1" stop-color="#A0A1A5"/></linearGradient>
+          <linearGradient id="mb-p7" x1="309.275" y1="352.619" x2="309.275" y2="374.291" gradientUnits="userSpaceOnUse"><stop stop-color="#858688" stop-opacity="0"/><stop offset="0.651042" stop-color="#737479"/><stop offset="0.927083" stop-color="#B7B8BD"/><stop offset="1" stop-color="#858688"/></linearGradient>
+          <linearGradient id="mb-p8" x1="261.868" y1="356.231" x2="356.683" y2="356.231" gradientUnits="userSpaceOnUse"><stop stop-color="#C6C7CC"/><stop offset="0.467668" stop-color="#D0D1D6"/><stop offset="1" stop-color="#C6C7CC"/></linearGradient>
+          <linearGradient id="mb-p9" x1="309.275" y1="340.429" x2="309.275" y2="352.619" gradientUnits="userSpaceOnUse"><stop stop-color="#232323"/><stop offset="1" stop-color="#0A0A0C"/></linearGradient>
+        </defs>
+      </svg>
       <div class="screen">
           <div class="mb-desk">
             <div class="menubar mb-menubar">
@@ -2810,63 +2882,63 @@ section.mb-section{padding-top:24px}
                  here — what shows up is what we can actually open. -->
             <div class="mb-windows" id="mb-windows">
               <div class="mb-window" data-project="web-app" style="--x:2%;--y:4%;--w:18%;--h:24%;--r:-3deg;--z:2;--d:40ms">
-                <div class="app-badge"><img src="assets/ide/cursor.webp" alt=""></div>
-                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/cursor.webp" alt=""></span><span class="title">web-app · page.tsx</span></div>
+                <div class="app-badge"><img src="assets/ide/cursor.webp" alt="" width="256" height="256" decoding="async"></div>
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/cursor.webp" alt="" width="256" height="256" decoding="async"></span><span class="title">web-app · page.tsx</span></div>
                 <div class="body"><div class="ln" style="--lw:65%"></div><div class="ln hl" style="--lw:42%"></div><div class="ln" style="--lw:78%"></div><div class="ln" style="--lw:50%"></div></div>
               </div>
               <div class="mb-window" data-project="ios-app" style="--x:36%;--y:6%;--w:15%;--h:20%;--r:2deg;--z:1;--d:80ms">
-                <div class="app-badge"><img src="assets/ide/xcode.webp" alt=""></div>
-                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/xcode.webp" alt=""></span><span class="title">ios-app</span></div>
+                <div class="app-badge"><img src="assets/ide/xcode.webp" alt="" width="256" height="256" decoding="async"></div>
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/xcode.webp" alt="" width="256" height="256" decoding="async"></span><span class="title">ios-app</span></div>
                 <div class="body"><div class="ln" style="--lw:58%"></div><div class="ln b" style="--lw:42%"></div><div class="ln" style="--lw:70%"></div></div>
               </div>
               <div class="mb-window" data-project="react-dashboard" style="--x:79%;--y:5%;--w:19%;--h:26%;--r:3deg;--z:2;--d:120ms">
-                <div class="app-badge"><img src="assets/ide/cursor.webp" alt=""></div>
-                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/cursor.webp" alt=""></span><span class="title">react-dashboard</span></div>
+                <div class="app-badge"><img src="assets/ide/cursor.webp" alt="" width="256" height="256" decoding="async"></div>
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/cursor.webp" alt="" width="256" height="256" decoding="async"></span><span class="title">react-dashboard</span></div>
                 <div class="body"><div class="ln" style="--lw:70%"></div><div class="ln" style="--lw:38%"></div><div class="ln b" style="--lw:60%"></div><div class="ln" style="--lw:82%"></div></div>
               </div>
               <div class="mb-window" data-project="api-gateway" style="--x:2%;--y:31%;--w:16%;--h:30%;--r:-1deg;--z:3;--d:160ms">
-                <div class="app-badge"><img src="assets/ide/intellij.webp" alt=""></div>
-                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/intellij.webp" alt=""></span><span class="title">api-gateway</span></div>
+                <div class="app-badge"><img src="assets/ide/intellij.webp" alt="" width="256" height="256" decoding="async"></div>
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/intellij.webp" alt="" width="256" height="256" decoding="async"></span><span class="title">api-gateway</span></div>
                 <div class="body"><div class="ln" style="--lw:55%"></div><div class="ln" style="--lw:80%"></div><div class="ln hl" style="--lw:45%"></div><div class="ln" style="--lw:70%"></div><div class="ln" style="--lw:38%"></div></div>
               </div>
               <div class="mb-window" data-project="design-tokens" style="--x:23%;--y:35%;--w:17%;--h:23%;--r:1deg;--z:2;--d:200ms">
-                <div class="app-badge"><img src="assets/ide/cursor.webp" alt=""></div>
-                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/cursor.webp" alt=""></span><span class="title">design-tokens</span></div>
+                <div class="app-badge"><img src="assets/ide/cursor.webp" alt="" width="256" height="256" decoding="async"></div>
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/cursor.webp" alt="" width="256" height="256" decoding="async"></span><span class="title">design-tokens</span></div>
                 <div class="body"><div class="ln hl" style="--lw:50%"></div><div class="ln" style="--lw:72%"></div><div class="ln" style="--lw:38%"></div><div class="ln" style="--lw:60%"></div></div>
               </div>
               <div class="mb-window" data-project="payments-svc" style="--x:60%;--y:36%;--w:18%;--h:24%;--r:-2deg;--z:2;--d:240ms">
-                <div class="app-badge"><img src="assets/ide/intellij.webp" alt=""></div>
-                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/intellij.webp" alt=""></span><span class="title">payments-svc · main.kt</span></div>
+                <div class="app-badge"><img src="assets/ide/intellij.webp" alt="" width="256" height="256" decoding="async"></div>
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/intellij.webp" alt="" width="256" height="256" decoding="async"></span><span class="title">payments-svc · main.kt</span></div>
                 <div class="body"><div class="ln" style="--lw:64%"></div><div class="ln" style="--lw:48%"></div><div class="ln b" style="--lw:72%"></div><div class="ln" style="--lw:35%"></div></div>
               </div>
               <div class="mb-window" data-project="platform-ios" style="--x:82%;--y:33%;--w:16%;--h:28%;--r:2deg;--z:3;--d:280ms">
-                <div class="app-badge"><img src="assets/ide/xcode.webp" alt=""></div>
-                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/xcode.webp" alt=""></span><span class="title">platform-ios</span></div>
+                <div class="app-badge"><img src="assets/ide/xcode.webp" alt="" width="256" height="256" decoding="async"></div>
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/xcode.webp" alt="" width="256" height="256" decoding="async"></span><span class="title">platform-ios</span></div>
                 <div class="body"><div class="ln" style="--lw:60%"></div><div class="ln" style="--lw:48%"></div><div class="ln b" style="--lw:72%"></div><div class="ln" style="--lw:55%"></div></div>
               </div>
               <div class="mb-window" data-project="admin-panel" style="--x:4%;--y:65%;--w:22%;--h:31%;--r:-2deg;--z:4;--d:320ms">
-                <div class="app-badge"><img src="assets/ide/cursor.webp" alt=""></div>
-                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/cursor.webp" alt=""></span><span class="title">admin-panel</span></div>
+                <div class="app-badge"><img src="assets/ide/cursor.webp" alt="" width="256" height="256" decoding="async"></div>
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/cursor.webp" alt="" width="256" height="256" decoding="async"></span><span class="title">admin-panel</span></div>
                 <div class="body"><div class="ln" style="--lw:70%"></div><div class="ln" style="--lw:45%"></div><div class="ln" style="--lw:60%"></div><div class="ln hl" style="--lw:78%"></div><div class="ln" style="--lw:40%"></div></div>
               </div>
               <div class="mb-window" data-project="etl-pipeline" style="--x:28%;--y:68%;--w:22%;--h:28%;--r:1deg;--z:5;--d:360ms">
-                <div class="app-badge"><img src="assets/ide/vscode.webp" alt=""></div>
-                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/vscode.webp" alt=""></span><span class="title">etl-pipeline.py</span></div>
+                <div class="app-badge"><img src="assets/ide/vscode.webp" alt="" width="256" height="256" decoding="async"></div>
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/vscode.webp" alt="" width="256" height="256" decoding="async"></span><span class="title">etl-pipeline.py</span></div>
                 <div class="body"><div class="ln" style="--lw:65%"></div><div class="ln b" style="--lw:50%"></div><div class="ln" style="--lw:78%"></div><div class="ln" style="--lw:42%"></div></div>
               </div>
               <div class="mb-window" data-project="odak-mac" style="--x:52%;--y:66%;--w:22%;--h:30%;--r:-1deg;--z:6;--d:400ms">
-                <div class="app-badge"><img src="assets/ide/xcode.webp" alt=""></div>
-                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/xcode.webp" alt=""></span><span class="title">odak-mac</span></div>
+                <div class="app-badge"><img src="assets/ide/xcode.webp" alt="" width="256" height="256" decoding="async"></div>
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/xcode.webp" alt="" width="256" height="256" decoding="async"></span><span class="title">odak-mac</span></div>
                 <div class="body"><div class="ln" style="--lw:55%"></div><div class="ln" style="--lw:72%"></div><div class="ln hl" style="--lw:38%"></div><div class="ln" style="--lw:65%"></div><div class="ln" style="--lw:48%"></div></div>
               </div>
               <div class="mb-window" data-project="plexo-cli" style="--x:76%;--y:69%;--w:22%;--h:28%;--r:2deg;--z:5;--d:440ms">
-                <div class="app-badge"><img src="assets/ide/intellij.webp" alt=""></div>
-                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/intellij.webp" alt=""></span><span class="title">plexo-cli · main.go</span></div>
+                <div class="app-badge"><img src="assets/ide/intellij.webp" alt="" width="256" height="256" decoding="async"></div>
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/intellij.webp" alt="" width="256" height="256" decoding="async"></span><span class="title">plexo-cli · main.go</span></div>
                 <div class="body"><div class="ln" style="--lw:72%"></div><div class="ln" style="--lw:48%"></div><div class="ln" style="--lw:60%"></div><div class="ln b" style="--lw:35%"></div></div>
               </div>
               <div class="mb-window" data-project="ml-notebook" style="--x:38%;--y:42%;--w:18%;--h:22%;--r:-1deg;--z:1;--d:480ms">
-                <div class="app-badge"><img src="assets/ide/vscode.webp" alt=""></div>
-                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/vscode.webp" alt=""></span><span class="title">ml-notebook.ipynb</span></div>
+                <div class="app-badge"><img src="assets/ide/vscode.webp" alt="" width="256" height="256" decoding="async"></div>
+                <div class="titlebar"><span class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="ico"><img src="assets/ide/vscode.webp" alt="" width="256" height="256" decoding="async"></span><span class="title">ml-notebook.ipynb</span></div>
                 <div class="body"><div class="ln" style="--lw:60%"></div><div class="ln" style="--lw:75%"></div><div class="ln hl" style="--lw:42%"></div></div>
               </div>
             </div>
@@ -2879,7 +2951,7 @@ section.mb-section{padding-top:24px}
                   <div class="input">
                     <span class="typed" id="mb-typed"></span><span class="caret"></span><span class="ghost" id="mb-ghost"></span><span class="open-hint" id="mb-open-hint"></span>
                   </div>
-                  <div class="top-ide tinted" id="mb-topide"><img src="assets/ide/cursor.webp" alt="Cursor"></div>
+                  <div class="top-ide tinted" id="mb-topide"><img src="assets/ide/cursor.webp" alt="Cursor" width="256" height="256" decoding="async"></div>
                 </div>
                 <!-- Project list (default view; hidden when actions menu is shown) -->
                 <ul id="mb-list" class="mb-projects">
@@ -2895,9 +2967,9 @@ section.mb-section{padding-top:24px}
                     </div>
                     <div class="meta">
                       <div class="ide-stack">
-                        <div class="ide" data-ide="cursor"><img src="assets/ide/cursor.webp" alt="Cursor"></div>
-                        <div class="ide" data-ide="vscode"><img src="assets/ide/vscode.webp" alt="VS Code"></div>
-                        <div class="ide" data-ide="intellij"><img src="assets/ide/intellij.webp" alt="IntelliJ"></div>
+                        <div class="ide" data-ide="cursor"><img src="assets/ide/cursor.webp" alt="Cursor" width="256" height="256" decoding="async"></div>
+                        <div class="ide" data-ide="vscode"><img src="assets/ide/vscode.webp" alt="VS Code" width="256" height="256" decoding="async"></div>
+                        <div class="ide" data-ide="intellij"><img src="assets/ide/intellij.webp" alt="IntelliJ" width="256" height="256" decoding="async"></div>
                       </div>
                     </div>
                   </li>
@@ -2912,7 +2984,7 @@ section.mb-section{padding-top:24px}
                       </div>
                     </div>
                     <div class="meta">
-                      <div class="ide-stack"><div class="ide"><img src="assets/ide/intellij.webp" alt="IntelliJ"></div></div>
+                      <div class="ide-stack"><div class="ide"><img src="assets/ide/intellij.webp" alt="IntelliJ" width="256" height="256" decoding="async"></div></div>
                     </div>
                   </li>
                   <li data-keys="react-dashboard">
@@ -2926,7 +2998,7 @@ section.mb-section{padding-top:24px}
                       </div>
                     </div>
                     <div class="meta">
-                      <div class="ide-stack"><div class="ide"><img src="assets/ide/cursor.webp" alt="Cursor"></div></div>
+                      <div class="ide-stack"><div class="ide"><img src="assets/ide/cursor.webp" alt="Cursor" width="256" height="256" decoding="async"></div></div>
                     </div>
                   </li>
                   <li data-keys="notion-clone">
@@ -2952,7 +3024,7 @@ section.mb-section{padding-top:24px}
                       </div>
                     </div>
                     <div class="meta">
-                      <div class="ide-stack"><div class="ide"><img src="assets/ide/xcode.webp" alt="Xcode"></div></div>
+                      <div class="ide-stack"><div class="ide"><img src="assets/ide/xcode.webp" alt="Xcode" width="256" height="256" decoding="async"></div></div>
                     </div>
                   </li>
                   <li data-keys="etl-pipeline">
@@ -2966,7 +3038,7 @@ section.mb-section{padding-top:24px}
                       </div>
                     </div>
                     <div class="meta">
-                      <div class="ide-stack"><div class="ide"><img src="assets/ide/vscode.webp" alt="VS Code"></div></div>
+                      <div class="ide-stack"><div class="ide"><img src="assets/ide/vscode.webp" alt="VS Code" width="256" height="256" decoding="async"></div></div>
                     </div>
                   </li>
                 </ul>
@@ -2992,12 +3064,12 @@ section.mb-section{padding-top:24px}
                   <kbd class="action-key">⌘G</kbd>
                 </li>
                 <li data-action="cursor" data-keys="cursor open">
-                  <div class="action-ico ide-ico"><img src="assets/ide/cursor.webp" alt=""></div>
+                  <div class="action-ico ide-ico"><img src="assets/ide/cursor.webp" alt="" width="256" height="256" decoding="async"></div>
                   <span class="action-name">Open in Cursor</span>
                   <kbd class="action-key">↵</kbd>
                 </li>
                 <li data-action="intellij" data-keys="intellij ij open">
-                  <div class="action-ico ide-ico"><img src="assets/ide/intellij.webp" alt=""></div>
+                  <div class="action-ico ide-ico"><img src="assets/ide/intellij.webp" alt="" width="256" height="256" decoding="async"></div>
                   <span class="action-name">Open in IntelliJ</span>
                   <kbd class="action-key">⇧↵</kbd>
                 </li>
@@ -3057,6 +3129,17 @@ section.mb-section{padding-top:24px}
             </div>
           </div>
         </div>
+      <svg class="notch-overlay" viewBox="0 0 619 377" preserveAspectRatio="xMidYMid meet" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M277.219 7.67548H281.283C282.031 7.67548 282.637 8.2819 282.637 9.02997V13.9964C282.637 15.4926 283.85 16.7054 285.346 16.7054H333.656C334.903 16.7054 335.914 15.6947 335.914 14.4479V9.02997C335.914 8.2819 336.52 7.67548 337.268 7.67548H341.332H277.219Z" fill="black"/>
+        <circle cx="309.275" cy="9.93296" r="2.25748" fill="url(#mb-lens)"/>
+        <defs>
+          <radialGradient id="mb-lens" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(309.275 9.93296) rotate(90) scale(2.25748)">
+            <stop stop-color="#9797AB"/>
+            <stop offset="0.391646" stop-color="#2C2C46"/>
+            <stop offset="1" stop-color="#3F3F46"/>
+          </radialGradient>
+        </defs>
+      </svg>
     </div>
   </div>
 </section>
@@ -3143,7 +3226,7 @@ section.mb-section{padding-top:24px}
                 <span class="typed" id="hero-typed"></span><span class="caret" id="hero-caret"></span><span class="ghost" id="hero-ghost"></span><span class="open-hint" id="hero-open-hint"></span>
               </div>
               <div class="hint-pill" id="hero-hint"></div>
-              <div class="top-ide tinted" id="hero-topide"><img src="assets/ide/cursor.webp" alt="Cursor"></div>
+              <div class="top-ide tinted" id="hero-topide"><img src="assets/ide/cursor.webp" alt="Cursor" width="256" height="256" decoding="async" loading="lazy"></div>
             </div>
             <ul id="hero-list">
               <li data-keys="web-app" class="on">
@@ -3160,9 +3243,9 @@ section.mb-section{padding-top:24px}
                 </div>
                 <div class="meta">
                   <div class="ide-stack" title="Open windows">
-                    <div class="ide" data-ide="cursor"   title="Cursor"><img src="assets/ide/cursor.webp" alt="Cursor"></div>
-                    <div class="ide" data-ide="vscode"   title="VS Code"><img src="assets/ide/vscode.webp" alt="VS Code"></div>
-                    <div class="ide" data-ide="intellij" title="IntelliJ IDEA"><img src="assets/ide/intellij.webp" alt="IntelliJ IDEA"></div>
+                    <div class="ide" data-ide="cursor"   title="Cursor"><img src="assets/ide/cursor.webp" alt="Cursor" width="256" height="256" decoding="async" loading="lazy"></div>
+                    <div class="ide" data-ide="vscode"   title="VS Code"><img src="assets/ide/vscode.webp" alt="VS Code" width="256" height="256" decoding="async" loading="lazy"></div>
+                    <div class="ide" data-ide="intellij" title="IntelliJ IDEA"><img src="assets/ide/intellij.webp" alt="IntelliJ IDEA" width="256" height="256" decoding="async" loading="lazy"></div>
                   </div>
                 </div>
               </li>
@@ -3177,7 +3260,7 @@ section.mb-section{padding-top:24px}
                   </div>
                 </div>
                 <div class="meta">
-                  <div class="ide-stack"><div class="ide"><img src="assets/ide/intellij.webp" alt="IntelliJ IDEA"></div></div>
+                  <div class="ide-stack"><div class="ide"><img src="assets/ide/intellij.webp" alt="IntelliJ IDEA" width="256" height="256" decoding="async" loading="lazy"></div></div>
                 </div>
               </li>
               <li data-keys="api-gateway">
@@ -3191,7 +3274,7 @@ section.mb-section{padding-top:24px}
                   </div>
                 </div>
                 <div class="meta">
-                  <div class="ide-stack"><div class="ide"><img src="assets/ide/intellij.webp" alt="IntelliJ IDEA"></div></div>
+                  <div class="ide-stack"><div class="ide"><img src="assets/ide/intellij.webp" alt="IntelliJ IDEA" width="256" height="256" decoding="async" loading="lazy"></div></div>
                 </div>
               </li>
               <li data-keys="react-dashboard">
@@ -3207,7 +3290,7 @@ section.mb-section{padding-top:24px}
                   </div>
                 </div>
                 <div class="meta">
-                  <div class="ide-stack"><div class="ide"><img src="assets/ide/cursor.webp" alt="Cursor"></div></div>
+                  <div class="ide-stack"><div class="ide"><img src="assets/ide/cursor.webp" alt="Cursor" width="256" height="256" decoding="async" loading="lazy"></div></div>
                 </div>
               </li>
               <li data-keys="notion-clone">
@@ -3247,7 +3330,7 @@ section.mb-section{padding-top:24px}
                 <div class="line"><span style="width:70px"></span><span style="width:30px"></span></div>
               </div>
             </div>
-            <span class="app-mark"><img src="assets/ide/cursor.webp" alt=""></span>
+            <span class="app-mark"><img src="assets/ide/cursor.webp" alt="" width="256" height="256" decoding="async" loading="lazy"></span>
           </div>
         </div>
       </div>
@@ -3294,7 +3377,7 @@ section.mb-section{padding-top:24px}
         </div>
         <ul class="win-list">
           <li class="win on">
-            <div class="app"><img src="assets/ide/cursor.webp" alt="Cursor"></div>
+            <div class="app"><img src="assets/ide/cursor.webp" alt="Cursor" width="256" height="256" decoding="async" loading="lazy"></div>
             <div class="body">
               <div class="title">web-app <span class="proj">· pricing.tsx</span></div>
               <div class="sub">Cursor · ~/code/work/web-app</div>
@@ -3310,7 +3393,7 @@ section.mb-section{padding-top:24px}
             <div class="mru">2m ago</div>
           </li>
           <li class="win">
-            <div class="app"><img src="assets/ide/xcode.webp" alt="Xcode"></div>
+            <div class="app"><img src="assets/ide/xcode.webp" alt="Xcode" width="256" height="256" decoding="async" loading="lazy"></div>
             <div class="body">
               <div class="title">platform-ios <span class="proj">· AppDelegate.swift</span></div>
               <div class="sub">Xcode 16.2</div>
@@ -3318,7 +3401,7 @@ section.mb-section{padding-top:24px}
             <div class="mru">8m</div>
           </li>
           <li class="win">
-            <div class="app"><img src="assets/ide/intellij.webp" alt="IntelliJ IDEA"></div>
+            <div class="app"><img src="assets/ide/intellij.webp" alt="IntelliJ IDEA" width="256" height="256" decoding="async" loading="lazy"></div>
             <div class="body">
               <div class="title">platform-api <span class="proj">· handler.go</span></div>
               <div class="sub">IntelliJ IDEA</div>
@@ -3326,7 +3409,7 @@ section.mb-section{padding-top:24px}
             <div class="mru">14m</div>
           </li>
           <li class="win">
-            <div class="app"><img src="assets/ide/vscode.webp" alt="VS Code"></div>
+            <div class="app"><img src="assets/ide/vscode.webp" alt="VS Code" width="256" height="256" decoding="async" loading="lazy"></div>
             <div class="body">
               <div class="title">platform-etl <span class="proj">· pipeline.py</span></div>
               <div class="sub">VS Code</div>
@@ -3401,7 +3484,7 @@ section.mb-section{padding-top:24px}
             <div class="input">
               <span class="typed">web</span><span class="open-hint">— Open</span>
             </div>
-            <div class="top-ide"><img src="assets/ide/cursor.webp" alt="Cursor"></div>
+            <div class="top-ide"><img src="assets/ide/cursor.webp" alt="Cursor" width="256" height="256" decoding="async" loading="lazy"></div>
           </div>
           <ul>
             <li class="on" data-keys="web-app">
@@ -3418,8 +3501,8 @@ section.mb-section{padding-top:24px}
               </div>
               <div class="meta">
                 <div class="ide-stack">
-                  <div class="ide" data-ide="cursor"><img src="assets/ide/cursor.webp" alt="Cursor"></div>
-                  <div class="ide" data-ide="vscode"><img src="assets/ide/vscode.webp" alt="VS Code"></div>
+                  <div class="ide" data-ide="cursor"><img src="assets/ide/cursor.webp" alt="Cursor" width="256" height="256" decoding="async" loading="lazy"></div>
+                  <div class="ide" data-ide="vscode"><img src="assets/ide/vscode.webp" alt="VS Code" width="256" height="256" decoding="async" loading="lazy"></div>
                 </div>
               </div>
             </li>
@@ -3435,7 +3518,7 @@ section.mb-section{padding-top:24px}
               </div>
               <div class="meta">
                 <div class="ide-stack">
-                  <div class="ide" data-ide="intellij"><img src="assets/ide/intellij.webp" alt="IntelliJ"></div>
+                  <div class="ide" data-ide="intellij"><img src="assets/ide/intellij.webp" alt="IntelliJ" width="256" height="256" decoding="async" loading="lazy"></div>
                 </div>
               </div>
             </li>
@@ -3451,7 +3534,7 @@ section.mb-section{padding-top:24px}
               </div>
               <div class="meta">
                 <div class="ide-stack">
-                  <div class="ide" data-ide="vscode"><img src="assets/ide/vscode.webp" alt="VS Code"></div>
+                  <div class="ide" data-ide="vscode"><img src="assets/ide/vscode.webp" alt="VS Code" width="256" height="256" decoding="async" loading="lazy"></div>
                 </div>
               </div>
             </li>
@@ -3584,7 +3667,7 @@ section.mb-section{padding-top:24px}
             <div class="np-head">Recent windows</div>
             <ul class="np-list">
               <li>
-                <span class="np-ide"><img src="assets/ide/cursor.webp" alt=""></span>
+                <span class="np-ide"><img src="assets/ide/cursor.webp" alt="" width="256" height="256" decoding="async" loading="lazy"></span>
                 <span class="np-name">pricing.tsx</span>
                 <span class="np-meta">just now</span>
               </li>
