@@ -13,5 +13,13 @@
             <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
             <enclosure url="https://github.com/salihcaan/odak.fyi/releases/download/v0.1.0/Odak-0.1.0.dmg" length="27551261" type="application/x-apple-diskimage" sparkle:edSignature="mlVhCGenHJLWPitlIdlEgUjxyvY8mg32MVOU5aI7jRv1blfhcDtie1/3ve/drGYXhyIomw/7D6DP3Th31ZveBw=="/>
         </item>
+            <item>
+            <title>Version 0.1.0</title>
+            <pubDate>Wed, 29 Apr 2026 14:06:20 +0000</pubDate>
+            <sparkle:version>3</sparkle:version>
+            <sparkle:shortVersionString>0.1.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/salihcaan/odak.fyi/releases/download/v0.1.0/Odak-0.1.0.dmg" length="27557916" type="application/x-apple-diskimage" sparkle:edSignature="BQ3RWJHwCitSIuU+Gl7E6VQqoMwSA7Wn6MbsfQ7gQ96q1WaU+q3qsNrrgKk9NKjJqShSGNhM4Uf3hfGHsk5aCQ=="/>
+        </item>
     </channel>
 </rss>
