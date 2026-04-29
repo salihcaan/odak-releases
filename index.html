@@ -49,6 +49,10 @@
   --accent-2:   oklch(68% 0.16 55);
   --accent-glow: oklch(78% 0.18 75 / .55);
   --accent-ink: #1a1410;
+  /* warm-red companion for ambient blobs (aurora, hero stage glow,
+     mb-stage glow). One source of truth across the page so the warm
+     halo reads as the same light source everywhere. */
+  --accent-warm-2: oklch(55% 0.18 25 / .32);
 
   /* product layer — the real app's default "Classic" accent #2B5AAA */
   --prod-blue:   #2B5AAA;
@@ -99,6 +103,7 @@
   --accent-2:   oklch(48% 0.19 45);
   --accent-glow: oklch(58% 0.22 55 / .35);
   --accent-ink: #fff6e8;
+  --accent-warm-2: oklch(48% 0.18 25 / .22);
 }
 
 /* Bundled Instrument Serif — used by presentation title cards on the
@@ -196,7 +201,7 @@ button{font-family:inherit}
 }
 .aurora::after{
   width:70vw;height:70vw;top:30vh;right:-25vw;
-  background:radial-gradient(circle, oklch(55% 0.18 25 / .35), transparent 60%);
+  background:radial-gradient(circle, var(--accent-warm-2), transparent 60%);
   opacity:.45;
   animation:aur2 32s ease-in-out infinite alternate;
 }
@@ -467,7 +472,7 @@ h1.hero-h .accent{
   position:absolute;inset:-20% -10% -10%;
   background:
     radial-gradient(ellipse 50% 40% at 50% 40%, var(--accent-glow), transparent 60%),
-    radial-gradient(ellipse 40% 30% at 30% 70%, oklch(55% 0.18 25 / .3), transparent 60%);
+    radial-gradient(ellipse 40% 30% at 30% 70%, var(--accent-warm-2), transparent 60%);
   filter:blur(40px);
   pointer-events:none;z-index:0;opacity:.8;
 }
@@ -1230,7 +1235,7 @@ h2.section-h .mute{color:var(--dim)}
 .actions-stage .ax-yaml .s{color:#a3e08e}
 .actions-stage .ax-yaml .c{color:rgba(255,255,255,.45)}
 [data-theme="light"] .actions-stage .ax-yaml{color:var(--fg-2)}
-[data-theme="light"] .actions-stage .ax-yaml .k{color:var(--accent)}
+[data-theme="light"] .actions-stage .ax-yaml .k{color:oklch(50% 0.14 220)}
 [data-theme="light"] .actions-stage .ax-yaml .s{color:oklch(60% 0.15 150)}
 [data-theme="light"] .actions-stage .ax-yaml .c{color:var(--mute)}
 
@@ -1909,8 +1914,9 @@ h2.section-h .mute{color:var(--dim)}
 
 /* Icon hover beats — each window covers approach + dwell so the
    icon is already growing as the cursor settles, and stays large
-   for a beat after. The accent border + lifted bg matches the
-   real macOS hover. Rest state: scale(1), no border highlight. */
+   for a beat after. The prod-blue border + lifted bg reads as the
+   real in-product hover (matching the palette's selected row and
+   the chosen-window border). Rest state: scale(1), no highlight. */
 @keyframes ns-ide-hov-a{
   0%, 30%, 44%, 100%{
     transform:scale(1);
@@ -1920,7 +1926,7 @@ h2.section-h .mute{color:var(--dim)}
   34%, 40%{
     transform:scale(1.32);
     background:rgba(255,255,255,0.08);
-    border-color:color-mix(in oklch, var(--accent) 50%, rgba(255,255,255,0.12));
+    border-color:color-mix(in oklch, var(--prod-blue) 50%, rgba(255,255,255,0.12));
   }
 }
 @keyframes ns-ide-hov-b{
@@ -1932,7 +1938,7 @@ h2.section-h .mute{color:var(--dim)}
   49%, 55%{
     transform:scale(1.32);
     background:rgba(255,255,255,0.08);
-    border-color:color-mix(in oklch, var(--accent) 50%, rgba(255,255,255,0.12));
+    border-color:color-mix(in oklch, var(--prod-blue) 50%, rgba(255,255,255,0.12));
   }
 }
 @keyframes ns-ide-hov-c{
@@ -1944,7 +1950,7 @@ h2.section-h .mute{color:var(--dim)}
   64%, 70%{
     transform:scale(1.32);
     background:rgba(255,255,255,0.08);
-    border-color:color-mix(in oklch, var(--accent) 50%, rgba(255,255,255,0.12));
+    border-color:color-mix(in oklch, var(--prod-blue) 50%, rgba(255,255,255,0.12));
   }
 }
 
@@ -2400,7 +2406,7 @@ section.mb-section{padding-top:24px;max-width:none}
   position:absolute;inset:-8% -4% -10%;z-index:-1;pointer-events:none;
   background:
     radial-gradient(ellipse 60% 40% at 50% 30%, var(--accent-glow), transparent 60%),
-    radial-gradient(ellipse 40% 30% at 30% 70%, oklch(55% 0.18 25 / .32), transparent 65%);
+    radial-gradient(ellipse 40% 30% at 30% 70%, var(--accent-warm-2), transparent 65%);
   filter:blur(60px);opacity:.7;
 }
 
@@ -2646,18 +2652,21 @@ section.mb-section{padding-top:24px;max-width:none}
   opacity:1;
   z-index:50;
   transform:translate(var(--cx, 0px), var(--cy, 0px)) rotate(0deg) scale(var(--focus-scale, 1.08));
-  /* Shadow + accent halo in cqi so they scale with the macbook frame.
-     Layered (contact + key + far cast) instead of one big α=.7 drop —
-     the focused window is also visually scaled ~3.4× by the transform,
-     which would amplify any single-layer edge into a hard cut.
-     The 2px accent ring stays a touch thicker — 0.23cqi ≈ 2px desktop;
-     the visible thickness is multiplied by the focus-scale transform. */
+  /* Shadow + product-blue halo in cqi so they scale with the macbook
+     frame. Layered (contact + key + far cast) instead of one big α=.7
+     drop — the focused window is also visually scaled ~3.4× by the
+     transform, which would amplify any single-layer edge into a hard
+     cut. Halo uses --prod-blue (not --accent) to honor the two-layer
+     rule: in-product surfaces inside the macbook scene (palette
+     selected row, caret, chosen-window) are all prod-blue. The 2px
+     ring stays a touch thicker — 0.23cqi ≈ 2px desktop; the visible
+     thickness is multiplied by the focus-scale transform. */
   box-shadow:
     0 0.7cqi 1.6cqi rgba(0,0,0,.30),
     0 2.4cqi 5.5cqi rgba(0,0,0,.36),
     0 5.5cqi 11.0cqi rgba(0,0,0,.26),
-    0 0 0 0.23cqi var(--accent),
-    0 0 5.48cqi var(--accent-glow);
+    0 0 0 0.23cqi var(--prod-blue),
+    0 0 5.48cqi var(--prod-blue-glow);
 }
 .mb-window .titlebar{
   display:flex;align-items:center;gap:0.57cqi;
