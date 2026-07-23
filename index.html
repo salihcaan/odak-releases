@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a0b09">
+  <meta name="description" content="Odak is the keyboard-first project finder, IDE switcher, and command launcher for macOS developers.">
+  <title>Odak — Every project, one command away</title>
+  <style>
+    :root {
+      --volt: #ceff00;
+      --ink: #0a0b09;
+      --carbon: #11130f;
+      --graphite: #1b1e18;
+      --slate: #282c23;
+      --mist: #f3f5ec;
+      --quiet: #9a9e90;
+      --line: rgba(243,245,236,.12);
+      --ease: cubic-bezier(.16,1,.3,1);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--ink);
+      color: var(--mist);
+      font: 16px/1.55 "Avenir Next", Avenir, ui-sans-serif, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    a { color: inherit; text-decoration: none; }
+    button { color: inherit; }
+    :focus-visible { outline: 2px solid var(--volt); outline-offset: 3px; }
+    .skip { position: fixed; left: 16px; top: -60px; z-index: 100; padding: 10px 14px; background: var(--volt); color: var(--ink); border-radius: 8px; }
+    .skip:focus { top: 16px; }
+    .noise { position: fixed; inset: 0; pointer-events: none; opacity: .035; z-index: 90; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E"); }
+    .shell { width: min(1240px, calc(100% - 40px)); margin-inline: auto; }
+    nav { position: relative; z-index: 20; display: flex; align-items: center; justify-content: space-between; padding-block: 26px; }
+    .brand { display: flex; align-items: center; gap: 11px; font-weight: 650; letter-spacing: -.02em; }
+    .brand-mark { width: 28px; aspect-ratio: 1; display: grid; place-items: center; color: var(--ink); background: var(--volt); border-radius: 8px; font-size: 16px; font-weight: 800; box-shadow: 0 0 30px rgba(206,255,0,.14); }
+    .nav-links { display: flex; align-items: center; gap: 30px; color: var(--quiet); font-size: 14px; }
+    .nav-links a:hover { color: var(--mist); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 44px; padding: 11px 17px; border: 1px solid var(--line); border-radius: 10px; background: transparent; cursor: pointer; transition: transform .2s var(--ease), background .2s, border-color .2s; }
+    .btn:hover { transform: translateY(-1px); border-color: rgba(243,245,236,.3); }
+    .btn-primary { background: var(--volt); color: var(--ink); border-color: var(--volt); font-weight: 700; }
+    .btn-primary:hover { background: #d9ff3d; border-color: #d9ff3d; }
+    .hero { padding: clamp(70px, 11vw, 150px) 0 70px; position: relative; }
+    .hero::before { content: ""; position: absolute; width: 50vw; height: 50vw; max-width: 720px; max-height: 720px; left: 47%; top: -25%; background: radial-gradient(circle, rgba(206,255,0,.07), transparent 67%); pointer-events: none; }
+    .eyebrow { display: flex; align-items: center; gap: 10px; color: var(--quiet); font: 12px/1.2 "SF Mono", ui-monospace, monospace; letter-spacing: .04em; }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--volt); box-shadow: 0 0 14px var(--volt); }
+    h1 { max-width: 980px; margin: 28px 0 32px; font-size: clamp(3.6rem, 9.4vw, 8.9rem); line-height: .89; letter-spacing: -.067em; font-weight: 620; }
+    h1 span { color: var(--volt); }
+    .hero-bottom { display: grid; grid-template-columns: 1fr minmax(300px, 470px); gap: 60px; align-items: end; }
+    .hero-copy { margin: 0; color: #c3c7bb; font-size: clamp(1.05rem, 2vw, 1.32rem); max-width: 48ch; }
+    .hero-actions { display: flex; justify-content: flex-end; gap: 12px; flex-wrap: wrap; }
+    .price-note { width: 100%; text-align: right; color: var(--quiet); font: 11px/1.4 "SF Mono", ui-monospace, monospace; }
+
+    .demo-wrap { padding: 50px 0 clamp(100px, 12vw, 170px); }
+    .demo-head { display: flex; justify-content: space-between; align-items: end; margin-bottom: 18px; color: var(--quiet); font-size: 13px; }
+    .demo-head strong { color: var(--mist); font-size: 15px; font-weight: 560; }
+    .desktop { position: relative; min-height: 720px; overflow: hidden; border: 1px solid rgba(243,245,236,.16); border-radius: 28px; background: #12170f; box-shadow: 0 70px 140px rgba(0,0,0,.56), 0 0 0 1px rgba(206,255,0,.025) inset; isolation: isolate; }
+    .desktop-wallpaper { position: absolute; inset: 0; background: radial-gradient(ellipse at 75% 10%, rgba(206,255,0,.17), transparent 34%), radial-gradient(ellipse at 18% 86%, rgba(112,136,82,.22), transparent 42%), linear-gradient(145deg, #11150e 0%, #1f2916 45%, #0c0e0b 100%); }
+    .desktop-wallpaper::after { content:""; position:absolute; inset:-30%; background: repeating-linear-gradient(105deg, transparent 0 42px, rgba(206,255,0,.018) 43px 44px); transform: rotate(-5deg); }
+    .menu-bar { position: relative; z-index: 2; height: 34px; display:flex; align-items:center; justify-content:space-between; padding:0 16px; background: rgba(10,11,9,.66); border-bottom:1px solid rgba(255,255,255,.07); backdrop-filter: blur(18px); font-size: 11px; }
+    .menu-left,.menu-right { display:flex; align-items:center; gap:16px; }
+    .menu-left strong { font-size: 14px; }
+    .ide-window { position:absolute; z-index:1; inset:66px 54px 50px; display:grid; grid-template-columns: 210px 1fr 250px; grid-template-rows: 42px 1fr 28px; background:#171a17; border:1px solid rgba(255,255,255,.14); border-radius:14px; overflow:hidden; box-shadow:0 25px 70px rgba(0,0,0,.44); transition: filter .35s var(--ease), transform .35s var(--ease); }
+    .desktop.palette-open .ide-window { filter: brightness(.72) saturate(.7); transform: scale(.992); }
+    .titlebar { grid-column:1/-1; display:flex; align-items:center; gap:9px; padding:0 14px; background:#20231f; border-bottom:1px solid rgba(255,255,255,.07); }
+    .traffic { width:11px; height:11px; border-radius:50%; background:#ff5e57; box-shadow:20px 0 #febc2e,40px 0 #28c840; margin-right:38px; }
+    .tab { height:30px; display:flex; align-items:center; gap:8px; padding:0 13px; margin-top:11px; color:#dfe3d8; background:#171a17; border-radius:7px 7px 0 0; font-size:12px; }
+    .sidebar { padding:15px 12px; background:#141714; border-right:1px solid rgba(255,255,255,.07); font:11px/1.8 "SF Mono",ui-monospace,monospace; color:#92988d; }
+    .file { display:flex; align-items:center; gap:7px; padding:1px 7px; border-radius:5px; }
+    .file.active { color:#e8ebe3; background:#2d3329; }
+    .file-dot { width:7px; height:7px; border-radius:2px; background:#72a7ff; }
+    .editor { padding:24px 30px; font:12px/1.9 "SF Mono",ui-monospace,monospace; color:#b7bdaf; overflow:hidden; }
+    .code-line { white-space:nowrap; }
+    .ln { display:inline-block; width:28px; color:#4f554d; user-select:none; }
+    .kw { color:#ff79c6; }.fn { color:#ceff00}.str { color:#e6c07b}.type { color:#78dce8}.comment { color:#5d6659}.blue { color:#82aaff; }
+    .inspector { padding:18px 16px; border-left:1px solid rgba(255,255,255,.07); color:#8f9689; font-size:11px; }
+    .inspector h4 { color:#d7dbd1; margin:0 0 14px; font-size:11px; }.inspector-row { display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid rgba(255,255,255,.055); }
+    .statusbar { grid-column:1/-1; display:flex; align-items:center; justify-content:space-between; padding:0 12px; background:#20231f; color:#93998f; font-size:10px; border-top:1px solid rgba(255,255,255,.06); }
+    .statusbar .branch { color:var(--volt); }
+
+    .palette { position:absolute; z-index:5; width:min(680px, calc(100% - 48px)); left:50%; top:50%; transform:translate(-50%,-45%) scale(.97); opacity:0; pointer-events:none; background:rgba(20,22,18,.94); border:1px solid rgba(243,245,236,.2); border-radius:22px; box-shadow:0 38px 100px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.03) inset; backdrop-filter:blur(30px) saturate(1.1); transition:opacity .25s var(--ease),transform .35s var(--ease); }
+    .desktop.palette-open .palette { transform:translate(-50%,-50%) scale(1); opacity:1; pointer-events:auto; }
+    .search-box { display:flex; align-items:center; gap:13px; height:66px; padding:0 18px; border-bottom:1px solid var(--line); }
+    .search-icon { width:18px;height:18px;border:2px solid #abb0a4;border-radius:50%;position:relative;flex:none}.search-icon::after{content:"";position:absolute;width:7px;height:2px;background:#abb0a4;right:-5px;bottom:-2px;transform:rotate(45deg)}
+    #project-search { width:100%; color:var(--mist); background:transparent; border:0; outline:0; font-size:19px; letter-spacing:-.02em; caret-color:var(--volt); }
+    #project-search::placeholder { color:#767c71; }
+    kbd { display:inline-flex; min-width:23px; height:23px; align-items:center; justify-content:center; padding:0 6px; border:1px solid rgba(255,255,255,.13); border-bottom-color:rgba(255,255,255,.22); border-radius:6px; color:#9da396; background:rgba(255,255,255,.055); font:10px/1 "SF Mono",ui-monospace,monospace; box-shadow:0 1px 0 rgba(255,255,255,.08) inset; }
+    .palette-label { display:flex; justify-content:space-between; padding:14px 18px 7px; color:#747a6f; font:10px/1.2 "SF Mono",ui-monospace,monospace; text-transform:uppercase; letter-spacing:.08em; }
+    .results { padding:0 8px 8px; min-height:276px; }
+    .result { width:100%; display:grid; grid-template-columns:36px 1fr auto; gap:12px; align-items:center; padding:10px; border:0; border-radius:11px; background:transparent; text-align:left; cursor:pointer; }
+    .result[hidden] { display:none; }
+    .result.selected { background:var(--volt); color:var(--ink); }
+    .project-icon { width:36px; height:36px; display:grid; place-items:center; border-radius:9px; background:#31372d; color:#d8ddd2; font-weight:700; }
+    .result.selected .project-icon { background:rgba(10,11,9,.15); color:var(--ink); }
+    .project-name { display:block; font-size:14px; font-weight:600; }.project-path{display:block;color:#747b70;font:10px/1.5 "SF Mono",ui-monospace,monospace}.result.selected .project-path{color:rgba(10,11,9,.58)}
+    .meta { display:flex; align-items:center; gap:7px; color:#858b80; font-size:10px; }.result.selected .meta{color:rgba(10,11,9,.65)}.dirty{width:6px;height:6px;border-radius:50%;background:#ff705d}.result.selected .dirty{background:#8c3600}
+    .palette-foot { display:flex; align-items:center; justify-content:space-between; min-height:44px; padding:8px 14px; border-top:1px solid var(--line); color:#777d72; font-size:10px; }
+    .key-hints { display:flex; gap:10px; }.key-hints span{display:flex;align-items:center;gap:5px}
+    .actions-panel { position:absolute; inset:66px 0 auto; z-index:7; padding:8px; background:rgba(20,22,18,.98); border-radius:0 0 22px 22px; opacity:0; transform:translateY(-8px); pointer-events:none; transition:opacity .2s var(--ease),transform .3s var(--ease); }
+    .actions-panel.open { opacity:1; transform:translateY(0); pointer-events:auto; }
+    .action { display:grid; grid-template-columns:34px 1fr auto; gap:11px; align-items:center; width:100%; padding:10px; border:0; border-radius:10px; background:transparent; text-align:left; cursor:pointer; }
+    .action:hover,.action.active { background:var(--graphite); }.action-glyph{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:#2b3028;font-size:15px}.action strong{display:block;font-size:13px}.action small{display:block;color:#777e72;font-size:10px}.action.live .action-glyph{background:var(--volt);color:var(--ink)}
+    .toast { position:absolute; z-index:10; left:50%; bottom:28px; display:flex; align-items:center; gap:10px; padding:11px 15px; border:1px solid rgba(206,255,0,.28); border-radius:10px; background:#171b13; box-shadow:0 20px 50px rgba(0,0,0,.45); transform:translate(-50%,20px); opacity:0; transition:opacity .2s,transform .35s var(--ease); font-size:12px; }.toast.show{opacity:1;transform:translate(-50%,0)}.toast-check{display:grid;place-items:center;width:21px;height:21px;border-radius:50%;background:var(--volt);color:var(--ink);font-weight:900}
+    .hint-pulse { position:absolute; z-index:3; right:28px; top:55px; padding:9px 11px; border:1px solid rgba(206,255,0,.24); border-radius:9px; background:rgba(10,11,9,.72); color:#dfe3d8; font-size:11px; backdrop-filter:blur(12px); animation:float 3s ease-in-out infinite; }
+    @keyframes float { 50%{transform:translateY(-5px)} }
+
+    .story { border-top:1px solid var(--line); }
+    .story-row { display:grid; grid-template-columns: minmax(250px, .75fr) 1.25fr; gap:clamp(50px,10vw,150px); padding:clamp(90px,13vw,170px) 0; border-bottom:1px solid var(--line); }
+    .story-index { color:var(--volt); font:11px/1 "SF Mono",ui-monospace,monospace; }
+    .story h2 { margin:22px 0 18px; font-size:clamp(2.5rem,5vw,5.2rem); line-height:.96; letter-spacing:-.055em; font-weight:600; }
+    .story-copy { max-width:58ch; align-self:end; color:#b6bbaf; font-size:clamp(1.05rem,1.8vw,1.26rem); }
+    .story-copy p { margin:0 0 28px; }
+    .feature-list { display:grid; gap:0; border-top:1px solid var(--line); }
+    .feature-item { display:grid; grid-template-columns:30px 1fr auto; gap:16px; align-items:center; padding:15px 0; border-bottom:1px solid var(--line); color:var(--mist); font-size:14px; }.feature-item span:last-child{color:var(--quiet);font:10px/1 "SF Mono",ui-monospace,monospace}
+    .session-strip { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:35px; }
+    .session { min-height:155px; padding:18px; border:1px solid var(--line); border-radius:12px; background:var(--carbon); }.session-top{display:flex;justify-content:space-between;color:var(--quiet);font-size:10px}.session h3{margin:34px 0 8px;font-size:16px}.session p{margin:0;color:var(--quiet);font-size:12px}.session-status{color:var(--volt);font:10px/1 "SF Mono",ui-monospace,monospace}
+    .closing { padding:clamp(110px,16vw,210px) 0; text-align:center; }
+    .closing h2 { max-width:1000px; margin:0 auto 32px; font-size:clamp(3rem,8vw,8rem); line-height:.9; letter-spacing:-.065em; font-weight:620; }.closing h2 span{color:var(--volt)}.closing p{max-width:52ch;margin:0 auto 36px;color:var(--quiet);font-size:18px}.closing-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+    footer { display:flex; justify-content:space-between; gap:20px; padding:28px 0 42px; border-top:1px solid var(--line); color:var(--quiet); font-size:12px; }.footer-links{display:flex;gap:22px}
+    .reveal { opacity:0; transform:translateY(26px); transition:opacity .8s var(--ease),transform .8s var(--ease); }.reveal.visible{opacity:1;transform:none}
+    @media(max-width:850px){.nav-links a:not(.nav-download){display:none}.hero-bottom,.story-row{grid-template-columns:1fr}.hero-actions{justify-content:flex-start}.price-note{text-align:left}.desktop{min-height:610px}.ide-window{inset:56px 18px 35px;grid-template-columns:140px 1fr}.inspector{display:none}.palette{width:calc(100% - 28px)}.session-strip{grid-template-columns:1fr}.story-copy{max-width:none}}
+    @media(max-width:560px){.shell{width:min(100% - 24px,1240px)}nav{padding-block:18px}.nav-links{gap:10px}.nav-buy{display:none}.hero{padding-top:60px}.hero-bottom{gap:30px}.hero-actions{display:grid;grid-template-columns:1fr 1fr}.demo-head span{display:none}.desktop{min-height:575px;border-radius:18px}.menu-right span:not(:last-child){display:none}.ide-window{inset:52px 10px 24px;grid-template-columns:1fr}.sidebar{display:none}.editor{padding:18px 12px;font-size:10px}.palette{top:48%;}.result{grid-template-columns:36px 1fr}.meta{display:none}.key-hints span:nth-child(n+2){display:none}.hint-pulse{right:12px;top:46px}.story-row{padding:90px 0;gap:35px}.closing-actions{display:grid}.footer-links{display:none}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.reveal{opacity:1;transform:none}}
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a><div class="noise" aria-hidden="true"></div>
+  <header class="shell"><nav aria-label="Main navigation"><a class="brand" href="#"><span class="brand-mark">O</span>Odak</a><div class="nav-links"><a href="#how">How it works</a><a href="#sessions">Sessions</a><a class="btn nav-buy" href="/buy">Buy for $19</a><a class="btn btn-primary nav-download download-link" href="https://github.com/salihcaan/odak-releases/releases/latest">Download</a></div></nav></header>
+  <main id="main">
+    <section class="hero shell">
+      <div class="eyebrow reveal"><span class="live-dot"></span>BUILT FOR MACOS 15+ · NATIVE SWIFTUI</div>
+      <h1 class="reveal">Every project.<br><span>One command away.</span></h1>
+      <div class="hero-bottom reveal"><p class="hero-copy">Find a repo, jump to its window, launch Xcode, open Codex, or run your own command. Odak keeps your entire development workspace one keystroke away.</p><div class="hero-actions"><button class="btn" id="try-demo">Try it with <kbd>⌘ K</kbd></button><a class="btn btn-primary download-link" href="https://github.com/salihcaan/odak-releases/releases/latest">Download Odak</a><div class="price-note">FREE TRIAL · $19 ONE-TIME · NO SUBSCRIPTION</div></div></div>
+    </section>
+    <section class="demo-wrap shell" aria-labelledby="demo-title">
+      <div class="demo-head reveal"><strong id="demo-title">This is the product. Use it.</strong><span>Press ⌘K, search a project, then choose what happens next.</span></div>
+      <div class="desktop reveal" id="desktop">
+        <div class="desktop-wallpaper"></div>
+        <div class="menu-bar"><div class="menu-left"><strong>●</strong><b>Xcode</b><span>File</span><span>Edit</span><span>View</span><span>Navigate</span></div><div class="menu-right"><span>⌁</span><span>◒</span><span>100%</span><span id="clock">10:24</span></div></div>
+        <div class="hint-pulse">Press <kbd>⌘</kbd> <kbd>K</kbd></div>
+        <div class="ide-window" aria-hidden="true"><div class="titlebar"><span class="traffic"></span><div class="tab"><span class="fn">◇</span> ProjectDashboard.swift</div></div><aside class="sidebar"><div>▾ ODAK</div><div class="file"><span class="file-dot"></span>OdakApp.swift</div><div class="file active"><span class="file-dot"></span>ProjectDashboard.swift</div><div class="file"><span class="file-dot"></span>SearchController.swift</div><div class="file"><span class="file-dot"></span>AgentSession.swift</div><div>▸ RESOURCES</div><div>▸ TESTS</div></aside><div class="editor"><div class="code-line"><span class="ln">1</span><span class="kw">import</span> SwiftUI</div><div class="code-line"><span class="ln">2</span></div><div class="code-line"><span class="ln">3</span><span class="kw">struct</span> <span class="type">ProjectDashboard</span>: <span class="type">View</span> {</div><div class="code-line"><span class="ln">4</span>&nbsp;&nbsp;<span class="kw">let</span> projects: [<span class="type">Project</span>]</div><div class="code-line"><span class="ln">5</span>&nbsp;&nbsp;<span class="kw">let</span> sessions: [<span class="type">AgentSession</span>]</div><div class="code-line"><span class="ln">6</span></div><div class="code-line"><span class="ln">7</span>&nbsp;&nbsp;<span class="kw">var</span> body: <span class="kw">some</span> <span class="type">View</span> {</div><div class="code-line"><span class="ln">8</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">Workspace</span> {</div><div class="code-line"><span class="ln">9</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">ProjectList</span>(projects)</div><div class="code-line"><span class="ln">10</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">SessionTimeline</span>(sessions)</div><div class="code-line"><span class="ln">11</span>&nbsp;&nbsp;&nbsp;&nbsp;}</div><div class="code-line"><span class="ln">12</span>&nbsp;&nbsp;&nbsp;&nbsp;.<span class="fn">keyboardFirst</span>()</div><div class="code-line"><span class="ln">13</span>&nbsp;&nbsp;}</div><div class="code-line"><span class="ln">14</span>}</div><div class="code-line"><span class="ln">15</span></div><div class="code-line"><span class="ln">16</span><span class="comment">// The website is the demo.</span></div></div><aside class="inspector"><h4>Quick Help</h4><div class="inspector-row"><span>Target</span><span class="blue">Odak</span></div><div class="inspector-row"><span>Platform</span><span>macOS</span></div><div class="inspector-row"><span>Status</span><span class="fn">Running</span></div></aside><div class="statusbar"><span class="branch">⌘ main</span><span>Swift · Ready</span></div></div>
+        <section class="palette" id="palette" aria-label="Odak project launcher"><div class="search-box"><span class="search-icon" aria-hidden="true"></span><input id="project-search" type="text" autocomplete="off" spellcheck="false" placeholder="Search projects, sessions, commands…" aria-label="Search projects"><kbd>esc</kbd></div><div class="palette-label"><span>Projects</span><span id="result-count">4 results</span></div><div class="results" id="results"><button class="result selected" data-name="Odak" data-path="~/code/Odak"><span class="project-icon">O</span><span><span class="project-name">Odak</span><span class="project-path">~/code/Odak · main</span></span><span class="meta"><i class="dirty"></i>Swift</span></button><button class="result" data-name="Atlas API" data-path="~/work/atlas-api"><span class="project-icon">A</span><span><span class="project-name">Atlas API</span><span class="project-path">~/work/atlas-api · feature/auth</span></span><span class="meta"><i class="dirty"></i>Go</span></button><button class="result" data-name="Northstar Web" data-path="~/work/northstar"><span class="project-icon">N</span><span><span class="project-name">Northstar Web</span><span class="project-path">~/work/northstar · main</span></span><span class="meta">React</span></button><button class="result" data-name="Signal Kit" data-path="~/labs/signal-kit"><span class="project-icon">S</span><span><span class="project-name">Signal Kit</span><span class="project-path">~/labs/signal-kit · develop</span></span><span class="meta">Rust</span></button></div><div class="palette-foot"><span>⌘K for project actions</span><div class="key-hints"><span><kbd>↑↓</kbd> navigate</span><span><kbd>↵</kbd> open</span><span><kbd>⌘K</kbd> actions</span></div></div><div class="actions-panel" id="actions"><button class="action active" data-action="Opening in Xcode"><span class="action-glyph">⌘</span><span><strong>Open in Xcode</strong><small>Launch the selected workspace</small></span><kbd>↵</kbd></button><button class="action" data-action="Starting cloud session"><span class="action-glyph">☁</span><span><strong>New cloud session</strong><small>Create an isolated worktree and agent session</small></span><kbd>⌘N</kbd></button><button class="action live" data-action="Opening in Codex"><span class="action-glyph">✦</span><span><strong>Open in Codex</strong><small>Continue with the project context attached</small></span><kbd>⌘C</kbd></button><button class="action" data-action="Running tests"><span class="action-glyph">▶</span><span><strong>Run test suite</strong><small>Custom command · swift test</small></span><kbd>⌘T</kbd></button></div></section>
+        <div class="toast" id="toast" role="status" aria-live="polite"><span class="toast-check">✓</span><span id="toast-text">Opening Odak in Xcode</span></div>
+      </div>
+    </section>
+    <section class="story" id="how"><div class="shell"><div class="story-row reveal"><div><span class="story-index">01 / FIND</span><h2>Search what you're already thinking.</h2></div><div class="story-copy"><p>Odak finds repositories, open IDE windows, worktrees, and live agent sessions from one input. Fuzzy matching and frecency put the right project first.</p><div class="feature-list"><div class="feature-item"><span>⌘</span><b>Every Git project</b><span>FUZZY SEARCH</span></div><div class="feature-item"><span>↗</span><b>Every open IDE window</b><span>MRU ORDER</span></div><div class="feature-item"><span>●</span><b>Every live agent session</b><span>REAL TIME</span></div></div></div></div><div class="story-row reveal"><div><span class="story-index">02 / ACT</span><h2>Open is only the beginning.</h2></div><div class="story-copy"><p>Press Command-K on any project to open Xcode, launch Codex, create a worktree, visit the remote, or run a command you wrote yourself.</p><div class="feature-list"><div class="feature-item"><span>⌘</span><b>Open in any editor</b><span>XCODE · CURSOR · CODE</span></div><div class="feature-item"><span>✦</span><b>Continue with an agent</b><span>CODEX · CLAUDE · CURSOR</span></div><div class="feature-item"><span>›_</span><b>Write your own command</b><span>YAML · LIVE RELOAD</span></div></div></div></div></div></section>
+    <section class="story" id="sessions"><div class="shell"><div class="story-row reveal"><div><span class="story-index">03 / TRACK</span><h2>Know what's running. Know where.</h2></div><div class="story-copy"><p>See the state of parallel work without hunting through windows. Odak connects each session to its project, branch, agent, and most recent activity.</p><div class="session-strip"><article class="session"><div class="session-top"><span>CODEX</span><span class="session-status">● RUNNING</span></div><h3>Odak</h3><p>main · Editing website</p></article><article class="session"><div class="session-top"><span>CLAUDE</span><span class="session-status">● WAITING</span></div><h3>Atlas API</h3><p>feature/auth · Needs input</p></article><article class="session"><div class="session-top"><span>CURSOR</span><span>12m AGO</span></div><h3>Northstar</h3><p>main · Tests passed</p></article></div></div></div></div></section>
+    <section class="closing shell reveal"><h2>Less switching.<br><span>More building.</span></h2><p>A native macOS utility for developers who have more projects, windows, and sessions than patience.</p><div class="closing-actions"><a class="btn btn-primary download-link" href="https://github.com/salihcaan/odak-releases/releases/latest">Download Odak</a><a class="btn" href="/buy">Buy once for $19</a></div></section>
+  </main>
+  <footer class="shell"><span>© 2026 Odak · Built for focus.</span><div class="footer-links"><a href="appcast.xml">Updates</a><a href="/actions">Actions</a><a href="https://github.com/salihcaan/odak-releases">GitHub</a></div></footer>
+  <script>
+    const desktop=document.querySelector('#desktop'),palette=document.querySelector('#palette'),search=document.querySelector('#project-search'),results=[...document.querySelectorAll('.result')],actions=document.querySelector('#actions'),actionButtons=[...document.querySelectorAll('.action')],toast=document.querySelector('#toast'),toastText=document.querySelector('#toast-text'),hint=document.querySelector('.hint-pulse');
+    let selected=0,actionIndex=0,toastTimer;
+    const visible=()=>results.filter(r=>!r.hidden);
+    function openPalette(){desktop.classList.add('palette-open');actions.classList.remove('open');hint.style.opacity='0';setTimeout(()=>search.focus(),80)}
+    function closePalette(){actions.classList.remove('open');desktop.classList.remove('palette-open');search.blur()}
+    function select(index){const list=visible();if(!list.length)return;selected=(index+list.length)%list.length;results.forEach(r=>r.classList.remove('selected'));list[selected].classList.add('selected');list[selected].scrollIntoView({block:'nearest'})}
+    function filter(){const q=search.value.toLowerCase().trim();results.forEach(r=>r.hidden=!(r.dataset.name+' '+r.dataset.path).toLowerCase().includes(q));selected=0;select(0);const n=visible().length;document.querySelector('#result-count').textContent=`${n} result${n===1?'':'s'}`}
+    function openActions(){if(!desktop.classList.contains('palette-open')){openPalette();return}actions.classList.add('open');actionIndex=0;setAction(0)}
+    function setAction(i){actionIndex=(i+actionButtons.length)%actionButtons.length;actionButtons.forEach((b,j)=>b.classList.toggle('active',j===actionIndex))}
+    function runAction(label){const project=(visible()[selected]||results[0]).dataset.name;toastText.textContent=`${label.replace(/ing$/,'ing')} · ${project}`;toast.classList.add('show');actions.classList.remove('open');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),2600)}
+    document.querySelector('#try-demo').addEventListener('click',()=>{openPalette();desktop.scrollIntoView({behavior:'smooth',block:'center'})});
+    results.forEach(r=>{r.addEventListener('mouseenter',()=>{selected=visible().indexOf(r);select(selected)});r.addEventListener('click',openActions)});
+    actionButtons.forEach((b,i)=>{b.addEventListener('mouseenter',()=>setAction(i));b.addEventListener('click',()=>runAction(b.dataset.action))});
+    search.addEventListener('input',filter);
+    document.addEventListener('keydown',e=>{const cmd=e.metaKey||e.ctrlKey;if(cmd&&e.key.toLowerCase()==='k'){e.preventDefault();actions.classList.contains('open')?actions.classList.remove('open'):desktop.classList.contains('palette-open')?openActions():openPalette();return}if(e.key==='Escape'){actions.classList.contains('open')?actions.classList.remove('open'):closePalette();return}if(!desktop.classList.contains('palette-open'))return;if(e.key==='ArrowDown'){e.preventDefault();actions.classList.contains('open')?setAction(actionIndex+1):select(selected+1)}if(e.key==='ArrowUp'){e.preventDefault();actions.classList.contains('open')?setAction(actionIndex-1):select(selected-1)}if(e.key==='Enter'){e.preventDefault();actions.classList.contains('open')?runAction(actionButtons[actionIndex].dataset.action):openActions()}});
+    desktop.addEventListener('click',e=>{if(e.target===desktop||e.target.classList.contains('desktop-wallpaper'))openPalette()});
+    const observer=new IntersectionObserver(entries=>entries.forEach(e=>e.target.classList.toggle('visible',e.isIntersecting)),{threshold:.12});document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+    document.querySelector('#clock').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    fetch('appcast.xml').then(r=>r.text()).then(xml=>{const items=[...new DOMParser().parseFromString(xml,'text/xml').querySelectorAll('item')];const url=items.at(-1)?.querySelector('enclosure')?.getAttribute('url');if(url)document.querySelectorAll('.download-link').forEach(a=>a.href=url)}).catch(()=>{});
+    setTimeout(()=>{if(!desktop.classList.contains('palette-open'))openPalette()},1700);
+  </script>
+</body>
+</html>

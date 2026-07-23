@@ -1,0 +1,697 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
+    <channel>
+        <title>Odak</title>
+        <link>https://odak.fyi/appcast.xml</link>
+        <description>Most recent updates to Odak</description>
+        <language>en</language>
+            <item>
+            <title>Version 0.1.0</title>
+            <pubDate>Mon, 27 Apr 2026 20:35:29 +0000</pubDate>
+            <sparkle:version>2</sparkle:version>
+            <sparkle:shortVersionString>0.1.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.0/Odak-0.1.0.dmg" length="27551261" type="application/x-apple-diskimage" sparkle:edSignature="mlVhCGenHJLWPitlIdlEgUjxyvY8mg32MVOU5aI7jRv1blfhcDtie1/3ve/drGYXhyIomw/7D6DP3Th31ZveBw=="/>
+        </item>
+            <item>
+            <title>Version 0.1.0</title>
+            <pubDate>Wed, 29 Apr 2026 14:06:20 +0000</pubDate>
+            <sparkle:version>3</sparkle:version>
+            <sparkle:shortVersionString>0.1.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.0/Odak-0.1.0.dmg" length="27557916" type="application/x-apple-diskimage" sparkle:edSignature="BQ3RWJHwCitSIuU+Gl7E6VQqoMwSA7Wn6MbsfQ7gQ96q1WaU+q3qsNrrgKk9NKjJqShSGNhM4Uf3hfGHsk5aCQ=="/>
+        </item>
+            <item>
+            <title>Version 0.1.1</title>
+            <pubDate>Tue, 05 May 2026 22:52:39 +0000</pubDate>
+            <sparkle:version>4</sparkle:version>
+            <sparkle:shortVersionString>0.1.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.1 — quieter idle, snappier feel
+
+This release is mostly performance work. Idle CPU drops to roughly nothing on Apple Silicon — the previous build had a hover-detection timer running 10 times a second whether or not anything was happening, and a search cache rebuilding itself every time any IDE window changed title.
+
+### Performance
+- Dynamic Island hover monitor halves its polling rate (10 Hz → 5 Hz) and skips hit-tests entirely when the cursor isn't anywhere near the top of the screen. This is the biggest win — most ticks now exit on a single coordinate compare.
+- Search caches no longer rebuild while the panel is hidden. They refresh automatically the moment you open it, so badges and filter chips are always current.
+- Global hotkey event tap reads cached shortcut bindings instead of touching the observable settings store on every keystroke.
+
+### Fixes (since 0.1.0)
+- Dynamic Island flares now meet the bezel with a clean horizontal tangent, and the pill blends into the notch and external-display top edge.
+- Search result rows no longer drift when the same project appears under multiple paths.
+- Settings detail pane no longer picks up the accent tint on its form background.
+- Click-to-pin removed from the Dynamic Island; hover-out collapse is reliable again.
+
+### Known limits
+- No in-app purchase yet (license server still being stood up). Trial runs unattended.
+- macOS 26+ only.
+
+Feedback welcome at support@odak.fyi.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.1/Odak-0.1.1.dmg" length="27572559" type="application/x-apple-diskimage" sparkle:edSignature="dvLMpe6g7ElafCRdLWFgwYQy7a5tmW/Lk2kfMcG9ZKqFc4kL0pOxflFnuDQAtarcnTEp/F5oH4UIoJxvCRtKAg=="/>
+        </item>
+            <item>
+            <title>Version 0.1.2</title>
+            <pubDate>Thu, 07 May 2026 06:33:36 +0000</pubDate>
+            <sparkle:version>5</sparkle:version>
+            <sparkle:shortVersionString>0.1.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.2 — fixes a launch crash on second launch
+
+A bug-fix release for a crash that some users hit on Apple Silicon Macs after using the app once: the next launch could trap inside `applicationDidFinishLaunching` and the app would never reach its first window.
+
+### Fixes
+- Don't crash on launch when two configured scan folders overlap (a parent and one of its subfolders, or roots that resolve to the same target). The project scanner now drops duplicate paths before returning, which kept the Dynamic Island, search, and App Intents from tripping a duplicate-key trap when building their path-keyed lookups.
+
+No behavior or UI changes — same 0.1.1, just no crash.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.2/Odak-0.1.2.dmg" length="27573165" type="application/x-apple-diskimage" sparkle:edSignature="HzO/cBP4SHSTbdPcLAz6fDmmsj0WyAUXrmv60mollPquaW/UxABzkdLlZrCdTAEahedCWkKJQFjZDqrdRdiBDw=="/>
+        </item>
+            <item>
+            <title>Version 0.1.3</title>
+            <pubDate>Thu, 07 May 2026 10:24:16 +0000</pubDate>
+            <sparkle:version>6</sparkle:version>
+            <sparkle:shortVersionString>0.1.3</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.3 — notch matches the Quick Switcher
+
+The Dynamic Island now shows the same set of open IDE windows that the Quick Switcher does, with one row per actual project.
+
+### Improvements
+- **DataGrip and other JetBrains-virtual projects** now appear in the notch. Previously only projects living in your configured scan folders showed up, so DataGrip sessions (and any project opened from outside your scan roots) silently went missing even when the Switcher could see them.
+- **Same-named projects at different paths render as separate rows.** Two `Swee` projects in different folders no longer collapse into a single ambiguous row whose icon belonged to whichever scan-folder iteration order won.
+- **Each open window gets its own icon in the row's strip.** Two Cursor windows of the same project show as two Cursor icons — each focusable independently — instead of being deduplicated into one.
+
+### Fixes
+- Hovering one row no longer highlights another. Variable row heights from a missing subtitle line, plus a couple of paths that produced colliding row IDs, were causing multiple rows to light up at once.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.3/Odak-0.1.3.dmg" length="27618743" type="application/x-apple-diskimage" sparkle:edSignature="q3BbxZXsAQs0pmkGkUFeQPkaXiHKI1Y+pDHkZARed3g0Z45fNdHOgNcavIfLcgT2xIrPX2NQhsTT4yHdYKlCAg=="/>
+        </item>
+            <item>
+            <title>Version 0.1.4</title>
+            <pubDate>Fri, 08 May 2026 22:16:38 +0000</pubDate>
+            <sparkle:version>7</sparkle:version>
+            <sparkle:shortVersionString>0.1.4</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.4 — same-name projects, everywhere
+
+When two projects share a name (e.g. an `odak.fyi` checkout in `~/code/` and another in `~/code/configs/`), Odak now shows the disambiguating parent folder as a small chip next to the project name on every surface, not just the search results.
+
+### Improvements
+- **Parent-folder chip in the Quick Switcher and Dynamic Island.** Two windows or rows for same-named projects in different folders now show a `configs` / `code` pill next to the title, the same one you've seen in search. The notch uses a higher-contrast variant so the pill stays readable on the dark notch surface in light mode.
+
+### Fixes
+- **Xcode-opened projects now match their scanned project correctly.** Opening Odak (or any Xcode project whose inner source directory shares the project name) used to produce two rows in the notch — one for the scanned project, one phantom row labelled like `Odak Odak` — and the search row would lose its Xcode icon. Windows resolved into a subdirectory of a scanned project now fold into that project everywhere.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.4/Odak-0.1.4.dmg" length="7844952" type="application/x-apple-diskimage" sparkle:edSignature="wO4JuIpnEnEVMuzJMAJsFi/C2jm6JXnu/dlYWvV+XJj2NcgId8ZJ22VcN00G56eT7a3Ei8P6YMIqJu072tjvCQ=="/>
+        </item>
+            <item>
+            <title>Version 0.1.5</title>
+            <pubDate>Sun, 10 May 2026 20:20:25 +0000</pubDate>
+            <sparkle:version>8</sparkle:version>
+            <sparkle:shortVersionString>0.1.5</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.5 — paid licensing, smoother onboarding, better notch & switcher
+
+This release brings the licensing flow online (Polar checkout, in-app license activation), tightens onboarding around the Accessibility prompt, and fixes a long list of papercuts across the notch, switcher, and search.
+
+### New
+- **Polar checkout.** Buy a license directly from the in-app paywall — debug builds hit the staging URL, releases hit `/buy`, so you can't accidentally land on the wrong page. The Settings → License tab has been redesigned with a hero card and per-device row.
+- **Dedicated Settings tab for the notch.** The Dynamic Island now has its own tab in Settings with a modifier-key picker and a live enable toggle, so you can change behavior without quitting the app.
+- **Detect non-git projects.** The scanner now picks up projects without a `.git` folder using a tiered marker scheme (`package.json`, `Package.swift`, `Cargo.toml`, `pyproject.toml`, etc.), so JetBrains scratch projects and language workspaces show up alongside your repos.
+
+### Improvements
+- **Smoother onboarding for Accessibility.** The AX-grant step now survives relaunches and revoke cycles cleanly — no more half-stuck states after granting and re-denying.
+- **Search starts faster.** Removed a 40ms keystroke debounce that was making the first character feel laggy. Searching now reacts as you type.
+- **Search field shows a Settings hint.** When the search field is empty, the hint bar surfaces a clickable `⌘,  Settings` shortcut so first-time users have an obvious way in.
+- **Reliable Option+Space on launch.** Fixes a race where the global hotkey occasionally wouldn't register on first launch, and the search field would flash an I-beam before showing.
+- **Cleaner Settings copy.** Friendlier shortcut labels, better button text in Actions and Projects tabs, no scrollbar flash on tab switch.
+- **Palette-matched search icon.** Replaced the system magnifying glass with the brand mark — fewer visual conflicts with macOS's Spotlight.
+- **Switcher pins same-name windows to the right folder.** Two `index.tsx` open in two different projects now route to the correct project row based on which file is open.
+
+### Privacy
+- **Max-privacy PostHog config.** Anonymous-only mode is on by default — no email identification, all event properties sanitized at the SDK boundary. Coded reasons replace free-form strings in license error events.
+
+### Fixes
+- **Paywall stays on-screen.** The buy/license windows no longer drift partially off the display when opened from a corner.
+- **Notch hover surfaces the AX prompt** when permissions are missing, instead of silently doing nothing.
+- **Privacy → Enable button alignment** in onboarding now matches the rest of the step.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.5/Odak-0.1.5.dmg" length="8460901" type="application/x-apple-diskimage" sparkle:edSignature="4nkIajRtm2xw2xzEdad/TDUpgawH7m8WiX0YteXn8xkqemKVh48H8Q3VrzXPu5FaOZ07/xZ5MCGMbYKak/puCg=="/>
+        </item>
+            <item>
+            <title>Version 0.1.5</title>
+            <pubDate>Sat, 23 May 2026 06:53:53 +0000</pubDate>
+            <sparkle:version>9</sparkle:version>
+            <sparkle:shortVersionString>0.1.5</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.5 (build 9) — small Quick Switcher fix
+
+A respin of 0.1.5 with one user-facing fix.
+
+### Fixes
+- **Copy Path / Copy Name now dismisses Odak.** Both copy actions used to close the actions panel but leave the search window hovering on screen, so you'd Cmd+V into a still-open Odak. They now hide the panel after the copy fires — same behavior as Open in IDE, Reveal in Finder, and the action shortcuts.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.5/Odak-0.1.5.dmg" length="8461526" type="application/x-apple-diskimage" sparkle:edSignature="nUgcWCpAc01wJmimeVqRv64Rj1y5+S7khkS7LacOfGEsYi7kZ1m5i5Rv+QUKdj8JPykKAquVqVV0LQv7+OzfDQ=="/>
+        </item>
+            <item>
+            <title>Version 0.1.6</title>
+            <pubDate>Sun, 24 May 2026 06:56:39 +0000</pubDate>
+            <sparkle:version>10</sparkle:version>
+            <sparkle:shortVersionString>0.1.6</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.6 — calmer launch, snappier switcher, prettier notch on external displays
+
+A handful of polish fixes plus a small visual unification.
+
+### Improvements
+- **Dynamic Island silhouette matches the MacBook notch on external displays.** On non-notched displays, the expanded pill now uses the same concave-flared shape with horizontal tangents as the built-in display — the shape animates open from a degenerate rest pill, so the morph reads as a single object rather than two different ones depending on which screen you're on.
+- **Quick Switcher Cmd+W feels instant on slow apps.** Closing a window now runs the AX press off the main actor with a 1-second messaging cap, so a hung target app no longer queues up your next Cmd+W or arrow keystroke behind a 6-second timeout.
+
+### Fixes
+- **No more I-beam flash or position jump when Odak appears.** The search window used to briefly flicker at the SwiftUI default position with a text-cursor before teleporting to its anchor — caused by the off-screen parking workaround. Now it pre-positions correctly at the spotlight anchor and stays hit-test-disabled across the transparent phase, so the cursor never picks up the field's I-beam.
+- **License no longer drops when switching between Debug and Release builds.** Stage and prod tokens used to share one keychain slot, so opening a Debug build after a `make install` (or vice-versa) silently wiped the active license. Each environment now gets its own slot, and existing prod activations migrate automatically — you should never see "re-enter your license" again unless you actually need to.
+
+### Other
+- **Pricing now reads $19** to match odak.fyi.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.6/Odak-0.1.6.dmg" length="8468935" type="application/x-apple-diskimage" sparkle:edSignature="XZ34yDBgaVBVfkg2jj2uWsmNRDu8nQ/pY+YdMr3j010b/2+fKA+HwU23R7RtpyGRhBJzLfi7ukpAj66OyUXACw=="/>
+        </item>
+            <item>
+            <title>Version 0.1.7</title>
+            <pubDate>Mon, 25 May 2026 10:34:34 +0000</pubDate>
+            <sparkle:version>11</sparkle:version>
+            <sparkle:shortVersionString>0.1.7</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.7 — your Mac's name stays on your Mac
+
+A small privacy tightening to how Odak's license server handles your devices.
+
+### Privacy
+- **Odak no longer stores your Mac's name on the license server.** The licensing system used to send your Mac's name (the one in System Settings → Sharing — often "Your Name's MacBook") to keep track of devices on your license. It now only sends a hardware identifier and your macOS version. Your Mac's name stays on this Mac.
+- **"At your Mac limit" picker now labels other Macs by macOS version and last-seen.** Previously the picker showed each Mac's name; now you'll see entries like "Another Mac · macOS 26.3.0 · last seen 3 days ago", with the current Mac still clearly marked "This Mac".
+
+### Under the hood
+- License server schema updated to drop the device-name columns. Existing names were removed during the migration. No action needed on your part — the change is invisible unless you hit the device-limit picker.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.7/Odak-0.1.7.dmg" length="8462947" type="application/x-apple-diskimage" sparkle:edSignature="3MrtRwoEgGg+xOtHt04RDWojoaoqDMSPpDQ6IMAyyDs8QUGxaauyn1enO4MDbUJhEI3kgPrAxmt/DHev/X7KDQ=="/>
+        </item>
+            <item>
+            <title>Version 0.1.8</title>
+            <pubDate>Fri, 29 May 2026 14:52:55 +0000</pubDate>
+            <sparkle:version>12</sparkle:version>
+            <sparkle:shortVersionString>0.1.8</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.8 — the Quick Switcher now sees every Space
+
+Until now the switcher only listed IDE windows on the Space you were currently looking at. Editors that live on another desktop or full-screen Space — especially Electron-based ones like Cursor and VS Code — quietly went missing. This release makes the switcher show your open IDE windows across **all** Spaces, and focusing one jumps you straight to it.
+
+### New
+- **IDE windows from every Space appear in the Quick Switcher.** A Cursor or VS Code window parked on another desktop now shows up alongside your current-Space windows, with its real title, and selecting it raises the window and switches you to its Space. No Screen Recording permission required.
+
+### Under the hood
+- Off-Space windows are resolved once and cached for their lifetime, so the steady-state cost is a couple of accessibility reads per window rather than a scan on every refresh. Each read is bounded by a short timeout so a hung editor can't stall the switcher, and the resolver logs a warning if a future macOS update ever changes the underlying behavior — so it fails loudly instead of silently reverting to current-Space-only.
+
+### Known limits
+- macOS 26+ only.
+
+Feedback welcome at support@odak.fyi.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.8/Odak-0.1.8.dmg" length="8484133" type="application/x-apple-diskimage" sparkle:edSignature="j4its8sNXaEMrX6gYjCyZAdf16I/+nq7L7ACNQ/JwAqZ7FmyHVwzlJP6jHX9wmgdGId23G/x6dFhi31BGgk7Cg=="/>
+        </item>
+            <item>
+            <title>Version 0.1.9</title>
+            <pubDate>Sat, 30 May 2026 11:00:12 +0000</pubDate>
+            <sparkle:version>13</sparkle:version>
+            <sparkle:shortVersionString>0.1.9</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.9 — onboarding that sets you up right
+
+Odak can only find your projects once it knows where they live, so first-run onboarding now makes that one step count — and drops you straight into search the moment you're done.
+
+### New
+- **Onboarding requires at least one project folder.** The final step now waits until you've picked a folder before letting you finish, with an inline hint so it's clear why. Your common dev folders (`code`, `Developer`, `Projects`, …) are still auto-detected and pre-selected, so most setups sail right through.
+- **Search opens automatically after onboarding.** Finishing setup now lands you in the search panel every time, instead of occasionally leaving you on an empty desktop on a fresh install.
+
+### Polish
+- The Odak mark now sits in the top-right of the onboarding window, balancing the window chrome and matching your chosen accent.
+
+### Known limits
+- macOS 26+ only.
+
+Feedback welcome at support@odak.fyi.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.9/Odak-0.1.9.dmg" length="8490533" type="application/x-apple-diskimage" sparkle:edSignature="GNo6uzROunBT9R1Ew1QWdl9aipTtXEX8/82EpIhi3pkz8XC0Wurmk/5AwAOjRihYPtkJy14RlSu/wtPWYyZmBQ=="/>
+        </item>
+            <item>
+            <title>Version 0.1.10</title>
+            <pubDate>Sat, 06 Jun 2026 11:09:18 +0000</pubDate>
+            <sparkle:version>14</sparkle:version>
+            <sparkle:shortVersionString>0.1.10</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.10 — smoother switching, a sharper notch
+
+A polish pass on the two surfaces you touch most: the window switcher's close motion and the notch's selection look.
+
+### Polish
+- **Closing a window in the switcher now moves as one motion.** Whether you use ⌥W or the per-row × button, the row collapse and the panel resize now happen in the same beat — no more "the content vanished, then the window slid up to catch it." The closing row also fades out cleanly instead of briefly ghosting over the row taking its place.
+- **The notch highlights with your accent color.** Hovering a project in the notch now paints the row in your chosen accent palette — the same selection color the quick switcher uses — instead of a flat gray.
+- **The notch's bottom row sits flush in the corner.** The selection highlight now nests concentrically into the notch card's rounded bottom, matching how the switcher's bottom row hugs its panel, instead of leaving a curved shoulder around a squarer row.
+
+### Known limits
+- macOS 26+ only.
+
+Feedback welcome at support@odak.fyi.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.10/Odak-0.1.10.dmg" length="8571998" type="application/x-apple-diskimage" sparkle:edSignature="S4dxl88vTBBNQhZaTFgcHGpIb+oXJ59/LcMkfL42JovCNFm54V0eRPEo/EOoG0OGb8xr5qZ3aQnHvuUBBkn4AA=="/>
+        </item>
+            <item>
+            <title>Version 0.1.11</title>
+            <pubDate>Sun, 07 Jun 2026 10:50:32 +0000</pubDate>
+            <sparkle:version>15</sparkle:version>
+            <sparkle:shortVersionString>0.1.11</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.11 — hold Right ⌘ to find any window, now on macOS 15
+
+This release adds a second, faster way to reach a window — hold Right ⌘ and just type — and broadens Odak to run on macOS 15 Sequoia, not only Tahoe.
+
+### New
+- **Hold Right ⌘, type, release — land in the window.** A new rcmd-style trigger sits alongside ⌥Tab: hold the right Command key, type a few letters to fuzzy-match your open IDE windows, and release to switch. Numbered rows still work, so ⌘1–9 jumps straight to a result. The classic ⌥Tab switcher is unchanged.
+- **Runs on macOS 15 Sequoia.** Odak previously needed macOS 26 for its Liquid Glass panel. It now falls back to a native material on Sequoia, so the full app works on macOS 15 and later — and still lights up with Liquid Glass on macOS 26.
+- **Open a project straight in your editor from search.** Hover a search result and click the IDE icon to open it in your editor, without switching to an existing window first.
+
+### Polish
+- The type-to-search field renders the query as a single text run, so letters no longer jitter or shift as you type. The typed text is also crisper and higher-contrast in light mode.
+- Row hover is now driven from a single source of truth, fixing cases where the switcher and the result list could disagree about which row was highlighted, and the selection indicator is correctly centered.
+
+### Requirements
+- macOS 15 Sequoia or later · Apple Silicon.
+
+Feedback welcome at support@odak.fyi.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.11/Odak-0.1.11.dmg" length="8650858" type="application/x-apple-diskimage" sparkle:edSignature="CcFN4tL3e3hDopojyWpYcyTpZHccXjiQQEr8qrtjn5xiVff4wgkCMkd3zoeynt+8iNTIJEVo5u52klhOE+oGBA=="/>
+        </item>
+            <item>
+            <title>Version 0.1.12</title>
+            <pubDate>Sun, 07 Jun 2026 18:26:20 +0000</pubDate>
+            <sparkle:version>16</sparkle:version>
+            <sparkle:shortVersionString>0.1.12</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.12 — windows on other Spaces show up reliably
+
+The switcher now finds IDE windows that live on other desktops (Spaces) — including a second window of the same project — that could previously go missing.
+
+### Fixed
+- **Windows on other Spaces now appear in the switcher.** When a window lived on a different desktop than the one you were on, the switcher could miss it — most often a Cursor or VS Code window whose internal accessibility handle fell just past Odak's off-Space lookup limit. Off-Space windows are now resolved reliably, and the result is cached so refreshes stay fast.
+- **Two windows of the same project no longer collapse into one row.** When the system couldn't hand Odak a stable window identifier (minimized windows, and some Electron windows), two windows of the same project in the same editor could fold into a single entry. They're now kept distinct.
+
+### Requirements
+- macOS 15 Sequoia or later · Apple Silicon.
+
+Feedback welcome at support@odak.fyi.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.12/Odak-0.1.12.dmg" length="8637039" type="application/x-apple-diskimage" sparkle:edSignature="Tyh4B9PeyQpXirLHZNv5xQOOP4u8dDkHTCaIjIclAxxUMgAY6x347u7oHDDqfXhauwhvULa5CPd7LEYDcOG1Aw=="/>
+        </item>
+            <item>
+            <title>Version 0.1.13</title>
+            <pubDate>Wed, 10 Jun 2026 19:11:51 +0000</pubDate>
+            <sparkle:version>17</sparkle:version>
+            <sparkle:shortVersionString>0.1.13</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.13 — no more freezes during window activity, rescan works instantly
+
+A responsiveness release: Odak no longer stalls when editor windows open or close, and a project rescan shows up in search right away.
+
+### Fixed
+- **Odak no longer freezes while your IDE is busy.** Refreshing the window list talked to each editor synchronously on the main thread — if Cursor, VS Code, or a JetBrains IDE was mid-build or indexing, opening or closing one of its windows could lock Odak up for seconds. The whole window scan now runs in the background with a tight per-app timeout, and the switcher opens instantly with the latest list folding in the moment the scan lands.
+- **Rescan now updates search immediately.** Pressing Rescan in Settings (or the automatic background rescan picking up a freshly cloned repo) rebuilt the project index but search kept serving the old list until you relaunched Odak. New projects now appear in search the moment the scan finishes — no relaunch needed.
+
+### Requirements
+- macOS 15 Sequoia or later · Apple Silicon.
+
+Feedback welcome at support@odak.fyi.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.13/Odak-0.1.13.dmg" length="8654370" type="application/x-apple-diskimage" sparkle:edSignature="/Ex0WFX29ogwFUYpq3PiFBvhMgJPElKNusRMOn+owOom6oZJLtiXVjCp8Ktr395ZhYsgPiKKBnXX9/voHNHPDg=="/>
+        </item>
+            <item>
+            <title>Version 0.1.14</title>
+            <pubDate>Thu, 11 Jun 2026 07:28:43 +0000</pubDate>
+            <sparkle:version>18</sparkle:version>
+            <sparkle:shortVersionString>0.1.14</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.14 — move the search panel anywhere, smarter search, faster launch
+
+The search panel is no longer pinned in place: drag it wherever you like, with magnetic guides to snap it back. Plus noticeably smarter fuzzy search, a ~2x faster launch, and fixes for vanishing windows and license lockouts.
+
+### New
+- **Drag the search panel anywhere.** Grab the panel and place it where you want — dashed guides appear at the default spot and the panel snaps magnetically when you get close. Drop it back on the guides (or use Settings → Search → Reset Position) to return to the default, and a new Top/Center anchor picker chooses where that default lives.
+
+### Improved
+- **Smarter search ranking.** The fuzzy matcher now always finds the best-scoring alignment and understands camelCase humps, acronyms, and digit groups — "wsv" cleanly matches WindowSwitcherView. Shorter and word-boundary matches rank first, and projects and windows rank by the same rules.
+- **~2x faster launch.** The panel appears as soon as its window is ready instead of waiting on a fixed delay, and Odak no longer blocks launch on an IDE that's busy compiling or indexing.
+- **Unified look across panels.** Search, the window switcher, and the notch now share the same keycap-style shortcut hints, dividers, and empty states. Selected rows are readable on every accent palette — pale palettes like Bone and Periwinkle no longer show white-on-white text.
+
+### Fixed
+- **Windows on other Spaces no longer vanish after login.** IDE windows restored to other Spaces while their apps were still starting up could disappear from the switcher until Odak restarted. Odak now retries until apps are fully awake and rescans during the first 90 seconds after startup.
+- **Valid licenses no longer fall back to the paywall.** A mismatch between the revalidation cadence and the offline-grace window could lock activated licenses out after 3 days. Revalidation now runs daily with a 7-day offline grace, and recovers automatically with a single online check — no re-entering your code.
+
+### Requirements
+- macOS 15 Sequoia or later · Apple Silicon.
+
+Feedback welcome at support@odak.fyi.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.14/Odak-0.1.14.dmg" length="8757945" type="application/x-apple-diskimage" sparkle:edSignature="ps3iGkPD5/K1JVO6/tOiAXeVvtdDAn4C68yBYkg/FinYGpUff8n1/LrSPdZ7iV3RFnW1/Y7/QOhFbxjy8fJYAw=="/>
+        </item>
+            <item>
+            <title>Version 0.1.15</title>
+            <pubDate>Thu, 11 Jun 2026 22:10:15 +0000</pubDate>
+            <sparkle:version>19</sparkle:version>
+            <sparkle:shortVersionString>0.1.15</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.15 — the Actions Marketplace
+
+Actions are Odak's superpower, and now you don't have to write them yourself: curated packs live at [odak.fyi/actions](https://odak.fyi/actions) and import with one click.
+
+### New
+- **Actions Marketplace.** Six curated packs — Git, GitHub, GitLab, Docker, Node/npm, and Xcode/Swift — at [odak.fyi/actions](https://odak.fyi/actions). Every pack shows each action and shortcut up front; **Add to Odak** imports it after the usual confirmation dialog, and the actions append to your `config.yaml` ready to edit.
+- **Browse Marketplace from Settings.** Settings → Actions now links straight to the marketplace, next to Edit config.yaml and Reload.
+- **YAML imports.** `odak://import?url=…` now accepts YAML as well as JSON — a single action, a list, or an `actions:` list. Share a snippet of your config.yaml via a Gist and it imports verbatim.
+
+### Requirements
+- macOS 15 Sequoia or later · Apple Silicon.
+
+Feedback welcome at support@odak.fyi.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.15/Odak-0.1.15.dmg" length="8801833" type="application/x-apple-diskimage" sparkle:edSignature="1asAjmYBiHATvc2qvjFK4CQF4iGqADAxsxfwHlJTEz8WfJ3LQcGGxT6ljqIGt+Cz8q8t5gZrFlp2CtdWGLwxBA=="/>
+        </item>
+            <item>
+            <title>Version 0.1.16</title>
+            <pubDate>Fri, 12 Jun 2026 07:41:52 +0000</pubDate>
+            <sparkle:version>20</sparkle:version>
+            <sparkle:shortVersionString>0.1.16</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.16 — groups, brand icons, and a real import review
+
+The actions panel grows up: imports get a proper review panel, packs land in their own named sections, and rows finally wear the right logos.
+
+### New
+- **Import review panel.** `odak://import` now opens a native review panel inside Odak — every action listed with its icon and shortcut, script actions flagged — instead of a bare confirmation dialog. Nothing is written until you approve.
+- **Action groups.** Actions from a pack (or a `group:` value in your config.yaml) render under their own section header in the panel, between Open and Copy, in config order.
+- **Brand icons.** Actions can declare an `icon:` — Git, GitHub, GitLab, Docker, and Node logos ship built in (the same set the [marketplace](https://odak.fyi/actions) shows), with any SF Symbol name as a fallback. Rows resolve the real app icon first, as before.
+- **Action editor.** Settings → Actions gains an add/edit sheet, so one-off tweaks no longer require opening config.yaml.
+
+### Requirements
+- macOS 15 Sequoia or later · Apple Silicon.
+
+Feedback welcome at support@odak.fyi.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.16/Odak-0.1.16.dmg" length="8936278" type="application/x-apple-diskimage" sparkle:edSignature="DMGIV+gEbC9vE0jiPyghg5IOwJns5s0SRWHnzBPpBKYTTXKWzGxvrVmqU7PJlNuQesuAgTxo8bltAPDf+wS7Cw=="/>
+        </item>
+            <item>
+            <title>Version 0.1.17</title>
+            <pubDate>Sun, 14 Jun 2026 20:38:32 +0000</pubDate>
+            <sparkle:version>21</sparkle:version>
+            <sparkle:shortVersionString>0.1.17</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.17 — git worktrees, idle windows, and sharper search
+
+Worktrees become a first-class Odak surface: spin one up, jump between them, and tear them down without leaving the launcher. The switcher learns which windows have gone stale, search shows you *why* a result matched, and actions can finally open your terminal of choice.
+
+### New
+- **Git worktrees (⌘Y).** Select a git project and press **⌘Y** to create, switch, or remove worktrees right from Odak. New worktrees copy your `.env` and can run a `postCreate` hook. A ⑂ branch badge follows each worktree across search, the switcher, and the notch, and rows show the worktree path inline. Configure with `worktreeRoot` / `copyOnCreate` / `postCreate` in your config. A `⌘Y Worktrees` hint surfaces in the search panel for git projects, and the shortcut is remappable in Settings → Shortcuts.
+- **Idle-time badges.** Windows untouched for over an hour wear a coarse idle badge (`3h`, `2d`, `1w`) in the switcher so stale windows are easy to spot and close. Idle history persists across relaunches. Toggle it in Settings → Quick Switcher (on by default).
+- **Preferred terminal.** A new `type: terminal` action opens your terminal of choice — Terminal, iTerm2, Warp, kitty, Ghostty, WezTerm, or Alacritty — honoring new-window vs new-tab where supported. Pick yours in Settings → General → Terminal.
+- **Tracked apps as actions.** Apps enabled in Settings → Applications now surface as an “Apps” section in the actions panel, deduped against your existing actions. Toggle with “Show as Actions”.
+- **Fuzzy-match highlighting.** Search results emphasize the exact characters that earned the match, and the switcher highlights whichever field won the rank.
+
+### Fixed
+- Navigate chords (default ⌥J/⌥K) now move the selection in the script/branch list overlay instead of typing stray characters into the filter.
+- Settings sidebar search gets a softer focus ring, opens with nothing focused, and the sidebar is narrowed to match System Settings.
+- Empty-state glyphs in the notch, search panel, and switcher no longer take the accent color — a “nothing here” moment is a state, not a highlight.
+
+### Requirements
+- macOS 15 Sequoia or later · Apple Silicon.
+
+Feedback welcome at support@odak.fyi.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.17/Odak-0.1.17.dmg" length="9186933" type="application/x-apple-diskimage" sparkle:edSignature="nJZVJn9+QUd6AaDRFgMvbuzJlBq7xIsfe8Uq/O5Jb+Y8e8Elfk+eCdu6S+eSo+z4jWC+dNOVenzPHU2mJElPAA=="/>
+        </item>
+            <item>
+            <title>Version 0.1.18</title>
+            <pubDate>Wed, 17 Jun 2026 13:57:06 +0000</pubDate>
+            <sparkle:version>22</sparkle:version>
+            <sparkle:shortVersionString>0.1.18</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.18 — quick actions in the switcher, a steadier panel
+
+The window switcher learns to *act*, not just switch: drop into any project's quick actions without leaving the rcmd hold. Search pins the project you're working in right now, and the switcher panel stays rock-steady as it grows.
+
+### New
+- **Actions in the switcher (rcmd + ".").** While holding Right ⌘ to switch, press **.** to drop into the highlighted window's project quick actions — open in your IDE, reveal in Finder, copy path, run a script, open your terminal. Type to filter, run with a digit or by releasing ⌘, and press **Esc** to pop back to the window list. App icons render inline so each action reads at a glance.
+- **"Current" project, pinned.** The project tied to your most-recently-focused IDE window is pinned to the top of the empty-query dashboard and pre-selected, wearing a ⌖ **Current** badge — so a quick action (pull latest, open terminal) is one keystroke away with zero navigation.
+
+### Fixed
+- **The switcher panel no longer drifts.** Switching rcmd → rcmd+"." or typing to filter used to nudge the panel up a few pixels as its content resized. Its top edge is now pinned for the lifetime of the session, so it only ever grows and shrinks from the bottom.
+- The search panel paints its dashboard — open windows and the "Current" project — on the very first frame instead of visibly updating a tick after it appears.
+
+### Requirements
+- macOS 15 Sequoia or later · Apple Silicon.
+
+Feedback welcome at support@odak.fyi.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.18/Odak-0.1.18.dmg" length="9270012" type="application/x-apple-diskimage" sparkle:edSignature="NDFemw1JXCC9GQBc4130PT9PIZQ9h4V3P8njMGN73Nn02HQyyvQNlYcQ/8aAc3grYx5bw5rvmjK3haIqNEI/Cw=="/>
+        </item>
+            <item>
+            <title>Version 0.1.19</title>
+            <pubDate>Wed, 17 Jun 2026 14:30:41 +0000</pubDate>
+            <sparkle:version>23</sparkle:version>
+            <sparkle:shortVersionString>0.1.19</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.19 — quieter switcher dismissal
+
+Dismissing the window switcher without picking a window no longer triggers the macOS system alert sound.
+
+### Fixed
+- **No more alert beep on Esc.** When you dismissed the switcher without focusing a window, Odak stayed frontmost with no key window — so the next keystroke (including Esc) landed on nothing and macOS played its system alert. Odak now hands focus back to the app you came from, just like the search panel, so you pick up right where you left off — silently.
+
+### Requirements
+- macOS 15 Sequoia or later · Apple Silicon.
+
+Feedback welcome at support@odak.fyi.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.19/Odak-0.1.19.dmg" length="9269377" type="application/x-apple-diskimage" sparkle:edSignature="SrDvbYZUXmb2cFHrjh9tKWshjAZnwq9AKH8SpGRmx8+nqFjPOMSvNgVQXhPrI0XOK0UC8qKuGe1Ok/OCaneyAA=="/>
+        </item>
+            <item>
+            <title>Version 0.1.20</title>
+            <pubDate>Wed, 17 Jun 2026 15:03:14 +0000</pubDate>
+            <sparkle:version>24</sparkle:version>
+            <sparkle:shortVersionString>0.1.20</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.20 — the switcher opens where you are
+
+Hold Right ⌘ and the switcher now highlights the project you're working in right now — not the one you'd switch away to.
+
+### Fixed
+- **rcmd highlights your current project.** Holding Right ⌘ used to pre-select the *next* window (the Cmd+Tab convention), so pressing **.** opened quick actions for the wrong project. Now the rcmd switcher opens on the project you're in, and **.** drops straight into its actions. ⌥Tab still skips to the next window for quick tap-release switching.
+
+### Requirements
+- macOS 15 Sequoia or later · Apple Silicon.
+
+Feedback welcome at support@odak.fyi.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.20/Odak-0.1.20.dmg" length="9272783" type="application/x-apple-diskimage" sparkle:edSignature="8Ku8U5inpg67co10aARykKYEgpZynZAy8jXLwaxestkis044Udklw8ioJ3Is7/soN75cMVeC0igDMcMTRqZNDg=="/>
+        </item>
+            <item>
+            <title>Version 0.1.21</title>
+            <pubDate>Wed, 17 Jun 2026 16:38:47 +0000</pubDate>
+            <sparkle:version>25</sparkle:version>
+            <sparkle:shortVersionString>0.1.21</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.21 — switch branches without leaving the switcher
+
+Quick actions that return a list now stay right inside the switcher. Hold Right ⌘, press **.** to open a project's actions, pick something like **Switch branch**, and its results appear in place — filter, pick, done. No detour through the search window.
+
+### Added
+- **Inline list actions in the switcher.** A list-output action (e.g. *Switch branch*, *Switch command*) committed from quick actions now drills into its results inside the switcher itself. Type to filter, ↑/↓ to navigate, ↩ to run the pick (e.g. check out the branch), ⎋ to step back to the action list.
+
+### Fixed
+- **Escape returns you where you were.** Dismissing the switcher with Escape now hands focus back to the app you were in, instead of leaving Odak frontmost with no window — which also silences the macOS alert sound on the next keystroke.
+- **Instant up/down in actions and lists.** Navigating quick actions and inline lists no longer animates the scroll — selection moves are instant, matching the window list.
+
+### Requirements
+- macOS 15 Sequoia or later · Apple Silicon.
+
+Feedback welcome at support@odak.fyi.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.21/Odak-0.1.21.dmg" length="9319710" type="application/x-apple-diskimage" sparkle:edSignature="A65oR0IQKyijvevNDgRBeq/mhABQg8OYWpyubzzl/ol6pl4peb4eC96RHwdvW2u1vgKga+mBgqFGDyltE52nBQ=="/>
+        </item>
+            <item>
+            <title>Version 0.1.22</title>
+            <pubDate>Tue, 23 Jun 2026 10:24:58 +0000</pubDate>
+            <sparkle:version>26</sparkle:version>
+            <sparkle:shortVersionString>0.1.22</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.22 — open any project from the switcher
+
+The Quick Switcher used to list only your open IDE windows. Now, when you type, it also surfaces matching **closed projects** — so you can reach a project that isn't open yet without leaving the switcher.
+
+### Added
+- **Closed projects in the switcher.** Hold Right ⌘ and type: matching projects with no open window appear beneath your live windows, marked with a folder tile and split off by a subtle divider. Press ↩ to open one in its editor, or **.** to run its quick actions — exactly like an open window. Results stay short (top few) so your open windows remain the focus, and the resting switcher is unchanged.
+
+### Requirements
+- macOS 15 Sequoia or later · Apple Silicon.
+
+Feedback welcome at support@odak.fyi.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.22/Odak-0.1.22.dmg" length="9364321" type="application/x-apple-diskimage" sparkle:edSignature="MxWHcObmR0o3SeBH+pY3z8pgOCB0uSX6TBxIGG6ODMnz0QW3I9uTIWkznW9KFlQWs1+gZ9M1RXkJ0PE7Lx3KBQ=="/>
+        </item>
+            <item>
+            <title>Version 0.1.23</title>
+            <pubDate>Tue, 23 Jun 2026 11:14:25 +0000</pubDate>
+            <sparkle:version>27</sparkle:version>
+            <sparkle:shortVersionString>0.1.23</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.23 — tidier switcher rows
+
+A cleanup pass on the Quick Switcher rows: show *where* a project lives without the extra clutter.
+
+### Changed
+- **Folder chips instead of full paths.** The *Project — Path* title mode is now *Project — Folder*: each window shows its parent folder as a compact chip (e.g. a `code` chip) on the title line instead of a dim full path on a second line — one tidy line. The chip still tells same-named projects apart (`code` vs `forks`).
+- **Closed-project rows simplified.** Projects with no open window no longer carry a folder-icon tile. The name sits flush at the leading edge with its parent-folder chip beside it, so the closed tier reads cleaner and lighter.
+
+### Improved
+- **Cleaner chips.** Folder chips are now text-only — the redundant folder glyph is gone. App chips keep their icon, so the two never blur together when they sit side by side.
+
+### Requirements
+- macOS 15 Sequoia or later · Apple Silicon.
+
+Feedback welcome at support@odak.fyi.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.23/Odak-0.1.23.dmg" length="9363886" type="application/x-apple-diskimage" sparkle:edSignature="VKlLSK+vTEPF4LP7DVvZ73Ul4x1BS86ZI7u+vLkXFts3kE7N0YgoR+rxGcDyRe6oMMy1vKAJY+H5R5DPZ+5FAw=="/>
+        </item>
+            <item>
+            <title>Version 0.1.24</title>
+            <pubDate>Tue, 23 Jun 2026 15:13:46 +0000</pubDate>
+            <sparkle:version>28</sparkle:version>
+            <sparkle:shortVersionString>0.1.24</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.24 — faster, smoother, more reliable
+
+A performance and reliability pass. No new UI — everything you already use just got quicker to respond and steadier under load.
+
+### Improved
+- **Snappier search.** Typing in the project finder no longer re-does redundant work on every keystroke: results are coalesced and the fuzzy matcher reuses precomputed data, so fast typing stays smooth even with hundreds of projects.
+- **No more hangs when opening projects.** Resolving your editor's command path and a repo's git remote now happen off the main thread, so the first open of an IDE — or an action that uses `{remoteURL}`/`{branch}` — never freezes the window for a moment.
+- **Lower input latency.** The global hotkey handler does less work on every keystroke system-wide, keeping the Quick Switcher responsive.
+
+### Fixed
+- **Quick Switcher picks the right window more reliably.** Window focus events are now processed strictly in order, fixing rare cases where rapid switching could land on the wrong window.
+- **License no longer locks out valid users.** Hardened revalidation and keychain handling so an online, paid license can't be pushed to the paywall after a long offline stretch or while the screen is locked.
+- **Settings window closes correctly in all languages.**
+
+### Requirements
+- macOS 15 Sequoia or later · Apple Silicon.
+
+Feedback welcome at support@odak.fyi.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.24/Odak-0.1.24.dmg" length="9402021" type="application/x-apple-diskimage" sparkle:edSignature="ZDe7+p2uvi5svd9sl2RPPBIuV8pzf7L+Yl11kMkyK3dTP/2X/ywkRnHoGRcCHoNJfzyLrHvCgCKzpTqE8PTuCw=="/>
+        </item>
+            <item>
+            <title>Version 0.1.25</title>
+            <pubDate>Tue, 23 Jun 2026 16:12:37 +0000</pubDate>
+            <sparkle:version>29</sparkle:version>
+            <sparkle:shortVersionString>0.1.25</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.25 — small readability polish
+
+A few quiet refinements to the project finder rows.
+
+### Improved
+- **See the full name and path on hover.** Long project names and paths that truncate in a result row now reveal their full text in a tooltip when you hover — no more guessing which deeply-nested project a clipped name belongs to.
+- **Steadier git counts.** The uncommitted-changes count next to a project no longer shifts width as the number changes, so rows stay visually calm while a repo's status updates.
+
+### Requirements
+- macOS 15 Sequoia or later · Apple Silicon.
+
+Feedback welcome at support@odak.fyi.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.25/Odak-0.1.25.dmg" length="9401849" type="application/x-apple-diskimage" sparkle:edSignature="FkyahrKQ2THHd5dyHoz1cdfjPx7NkLctY/aSz4pdB6fGlNoMAtUHqXiGzPkT1GI6IcDeoQluuRcwt/M0p/TJBg=="/>
+        </item>
+            <item>
+            <title>Version 0.1.26</title>
+            <pubDate>Thu, 25 Jun 2026 05:33:29 +0000</pubDate>
+            <sparkle:version>30</sparkle:version>
+            <sparkle:shortVersionString>0.1.26</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.26 — same-name projects, sorted out
+
+If you keep two projects with the same folder name in different places (say `~/work/api` and `~/personal/api`, or two clones of `abey`), Odak no longer mixes them up.
+
+### Fixed
+- **The right folder, every time.** When the same folder name was open in two places, Odak could point a result row — and the *Enter-to-jump* action — at the wrong checkout. It now resolves each open window to its true folder, and when two same-named folders genuinely can't be told apart (both open with no file focused), it opens the correct path instead of guessing wrong.
+- **Honest "open in editor" badges.** The open-editor indicator and idle-time badges are no longer shared between two same-named projects, so each row reflects its own window.
+
+### Improved
+- **Smarter path detection.** Editors that don't advertise their open folder (e.g. DataGrip) are now placed by the project they actually have open, so more of your open windows light up against the correct project.
+
+### Requirements
+- macOS 15 Sequoia or later · Apple Silicon.
+
+Feedback welcome at support@odak.fyi.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.26/Odak-0.1.26.dmg" length="9413016" type="application/x-apple-diskimage" sparkle:edSignature="Z9Y6KNwZ+LJYisr+VA1/eqAbiIN31ovKtbpYtrJIKxd5MhmnQJhLkGYxcPGPg4DQw+SHdy/isEt3356JKWTaBw=="/>
+        </item>
+            <item>
+            <title>Version 0.1.27</title>
+            <pubDate>Sat, 27 Jun 2026 08:28:48 +0000</pubDate>
+            <sparkle:version>31</sparkle:version>
+            <sparkle:shortVersionString>0.1.27</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+## Odak 0.1.27 — a clearer way into a project
+
+When you act on a project, Odak now shows you exactly which one you're acting on.
+
+### New
+- **Selected-project pill.** Drilling into a project's actions — with Tab or ⌘K — now pins it as a pill in the search bar, Spotlight-style, so the project you're acting on is always clear. Press Esc, click the pill's ✕, or hit Backspace to step back to your search exactly where you left it.
+
+### Improved
+- **Tab still switches editors.** Tab keeps cycling through the open editor windows on a row (Enter jumps to the one you pick) — that didn't change. What's gone is the focus ring sitting on the first icon before you'd touched anything; rows read calmer until you actually Tab.
+- **Tidier popovers.** The actions and worktree popovers now keep their inner scroll corners in lockstep with the card's rounded edge.
+
+### Requirements
+- macOS 15 Sequoia or later · Apple Silicon.
+
+Feedback welcome at support@odak.fyi.
+            ]]></description>
+            <enclosure url="https://github.com/salihcaan/odak-releases/releases/download/v0.1.27/Odak-0.1.27.dmg" length="9423546" type="application/x-apple-diskimage" sparkle:edSignature="KYJLkmqBMSfC1JFk/3k723vNkjBQV/jYlhKksPon5i1rnV5BiqMYZtHz+uNNzhRgD+0oZbM1hsmFwdA2M6wSCw=="/>
+        </item>
+    </channel>
+</rss>
